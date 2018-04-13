@@ -1,0 +1,37 @@
+{
+  "name": "hmmh/solr-file-indexer",
+  "description": "Solr file indexer for Typo3",
+  "type": "typo3-cms-extension",
+
+  "authors": [
+    {
+      "name": "Sascha Wilking",
+      "email": "sascha.wilking@hmmh.de",
+      "homepage": "http://hmmh.de/",
+      "role": "Developer"
+    }
+  ],
+
+  "require": {
+    "php": ">=7.0",
+    "typo3/cms": ">=8.7",
+    "typo3-ter/solr": ">=7.0"
+  },
+
+  "replace": {
+    "solr_file_indexer": "self.version"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "HMMH\\SolrFileIndexer\\": "Classes"
+    }
+  },
+
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https:\/\/composer.typo3.org\/"
+    }
+  ]
+}
