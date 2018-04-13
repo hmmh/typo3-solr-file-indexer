@@ -54,8 +54,10 @@ SOLR file indexing
 .. toctree::
 	:maxdepth: 3
 	:titlesonly:
+	:glob:
 
 	Introduction/Index
-	UsersManual/Index
-	AdministratorManual/Index
+	ForEditors/Index
+	ForAdminstrators/Index
+	ForDevelopers/Index
 	Links

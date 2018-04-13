@@ -19,3 +19,4 @@ Links
 
 :Git Repository:
 	https://github.com/hmmh/typo3-solr-file-indexer
+

@@ -8,8 +8,8 @@
 
 .. _users-manual:
 
-Users manual
-============
+For Developers
+==============
 
 Documentation of how to use the extension, how it works, how to apply it, if it's a website plugin.
 

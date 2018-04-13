@@ -9,16 +9,9 @@
 What does it do?
 ================
 
-First of all, if you have any idea how this template can be improved, please, drop a note to our team_. Documentation is written in reST format. Please, refer to Help writing reStructuredText to get some insight regarding syntax and existing reST editors on the market.
+Mit der Extension können einzelne Dokumente über Solr indexiert werden. Für das Parsen des Dokumentinhaltes wird Apache Tika
+verwendet, das über 1000 Dateiformate parsen kann. Die Einstellung für Tika kann in der entsprechenden Extension direkt vorgenommen
+werden. Für das Parsen reicht der Solr-Server, der die entsprechende Funktion mitbringt.
 
-.. _team: https://forge.typo3.org/projects/typo3v4-official_extension_template/issues
-
-Here should be given a brief overview of the extension. What does it do? What problem does it solve? Who is interested in this? Basically the document includes everything people need to know to decide, if they should go on with this extension.
-
-.. figure:: ../Images/IntroductionPackage.png
-	:width: 500px
-	:alt: Introduction Package
-
-	Introduction Package just after installation (caption of the image)
-
-	How the Frontend of the Introduction Package looks like just after installation (legend of the image)
+Jedes Dokument kann individuell in der Default-Sprache oder für jede Lokalisierung dem Suchindex hinzugefügt werden. Ebenso
+kann für jedes Dokument individuell gewählt werden, für welche Siteroots es indexiert werden soll.
