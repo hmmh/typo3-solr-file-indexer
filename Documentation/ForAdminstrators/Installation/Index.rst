@@ -28,7 +28,15 @@ Extension Manager Configuration
 	:width: 350px
 	:alt: Extension configuration
 
-	Dokument in Suchindex aufnehmen
+	Extension Manager Configuration
+
+
+================================ ===============================================================================================
+**Use Tika Extension**           Wenn die EXT:tika verwendet wird, kann darüber die Verbindung zum Tika-Server aufgebaut werden.
+**Solr connection from page id** Rootpage-ID mit einer Solr-Connection
+================================ ===============================================================================================
 
 Static Template
 ---------------
+
+Fügen Sie solr_file_indexer als statisches Template hinzu, um die Basiskonfiguration für die Index-Queue zu übernehmen.

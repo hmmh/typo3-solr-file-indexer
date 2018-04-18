@@ -11,7 +11,7 @@
  ***************************************************************/
 
 $EM_CONF[$_EXTKEY] = [
-    'title'            => 'SOLR file indexing',
+    'title'            => 'Solr file indexing',
     'description'      => '',
     'category'         => 'plugin',
     'author'           => 'Sascha Wilking',

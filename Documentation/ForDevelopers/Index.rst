@@ -11,39 +11,66 @@
 For Developers
 ==============
 
-Documentation of how to use the extension, how it works, how to apply it, if it's a website plugin.
+TypoScript Konfiguration
+------------------------
 
-Language should be non-technical, explaining, using small examples. Don't use to many acronyms unless they have been explained.
+::
 
-Examples: For the "News" plugin this would be a manual showing how to create the news items, explaining the options etc.
+  plugin.tx_solr {
+    index {
+      queue {
+        sys_file_metadata = 1
+        sys_file_metadata {
+          initialization = HMMH\SolrFileIndexer\IndexQueue\FileInitializer
+          indexer = HMMH\SolrFileIndexer\Indexer\FileIndexer
+          allowedFileTypes = 'pdf','doc','docx','xlsx'
 
-Provide screenshots of a neutral Backend such as the Backend of the Introduction Package for instance. Have in mind that the User manual could possibly be re-used in a larger documentation compilation, for example when a company generates a documentation for its client.
+          fields {
+            title = title
+            created = crdate
+            changed = tstamp
 
-Target group: **Users**
+            size_intS = SOLR_RELATION
+            size_intS {
+              localField = file
+              foreignLabelField = size
+            }
 
-.. figure:: ../Images/UserManual/BackendView.png
-	:width: 500px
-	:alt: Backend view
+            fileExtension = SOLR_RELATION
+            fileExtension {
+              localField = file
+              foreignLabelField = extension
+            }
 
-	Default Backend view (caption of the image)
+            title_stringS = SOLR_RELATION
+            title_stringS {
+              localField = file
+              foreignLabelField = name
+            }
 
-	The Backend view of TYPO3 after the user has clicked on module "Page". (legend of the image)
-
-
-Link to official documentation
-------------------------------
-
-Sphinx makes it easy to link to official TYPO3 documentation:
-
-- :ref:`TYPO3 Tutorial for Editors <t3editors:start>`
-- :ref:`Getting Started Tutorial <t3start:start>`
-
-and you may even link to a very specific chapter explaining how to :ref:`create a browser condition <t3tsref:condition-browser>` within the TypoScript Reference.
-
-For a complete reference of available cross-link prefixes, please consult file ``_make/conf.py``.
+            description = description
+            keywords = keywords
+            author = creator
+          }
+        }
+      }
+    }
+  }
 
 
-FAQ
-^^^
+Die Konfiguration kann beliebig erweitert werden. Folgende Parameter wurden gegenüber der EXT:solr hinzugefügt:
 
-Possible subsection: FAQ
+plugin.tx_solr.index.queue.sys_file_metadata.allowedFileTypes
+-------------------------------------------------------------
+
+Angabe, welche Dateitypen für die Indexierung verwendet werden können.
+
+:aspect:`Option path`
+      plugin.tx_solr.index.queue.sys_file_metadata.allowedFileTypes
+
+:aspect:`Data type`
+      string
+
+:aspect:`Default`
+      'pdf','doc','docx','xlsx'
+

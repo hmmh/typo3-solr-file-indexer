@@ -5,13 +5,13 @@
 ---
 conf.py:
   copyright: 2018
-  project: SOLR file indexing
+  project: Solr file indexing
   version: 1.0
   release: 1.0.0
   latex_documents:
   - - Index
     - solr_file_indexer.tex
-    - SOLR file indexing
+    - Solr file indexing
     - Sascha Wilking
     - manual
   latex_elements:
