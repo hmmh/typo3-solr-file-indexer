@@ -59,8 +59,6 @@ class FileInitializer extends AbstractInitializer
 
         if (!empty($indexRows)) {
             $initialized = $this->queue->addMultipleItemsToQueue($indexRows);
-
-            $this->logInitialization($this->getInsertQueryForLog($indexRows));
         }
 
         return $initialized;
@@ -119,21 +117,5 @@ class FileInitializer extends AbstractInitializer
             ->where(...$constraints)
             ->execute()
             ->fetchAll();
-    }
-
-    /**
-     * @param array $rows
-     *
-     * @return string
-     */
-    private function getInsertQueryForLog($rows)
-    {
-        $insertString = 'INSERT INTO (`root`, `item_type`, `item_uid`, `indexing_configuration`, `indexing_priority`, `changed`) VALUES ';
-        foreach ($rows as $row) {
-            $insertString .= '(' . $row['root'] . ',"' . $row['item_type'] . '",' . $row['item_uid'] . ',"';
-            $insertString .= $row['indexing_configuration'] . '",' . $row['indexing_priority'] . ',' . $row['changed'] . '),';
-        }
-
-        return substr($insertString, 0, -1) . ';';
     }
 }

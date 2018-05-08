@@ -27,7 +27,6 @@ namespace HMMH\SolrFileIndexer\Service\Tika;
  ***************************************************************/
 
 use ApacheSolrForTypo3\Solr\ConnectionManager;
-use ApacheSolrForTypo3\Solr\ExtractingQuery;
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
 use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
 use TYPO3\CMS\Core\Resource\FileInterface;
@@ -44,7 +43,7 @@ class SolrService
     /**
      * Solr connection
      *
-     * @var \ApacheSolrForTypo3\Solr\SolrService
+     * @var \ApacheSolrForTypo3\Solr\SolrService|\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection
      */
     protected $solr;
 
@@ -67,10 +66,18 @@ class SolrService
     public function extractText(FileInterface $file)
     {
         $localTempFilePath = $file->getForLocalProcessing(false);
-        $query = GeneralUtility::makeInstance(ExtractingQuery::class, $localTempFilePath);
+        if (class_exists(\ApacheSolrForTypo3\Solr\Domain\Search\Query\ExtractingQuery::class)) {
+            $query = GeneralUtility::makeInstance(\ApacheSolrForTypo3\Solr\Domain\Search\Query\ExtractingQuery::class, $localTempFilePath);
+        } else {
+            $query = GeneralUtility::makeInstance(\ApacheSolrForTypo3\Solr\ExtractingQuery::class, $localTempFilePath);
+        }
         $query->setExtractOnly();
 
-        $response = $this->solr->extractByQuery($query);
+        if ($this->solr instanceof \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection) {
+            $response = $this->solr->getWriteService()->extractByQuery($query);
+        } else {
+            $response = $this->solr->extractByQuery($query);
+        }
 
         if (PathUtility::basename($localTempFilePath) !== $file->getName()) {
             unlink($localTempFilePath);
