@@ -1,4 +1,4 @@
-# EXT solr_file
+# EXT solr_file_indexer
 
 Mit der Extension können einzelne Dokumente über Solr indexiert werden. Für das Parsen des Dokumentinhaltes wird Apache Tika
 verwendet, das ca. 1200 Dateiformate parsen kann. Die Einstellung für Tika kann in der entsprechenden Extension direkt vorgenommen 
@@ -28,8 +28,8 @@ plugin.tx_solr {
     queue {
       sys_file_metadata = 1
       sys_file_metadata {
-        initialization = HMMH\SolrFile\IndexQueue\FileInitializer
-        indexer = HMMH\SolrFile\Indexer\FileIndexer
+        initialization = HMMH\SolrFileIndexer\IndexQueue\FileInitializer
+        indexer = HMMH\SolrFileIndexer\Indexer\FileIndexer
         allowedFileTypes = 'pdf','doc','docx','xlsx'
 
         fields {
