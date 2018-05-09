@@ -1,13 +1,15 @@
 {
   "name": "hmmh/solr-file-indexer",
   "description": "Solr file indexer for Typo3",
+  "keywords": ["typo3", "solr", "file", "tika", "apache", "indexer"],
   "type": "typo3-cms-extension",
+  "license": "GPL-3.0-or-later",
 
   "authors": [
     {
       "name": "Sascha Wilking",
       "email": "sascha.wilking@hmmh.de",
-      "homepage": "http://hmmh.de/",
+      "homepage": "https://hmmh.de/",
       "role": "Developer"
     }
   ],
@@ -18,6 +20,10 @@
     "typo3-ter/solr": ">=7.0"
   },
 
+  "require-dev": {
+    "nimut/testing-framework": "^3.0"
+  },
+
   "replace": {
     "solr_file_indexer": "self.version"
   },
@@ -25,6 +31,12 @@
   "autoload": {
     "psr-4": {
       "HMMH\\SolrFileIndexer\\": "Classes"
+    }
+  },
+
+  "autoload-dev": {
+    "psr-4": {
+      "HMMH\\SolrFileIndexer\\Tests\\": "Tests"
     }
   },
 

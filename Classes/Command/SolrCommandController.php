@@ -64,8 +64,7 @@ class SolrCommandController extends CommandController
      */
     public function deleteByTypeCommand($siteRootPageId, $type = 'sys_file_metadata', $reindexing = true)
     {
-        $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
-        $this->site = $siteRepository->getSiteByPageId((int)$siteRootPageId);
+        $this->setSite($siteRootPageId);
 
         try {
             $this->deleteByType($type);
@@ -103,5 +102,14 @@ class SolrCommandController extends CommandController
     {
         $itemIndexQueue = GeneralUtility::makeInstance(Queue::class);
         $itemIndexQueue->initialize($this->site, $type);
+    }
+
+    /**
+     * @param $siteRootPageId
+     */
+    protected function setSite($siteRootPageId)
+    {
+        $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
+        $this->site = $siteRepository->getSiteByPageId((int)$siteRootPageId);
     }
 }
