@@ -27,11 +27,10 @@ namespace HMMH\SolrFileIndexer\Command;
 
 use Apache_Solr_HttpTransportException;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use HMMH\SolrFileIndexer\Base;
+use HMMH\SolrFileIndexer\IndexQueue\Queue;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 use ApacheSolrForTypo3\Solr\Site;
-use ApacheSolrForTypo3\Solr\SolrService;
-use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 
 /**
  * SOLR Command Controller
@@ -43,10 +42,10 @@ class SolrCommandController extends CommandController
 {
 
     /**
-     * @var \ApacheSolrForTypo3\Solr\ConnectionManager
+     * @var \HMMH\SolrFileIndexer\Service\Adapter\SolrConnection
      * @inject
      */
-    protected $connectionManager;
+    protected $solr;
 
     /**
      * The currently selected Site.
@@ -84,12 +83,10 @@ class SolrCommandController extends CommandController
      */
     protected function deleteByType($type)
     {
-        $solrServers = $this->connectionManager->getConnectionsBySite($this->site);
+        $solrServers = $this->solr->getConnectionsBySite($this->site);
         foreach ($solrServers as $solrServer) {
-            /* @var $solrServer SolrService */
-            // make sure maybe not-yet committed documents are committed
-            $solrServer->commit();
-            $solrServer->deleteByType(trim($type), true);
+            $this->solr->commit($solrServer);
+            $this->solr->deleteByType($solrServer, trim($type), true);
         }
     }
 
@@ -100,7 +97,7 @@ class SolrCommandController extends CommandController
      */
     protected function reindexByType($type)
     {
-        $itemIndexQueue = GeneralUtility::makeInstance(Queue::class);
+        $itemIndexQueue = Base::getObjectManager()->get(Queue::class);
         $itemIndexQueue->initialize($this->site, $type);
     }
 
@@ -109,7 +106,7 @@ class SolrCommandController extends CommandController
      */
     protected function setSite($siteRootPageId)
     {
-        $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
+        $siteRepository = Base::getObjectManager()->get(SiteRepository::class);
         $this->site = $siteRepository->getSiteByPageId((int)$siteRootPageId);
     }
 }

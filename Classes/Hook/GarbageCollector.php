@@ -27,10 +27,11 @@ namespace HMMH\SolrFileIndexer\Hook;
  ***************************************************************/
 
 use Apache_Solr_HttpTransportException;
-use ApacheSolrForTypo3\Solr\ConnectionManager;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\RecordMonitor\Helper\ConfigurationAwareRecordService;
 use ApacheSolrForTypo3\Solr\Util;
+use HMMH\SolrFileIndexer\Base;
 use HMMH\SolrFileIndexer\IndexQueue\Queue;
+use HMMH\SolrFileIndexer\Service\Adapter\SolrConnection;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
@@ -144,8 +145,7 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
      */
     protected function collectRecordGarbageForDisabledRootpages($table, $uid, $rootPages)
     {
-        /** @var $connectionManager ConnectionManager */
-        $connectionManager = GeneralUtility::makeInstance(ConnectionManager::class);
+        $solr = Base::getObjectManager()->get(SolrConnection::class);
 
         $indexQueueItems = $this->queue->getItems($table, $uid);
         foreach ($indexQueueItems as $indexQueueItem) {
@@ -155,12 +155,12 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
                 $enableCommitsSetting = $solrConfiguration->getEnableCommits();
 
                 // a site can have multiple connections (cores / languages)
-                $solrConnections = $connectionManager->getConnectionsBySite($site);
-                foreach ($solrConnections as $solr) {
+                $solrConnections = $solr->getConnectionsBySite($site);
+                foreach ($solrConnections as $connection) {
                     try {
-                        $solr->deleteByQuery('type:' . $table . ' AND uid:' . intval($uid));
+                        $solr->deleteByQuery($connection, 'type:' . $table . ' AND uid:' . intval($uid));
                         if ($enableCommitsSetting) {
-                            $solr->commit(false, false, false);
+                            $solr->commit($connection, false, false, false);
                         }
                     } catch (Apache_Solr_HttpTransportException $e) {
                         // do nothing
