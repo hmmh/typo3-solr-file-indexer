@@ -43,6 +43,15 @@ class FileInitializer extends AbstractInitializer
     protected $queue;
 
     /**
+     * FileInitializer constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->queue = GeneralUtility::makeInstance(Queue::class);
+    }
+
+    /**
      * Initializes Index Queue items for a certain site and indexing
      * configuration.
      *
@@ -52,8 +61,6 @@ class FileInitializer extends AbstractInitializer
     public function initialize()
     {
         $initialized = false;
-
-        $this->queue = GeneralUtility::makeInstance(Queue::class);
 
         $indexRows = $this->getMetadataForSiteroot();
 

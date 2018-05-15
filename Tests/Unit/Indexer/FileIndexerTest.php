@@ -155,4 +155,24 @@ class FileIndexerTest extends UnitTestCase
 
         $this->instance->_callRef('addDocumentUrl', $item, $document);
     }
+
+    /**
+     * @test
+     */
+    public function cleanupContentReturnTrimString()
+    {
+        $content = ' abcde ';
+        $result = $this->instance->_callRef('cleanupContent', $content);
+
+        $this->assertSame(trim($content), $result);
+    }
+
+    /**
+     * @test
+     */
+    public function getSignalSlotDispatcherReturnDispatcher()
+    {
+        $result = $this->instance->_callRef('getSignalSlotDispatcher');
+        $this->assertInstanceOf(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class, $result);
+    }
 }
