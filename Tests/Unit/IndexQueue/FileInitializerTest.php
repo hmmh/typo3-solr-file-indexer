@@ -1,5 +1,5 @@
 <?php
-namespace HMMH\SolrFileIndexer\Tests\Unit\IndexQueu;
+namespace HMMH\SolrFileIndexer\Tests\Unit\IndexQueue;
 
 /***************************************************************
  *
@@ -38,7 +38,7 @@ use Prophecy\Prophecy\ProphecySubjectInterface;
 /**
  * Class FileInitializerTest
  *
- * @package HMMH\SolrFileIndexer\Tests\Unit\IndexQueu
+ * @package HMMH\SolrFileIndexer\Tests\Unit\IndexQueue
  */
 class FileInitializerTest extends UnitTestCase
 {

@@ -169,7 +169,7 @@ class FileIndexer extends Indexer
     {
         if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'] as $classReference) {
-                $documentUrlObject = GeneralUtility::getUserObj($classReference);
+                $documentUrlObject = GeneralUtility::makeInstance($classReference);
 
                 if ($documentUrlObject instanceof DocumentUrlInterface) {
                     $documentUrlObject->addDocumentUrl($item, $document);
