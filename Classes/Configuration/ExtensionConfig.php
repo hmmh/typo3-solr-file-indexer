@@ -26,12 +26,14 @@ namespace HMMH\SolrFileIndexer\Configuration;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use TYPO3\CMS\Core\SingletonInterface;
+
 /**
  * Class ExtensionConfig
  *
  * @package HMMH\SolrFileIndexer\Configuration
  */
-class ExtensionConfig
+class ExtensionConfig implements SingletonInterface
 {
     /**
      * @var array

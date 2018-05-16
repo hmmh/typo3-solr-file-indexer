@@ -24,6 +24,10 @@
     "nimut/testing-framework": "^3.0"
   },
 
+  "suggest": {
+    "apache-solr-for-typo3/tika": ">=2.4"
+  },
+
   "replace": {
     "solr_file_indexer": "self.version"
   },

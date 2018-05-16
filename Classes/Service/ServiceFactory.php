@@ -27,9 +27,12 @@ namespace HMMH\SolrFileIndexer\Service;
  ***************************************************************/
 
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
+use HMMH\SolrFileIndexer\Base;
 use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
 use HMMH\SolrFileIndexer\Interfaces\ServiceInterface;
 use HMMH\SolrFileIndexer\Service\Tika\SolrService;
+use TYPO3\CMS\Core\Package\Exception\UnknownPackageException;
+use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -39,21 +42,81 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class ServiceFactory
 {
+    /**
+     * @var SolrService
+     */
+    protected static $solrService = null;
 
     /**
      * @return \ApacheSolrForTypo3\Tika\Service\Tika\ServiceInterface|ServiceInterface
      * @throws NoSolrConnectionFoundException
+     * @throws UnknownPackageException
      */
     public static function getTika()
     {
-        $extensionConfig = GeneralUtility::makeInstance(ExtensionConfig::class);
-        if ($extensionConfig->useTika()) {
-            $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tika']);
-            $service = \ApacheSolrForTypo3\Tika\Service\Tika\ServiceFactory::getTika($configuration['extractor']);
-        } else {
-            $service = GeneralUtility::makeInstance(SolrService::class, $extensionConfig);
+        if (self::$solrService === null) {
+            $serviceFactory = new self();
+            self::$solrService = $serviceFactory->getTikaService();
         }
 
-        return $service;
+        return self::$solrService;
+
+    }
+
+    /**
+     * @return \ApacheSolrForTypo3\Tika\Service\Tika\ServiceInterface|ServiceInterface
+     * @throws NoSolrConnectionFoundException
+     * @throws UnknownPackageException
+     */
+    protected function getTikaService()
+    {
+        $extensionConfig = $this->getExtensionConfig();
+
+        if ($extensionConfig->useTika()) {
+            if ($this->isTikaActive()) {
+                $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tika']);
+                return $this->getTikaExtensionService($configuration['extractor']);
+            }
+            throw new UnknownPackageException('Package tika does not exists or is inactive');
+        }
+
+        return $this->getSolrService($extensionConfig);
+    }
+
+    /**
+     * @return ExtensionConfig
+     */
+    protected function getExtensionConfig()
+    {
+        return Base::getObjectManager()->get(ExtensionConfig::class);
+    }
+
+    /**
+     * @param $extensionConfig
+     *
+     * @return SolrService
+     */
+    protected function getSolrService($extensionConfig)
+    {
+        return Base::getObjectManager()->get(SolrService::class, $extensionConfig);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isTikaActive()
+    {
+        $packageManager = Base::getObjectManager()->get(PackageManager::class);
+        return $packageManager->isPackageActive('tika');
+    }
+
+    /**
+     * @param string $tikaServiceType
+     *
+     * @return \ApacheSolrForTypo3\Tika\Service\Tika\ServiceInterface
+     */
+    protected function getTikaExtensionService($tikaServiceType)
+    {
+        return \ApacheSolrForTypo3\Tika\Service\Tika\ServiceFactory::getTika($tikaServiceType);
     }
 }

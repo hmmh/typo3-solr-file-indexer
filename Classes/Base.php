@@ -46,6 +46,11 @@ class Base
     protected static $objectManager;
 
     /**
+     * @var string
+     */
+    protected static $solrVersion = '';
+
+    /**
      * get singleton object manager
      *
      * @return ObjectManagerInterface
@@ -64,10 +69,14 @@ class Base
      */
     public static function getSolrExtensionVersion()
     {
+        if (!empty(self::$solrVersion)) {
+            return self::$solrVersion;
+        }
+
         $packageManager = Base::getObjectManager()->get(PackageManager::class);
         try {
             $package = $packageManager->getPackage('solr');
-            return $package->getPackageMetaData()->getVersion();
+            self::$solrVersion = $package->getPackageMetaData()->getVersion();
         } catch (UnknownPackageException $e) {
             if (class_exists(EmConfUtility::class)) {
                 $emConfUtility = GeneralUtility::makeInstance(EmConfUtility::class);
@@ -76,10 +85,10 @@ class Base
                     'siteRelPath' => 'typo3conf/ext/solr/'
                 ];
                 $emConf = $emConfUtility->includeEmConf($config);
-                return $emConf['version'];
+                self::$solrVersion = $emConf['version'];
             }
-
-            return '';
         }
+
+        return self::$solrVersion;
     }
 }

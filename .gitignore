@@ -12,6 +12,7 @@ typo3conf
 typo3temp
 uploads
 vendor
+public
 composer.lock
 .Build
 Documentation/_make

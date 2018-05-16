@@ -29,6 +29,7 @@ namespace HMMH\SolrFileIndexer\Service\Tika;
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
 use HMMH\SolrFileIndexer\Base;
 use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
+use HMMH\SolrFileIndexer\Interfaces\ServiceInterface;
 use HMMH\SolrFileIndexer\Service\Adapter\SolrConnection;
 use HMMH\SolrFileIndexer\Service\Adapter\SolrExtractingQuery;
 use TYPO3\CMS\Core\Resource\FileInterface;
@@ -40,7 +41,7 @@ use TYPO3\CMS\Core\Utility\PathUtility;
  *
  * @package HMMH\SolrFileIndexer\Service\Tika
  */
-class SolrService
+class SolrService implements ServiceInterface
 {
     /**
      * Solr adapter
