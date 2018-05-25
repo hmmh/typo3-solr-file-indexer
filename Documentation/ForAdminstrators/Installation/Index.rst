@@ -14,7 +14,7 @@ Installation
 Import
 ------
 
-Import Extension from the TYPO3 Extension Repository to your server or use composer for that.
+Import Extension from the TYPO3 Extension Repository to your server or use composer.
 
 Install
 -------
@@ -32,11 +32,11 @@ Extension Manager Configuration
 
 
 ================================ ===============================================================================================
-**Use Tika Extension**           Wenn die EXT:tika verwendet wird, kann darüber die Verbindung zum Tika-Server aufgebaut werden.
-**Solr connection from page id** Rootpage-ID mit einer Solr-Connection
+**Use Tika Extension**           A connection to the Tika server can be use when EXT:tika is enabled
+**Solr connection from page id** Root page ID with a Solr connection
 ================================ ===============================================================================================
 
 Static Template
 ---------------
 
-Fügen Sie solr_file_indexer als statisches Template hinzu, um die Basiskonfiguration für die Index-Queue zu übernehmen.
+To set the base configuration for the index queue, add solr_file_indexer as a static template.

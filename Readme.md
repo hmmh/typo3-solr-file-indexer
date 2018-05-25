@@ -1,26 +1,27 @@
 # EXT solr_file_indexer
 
-Mit der Extension können einzelne Dokumente über Solr indexiert werden. Für das Parsen des Dokumentinhaltes wird Apache Tika
-verwendet, das ca. 1200 Dateiformate parsen kann. Die Einstellung für Tika kann in der entsprechenden Extension direkt vorgenommen 
-werden. Für das Parsing reicht der Solr-Server, der die entsprechende Funktion mitbringt.
+This extension gives you the capability to index individual documents using Solr.
 
-Jedes Dokument kann individuell in der Default-Sprache oder für jede Lokalisierung dem Suchindex hinzugefügt werden. Ebenso
-kann für jedes Dokument individuell gewählt werden, für welche Siteroots es indexiert werden soll.
+Apache Tika, which is capable of detecting and extracting metadata from approx. 1200 different file types is used for document content analysis. The configuration for Tika can be implemented directly within the extension, Solr server functionality is then used for parsing.
+
+Individual documents can be added to the search index for the default language or any localisation, likewise site roots can be selected for which the document is to indexed.
+
 
 ## Installation
 
-Die Extension hat folgende Abhängigkeiten
+The extension has the following requirements:
+
 * TYPO3 CMS >= 8.7
 * PHP >= 7.0
 * EXT: TYPO3 Solr ab 7.0.0
 
-Die Extension kann per Composer installiert werden.
+The extension can be installed using composer.
 
-Anschließend muss die Extension im Extensionmanager aktiviert werden.
+After installation activate the extension within the extension manager.
 
-## Konfiguration
+## Configuration
 
-Beispiel:
+Example:
 
 ````
 plugin.tx_solr {
@@ -65,22 +66,21 @@ plugin.tx_solr {
 }
 ````
 
-Um die Indexkonfiguration zu aktivieren muss "plugin.tx_solr.index.queue.sys_file_metadata" auf "1" gesetzt werden.
-Unter den "allowedFileTypes" kann eine Liste der Dokumente angegeben werden, die Indexiert werden dürfen. Unter "fields"
-sind die einzelnen Mappings der Felder aus "sys_file_metadata" bzw. "sys_file" auf die enstprechenden Solr-Felder
-definiert.
+To activate the indexing configuration set "plugin.tx_solr.index.queue.sys_file_metadata" to "1".
 
-## Dokument zum Suchindex hinzufügen
+Configure "allowedFileTypes" with a comma seperated list of permitted file types.
 
-Die Metadaten des Dokuments bearbeiten und durch unter "Erweitert" die gewünschten Siteroots auswählen und speichern. Das
-Dokument wird anschließend automatisch in die Index-Queue von Solr hinzugefügt und beim nächsten Durchlauf des Index Queue Workers
-dem Suchindex hinzugefügt.
+The "fields" parameter provides a mapping from the "sys_file_metadata" fields to the respective Solr "sys_file" fields.
 
-Wenn ein Siteroot entfernt wird, wird das Dokument automatisch aus der Queue und auch aus dem Suchindex des Solr-Servers entfernt.
+## Adding a document to the search index
 
-## Scheduler-Tasks
+Edit the metadata for a document then select the desired site roots within the "Extended" tab and save.
 
-Es gibt einen Extbase-Scheduler-Task der es ermöglicht, alle Dokumente eines Types vom Suchindex zu entfernen, z.B. 
-"sys_file_metadata" oder auch "pages". Alle Dokumente diesen Typs werden dann vom Suchindex des Solr-Servers entfernt 
-(für alle Sprachen, aber nur für das angegebene Siteroot)
+The document will then be added to the Solr index queue, the index queue workers will add the document/metadata to the search index during the next cycle.
+
+Whenever a site root is deleted the document/metadata is automatically removed from the corresponding Solr index queue and search index.
+
+## Scheduler Tasks
+
+There is an Extbase scheduler task that can delete files types (i.e. "sys_file_metadata" and or "pages") from the search index. File types are deleted from the Solr server search index for all languages but only for a specified site root.
 

@@ -11,7 +11,7 @@
 For Developers
 ==============
 
-TypoScript Konfiguration
+TypoScript Configuration
 ------------------------
 
 ::
@@ -57,13 +57,12 @@ TypoScript Konfiguration
     }
   }
 
-
-Die Konfiguration kann beliebig erweitert werden. Folgende Parameter wurden gegenüber der EXT:solr hinzugefügt:
+The configuration can be updated as required. The following parameters will be added to EXT:solr:
 
 plugin.tx_solr.index.queue.sys_file_metadata.allowedFileTypes
 -------------------------------------------------------------
 
-Angabe, welche Dateitypen für die Indexierung verwendet werden können.
+Specifies the allowed file types to be indexed.
 
 :aspect:`Option path`
       plugin.tx_solr.index.queue.sys_file_metadata.allowedFileTypes
