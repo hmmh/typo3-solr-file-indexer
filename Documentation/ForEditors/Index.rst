@@ -11,15 +11,15 @@
 For Editors
 ===========
 
-Dokumente können in den File Metadaten zum Suchindex hinzugefügt werden.
+Adding file metadata to the search index
 
 .. figure:: ../Images/Metadata.png
 	:width: 500px
 	:alt: File Metadata
 
-	Dokument in Suchindex aufnehmen
+Adding a document to the search index
 
-Individuell pro Seitenbaum kann ein Dokument zum Suchindex hinzugefügt werden. Sobald der Datensatz gespeichert wird, wird ein Eintrag in der Solr
-Index Queue erstellt bzw. upgedated. Wenn eine Zuweisung entfernt wird, oder das Dokument in der Filelist gelöscht wird, wird es automatisch aus dem
-Solr Index entfernt.
+Documents within a site root can be individually added to the search index, an entry is added or updated in the Solr index queue upon saving.
+
+When a selection is removed or a document is deleted from the file list, it is automatically removed from the Solr index.
 
