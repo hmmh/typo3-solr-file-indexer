@@ -12,16 +12,16 @@
 
 $EM_CONF[$_EXTKEY] = [
     'title'            => 'Solr file indexing',
-    'description'      => '',
+    'description'      => 'This extension gives you the capability to index individual documents using Solr.',
     'category'         => 'plugin',
-    'author'           => 'Sascha Wilking',
-    'author_email'     => 'sascha.wilking@hmmh.de',
+    'author'           => 'hmmh multimediahaus AG',
+    'author_email'     => 'typo3@hmmh.de',
     'state'            => 'stable',
     'internal'         => '',
     'uploadfolder'     => '0',
     'createDirs'       => '',
     'clearCacheOnLoad' => 0,
-    'version'          => '1.2.1',
+    'version'          => '1.2.2',
     'constraints'      => [
         'depends'   => [
             'typo3' => '8.7.1-8.7.99',
