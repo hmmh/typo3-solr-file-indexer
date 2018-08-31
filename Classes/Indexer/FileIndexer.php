@@ -87,6 +87,7 @@ class FileIndexer extends Indexer
      * @param int  $language
      *
      * @return Apache_Solr_Document
+     * @throws \TYPO3\CMS\Core\Package\Exception\UnknownPackageException
      */
     protected function itemToDocument(Item $item, $language = 0)
     {
@@ -99,6 +100,9 @@ class FileIndexer extends Indexer
             $content .= $baseContent['value'];
         }
         $content .= $this->txtFromFile($this->fetchFile($item));
+
+        $content = $this->emitPostAddContentAfterSignal($document, $content);
+
         $document->setField('content', $content);
         $url = $document->getField('url');
         if ($url === false) {
@@ -112,6 +116,7 @@ class FileIndexer extends Indexer
      * @param File $file
      *
      * @return string
+     * @throws \TYPO3\CMS\Core\Package\Exception\UnknownPackageException
      */
     protected function txtFromFile(File $file)
     {
@@ -210,6 +215,26 @@ class FileIndexer extends Indexer
         try {
             $result = $this->getSignalSlotDispatcher()->dispatch(self::class, 'cleanupContent', [$content]);
             $returnValue = $result[0];
+        } catch (InvalidSlotException $ise) {
+            $returnValue = $content;
+        } catch (InvalidSlotReturnException $isre) {
+            $returnValue = $content;
+        }
+
+        return $returnValue;
+    }
+
+    /**
+     * @param Apache_Solr_Document $document
+     * @param string $content
+     *
+     * @return string
+     */
+    protected function emitPostAddContentAfterSignal(Apache_Solr_Document $document, $content)
+    {
+        try {
+            $result = $this->getSignalSlotDispatcher()->dispatch(self::class, 'addContentAfter', [$document, $content]);
+            $returnValue = $result[1];
         } catch (InvalidSlotException $ise) {
             $returnValue = $content;
         } catch (InvalidSlotReturnException $isre) {
