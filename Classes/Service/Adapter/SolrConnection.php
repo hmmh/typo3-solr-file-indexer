@@ -60,6 +60,7 @@ class SolrConnection implements SingletonInterface
      * @param int $pageId
      *
      * @return \ApacheSolrForTypo3\Solr\SolrService|\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection
+     * @throws \ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException
      */
     public function getConnectionByPageId(int $pageId)
     {
@@ -89,6 +90,8 @@ class SolrConnection implements SingletonInterface
 
     /**
      * @param \ApacheSolrForTypo3\Solr\SolrService|\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $solrConnection
+     *
+     * @throws \Apache_Solr_HttpTransportException
      */
     public function commit($solrConnection, $expungeDeletes = false, $waitFlush = true, $waitSearcher = true)
     {
@@ -108,6 +111,8 @@ class SolrConnection implements SingletonInterface
     /**
      * @param \ApacheSolrForTypo3\Solr\SolrService|\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $solrConnection
      * @param string $rawQuery
+     *
+     * @throws \Apache_Solr_HttpTransportException
      */
     public function deleteByQuery($solrConnection, $rawQuery)
     {
