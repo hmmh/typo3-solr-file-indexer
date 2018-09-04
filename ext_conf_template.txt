@@ -3,3 +3,6 @@ useTika = 0
 
 # cat=general//20; type=string; label=Solr connection from page id
 solrSite = 1
+
+# cat=general//30; type=boolean; label=Ignore localization (default file metadata will be added to all language cores if no translation exists)
+ignoreLocalization = 0

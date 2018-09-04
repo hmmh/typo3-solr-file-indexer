@@ -63,4 +63,12 @@ class ExtensionConfig implements SingletonInterface
     {
         return (int)$this->extConfig['solrSite'];
     }
+
+    /**
+     * @return bool
+     */
+    public function ignoreLocalization(): bool
+    {
+        return (bool)$this->extConfig['ignoreLocalization'];
+    }
 }

@@ -34,6 +34,7 @@ Extension Manager Configuration
 ================================ ===============================================================================================
 **Use Tika Extension**           A connection to the Tika server can be use when EXT:tika is enabled
 **Solr connection from page id** Root page ID with a Solr connection
+**Ignore localization**          Default file metadata will be added to all language cores if no translation exists
 ================================ ===============================================================================================
 
 Static Template
