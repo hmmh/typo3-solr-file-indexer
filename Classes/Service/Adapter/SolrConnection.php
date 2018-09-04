@@ -110,7 +110,7 @@ class SolrConnection implements SingletonInterface
 
     /**
      * @param \ApacheSolrForTypo3\Solr\SolrService|\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $solrConnection
-     * @param string                                                                                   $rawQuery
+     * @param string $rawQuery
      *
      * @throws \Apache_Solr_HttpTransportException
      */
