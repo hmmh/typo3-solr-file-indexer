@@ -26,7 +26,6 @@ namespace HMMH\SolrFileIndexer\Hook;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use Apache_Solr_HttpTransportException;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\RecordMonitor\Helper\ConfigurationAwareRecordService;
 use ApacheSolrForTypo3\Solr\Util;
 use HMMH\SolrFileIndexer\Base;
@@ -79,7 +78,7 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
             $rootPages = empty($record['enable_indexing']) ? null : GeneralUtility::trimExplode(',', $record['enable_indexing']);
 
             if (empty($rootPages)) {
-                $this->collectRecordGarbage($table, $uid);
+                $this->collectGarbage($table, $uid);
             } else {
                 $this->collectRecordGarbageForDisabledRootpages($table, $uid, $rootPages);
                 $this->updateItem($table, $uid, $record, $rootPages);
@@ -105,7 +104,7 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
 
             $file = $this->getSysFile($record['file'], $indexingConfiguration);
             if (!$file) {
-                $this->collectRecordGarbage($table, $uid);
+                $this->collectGarbage($table, $uid);
                 continue;
             }
 
@@ -157,13 +156,9 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
                 // a site can have multiple connections (cores / languages)
                 $solrConnections = $solr->getConnectionsBySite($site);
                 foreach ($solrConnections as $connection) {
-                    try {
-                        $solr->deleteByQuery($connection, 'type:' . $table . ' AND uid:' . intval($uid));
-                        if ($enableCommitsSetting) {
-                            $solr->commit($connection, false, false, false);
-                        }
-                    } catch (Apache_Solr_HttpTransportException $e) {
-                        // do nothing
+                    $solr->deleteByQuery($connection, 'type:' . $table . ' AND uid:' . intval($uid));
+                    if ($enableCommitsSetting) {
+                        $solr->commit($connection, false, false);
                     }
                 }
             }
@@ -188,7 +183,7 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
             ->fetch();
 
         if (isset($metadata['uid'])) {
-            $this->collectRecordGarbage(self::FILE_TABLE, $metadata['uid']);
+            $this->collectGarbage(self::FILE_TABLE, $metadata['uid']);
         }
     }
 }

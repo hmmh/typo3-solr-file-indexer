@@ -25,7 +25,7 @@ namespace HMMH\SolrFileIndexer\Interfaces;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use Apache_Solr_Document;
+use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
 use ApacheSolrForTypo3\Solr\IndexQueue\Item;
 
 /**
@@ -38,7 +38,7 @@ interface DocumentUrlInterface
 
     /**
      * @param Item $item
-     * @param Apache_Solr_Document $document
+     * @param Document $document
      */
-    public function addDocumentUrl(Item $item, Apache_Solr_Document $document);
+    public function addDocumentUrl(Item $item, Document $document);
 }

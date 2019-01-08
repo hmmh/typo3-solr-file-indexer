@@ -53,7 +53,7 @@ class SolrService implements ServiceInterface
     /**
      * Solr connection
      *
-     * @var \ApacheSolrForTypo3\Solr\SolrService|\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection
+     * @var \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection
      */
     protected $solrConnection;
 
@@ -77,8 +77,8 @@ class SolrService implements ServiceInterface
     {
         $localTempFilePath = $file->getForLocalProcessing(false);
 
-        $query = Base::getObjectManager()->get(SolrExtractingQuery::class)->getExtractingQuery($localTempFilePath);
-        $query->setExtractOnly();
+        $query = GeneralUtility::makeInstance(\ApacheSolrForTypo3\Solr\Domain\Search\Query\ExtractingQuery::class, $localTempFilePath);
+        $query->setExtractOnly(true);
 
         $response = $this->solr->extractByQuery($this->solrConnection, $query);
 
