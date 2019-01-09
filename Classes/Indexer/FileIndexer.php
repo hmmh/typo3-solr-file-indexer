@@ -25,7 +25,7 @@ namespace HMMH\SolrFileIndexer\Indexer;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use Apache_Solr_Document;
+use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
 use ApacheSolrForTypo3\Solr\IndexQueue\Indexer;
 use ApacheSolrForTypo3\Solr\IndexQueue\Item;
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
@@ -97,7 +97,7 @@ class FileIndexer extends Indexer
      * @param Item $item
      * @param int  $language
      *
-     * @return Apache_Solr_Document
+     * @return Document
      * @throws \TYPO3\CMS\Core\Package\Exception\UnknownPackageException
      */
     protected function itemToDocument(Item $item, $language = 0)
@@ -105,7 +105,7 @@ class FileIndexer extends Indexer
         $content = '';
 
         $document = parent::itemToDocument($item, $language);
-        if (!($document instanceof Apache_Solr_Document) && $this->extensionConfiguration->ignoreLocalization()) {
+        if (!($document instanceof Document) && $this->extensionConfiguration->ignoreLocalization()) {
             $document = parent::itemToDocument($item, 0);
         }
         $baseContent = $document->getField('content');
@@ -183,9 +183,9 @@ class FileIndexer extends Indexer
 
     /**
      * @param Item $item
-     * @param Apache_Solr_Document $document
+     * @param Document $document
      */
-    protected function addDocumentUrl(Item $item, Apache_Solr_Document $document)
+    protected function addDocumentUrl(Item $item, Document $document)
     {
         if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'] as $classReference) {
@@ -240,12 +240,12 @@ class FileIndexer extends Indexer
     }
 
     /**
-     * @param Apache_Solr_Document $document
+     * @param Document $document
      * @param string $content
      *
      * @return string
      */
-    protected function emitPostAddContentAfterSignal(Apache_Solr_Document $document, $content)
+    protected function emitPostAddContentAfterSignal(Document $document, $content)
     {
         try {
             $result = $this->getSignalSlotDispatcher()->dispatch(self::class, 'addContentAfter', [$document, $content]);
@@ -325,12 +325,8 @@ class FileIndexer extends Indexer
      */
     protected function removeOriginalFromIndex($uid)
     {
-        try {
-            $connectionAdapter = GeneralUtility::makeInstance(SolrConnection::class);
-            $connectionAdapter->deleteByQuery($this->solr, 'type:' . self::FILE_TABLE . ' AND uid:' . (int)$uid);
-        } catch (\Apache_Solr_HttpTransportException $e) {
-            // do nothing
-        }
+        $connectionAdapter = GeneralUtility::makeInstance(SolrConnection::class);
+        $connectionAdapter->deleteByQuery($this->solr, 'type:' . self::FILE_TABLE . ' AND uid:' . (int)$uid);
     }
 
     /**

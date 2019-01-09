@@ -25,10 +25,9 @@ namespace HMMH\SolrFileIndexer\Command;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use Apache_Solr_HttpTransportException;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use HMMH\SolrFileIndexer\Base;
-use HMMH\SolrFileIndexer\IndexQueue\Queue;
+use ApacheSolrForTypo3\Solr\Domain\Index\Queue\QueueInitializationService;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 use ApacheSolrForTypo3\Solr\Site;
 
@@ -79,7 +78,6 @@ class SolrCommandController extends CommandController
      * @param string $type
      *
      * @return void
-     * @throws Apache_Solr_HttpTransportException
      */
     protected function deleteByType($type)
     {
@@ -97,8 +95,8 @@ class SolrCommandController extends CommandController
      */
     protected function reindexByType($type)
     {
-        $itemIndexQueue = Base::getObjectManager()->get(Queue::class);
-        $itemIndexQueue->initialize($this->site, $type);
+        $itemIndexQueue = Base::getObjectManager()->get(QueueInitializationService::class);
+        $itemIndexQueue->initializeBySiteAndIndexConfiguration ($this->site, $type);
     }
 
     /**

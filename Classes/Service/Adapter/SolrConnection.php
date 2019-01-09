@@ -59,7 +59,7 @@ class SolrConnection implements SingletonInterface
     /**
      * @param int $pageId
      *
-     * @return \ApacheSolrForTypo3\Solr\SolrService|\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection
+     * @return \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection
      * @throws \ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException
      */
     public function getConnectionByPageId(int $pageId)
@@ -70,7 +70,7 @@ class SolrConnection implements SingletonInterface
     /**
      * @param Site $site
      *
-     * @return \ApacheSolrForTypo3\Solr\SolrService[]|\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection[]
+     * @return \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection[]
      */
     public function getConnectionsBySite(Site $site)
     {
@@ -78,8 +78,8 @@ class SolrConnection implements SingletonInterface
     }
 
     /**
-     * @param \ApacheSolrForTypo3\Solr\SolrService|\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $solrConnection
-     * @param \ApacheSolrForTypo3\Solr\Domain\Search\Query\ExtractingQuery|\ApacheSolrForTypo3\Solr\ExtractingQuery $query
+     * @param \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $solrConnection
+     * @param \Solarium\QueryType\Extract\Query $query
      *
      * @return array
      */
@@ -89,17 +89,17 @@ class SolrConnection implements SingletonInterface
     }
 
     /**
-     * @param \ApacheSolrForTypo3\Solr\SolrService|\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $solrConnection
-     *
-     * @throws \Apache_Solr_HttpTransportException
+     * @param \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $solrConnection
+     * @param bool $expungeDeletes
+     * @param bool $waitSearcher
      */
-    public function commit($solrConnection, $expungeDeletes = false, $waitFlush = true, $waitSearcher = true)
+    public function commit($solrConnection, $expungeDeletes = false, $waitSearcher = true)
     {
-        $this->getSolrWriteService($solrConnection)->commit($expungeDeletes, $waitFlush, $waitSearcher);
+        $this->getSolrWriteService($solrConnection)->commit($expungeDeletes, $waitSearcher);
     }
 
     /**
-     * @param \ApacheSolrForTypo3\Solr\SolrService|\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $solrConnection
+     * @param \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $solrConnection
      * @param string $type
      * @param bool $commit
      */
@@ -109,10 +109,8 @@ class SolrConnection implements SingletonInterface
     }
 
     /**
-     * @param \ApacheSolrForTypo3\Solr\SolrService|\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $solrConnection
+     * @param \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $solrConnection
      * @param string $rawQuery
-     *
-     * @throws \Apache_Solr_HttpTransportException
      */
     public function deleteByQuery($solrConnection, $rawQuery)
     {
@@ -120,16 +118,12 @@ class SolrConnection implements SingletonInterface
     }
 
     /**
-     * @param \ApacheSolrForTypo3\Solr\SolrService|\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $solrConnection
+     * @param \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $solrConnection
      *
-     * @return \ApacheSolrForTypo3\Solr\SolrService|\ApacheSolrForTypo3\Solr\System\Solr\Service\SolrWriteService
+     * @return \ApacheSolrForTypo3\Solr\System\Solr\Service\SolrWriteService
      */
     protected function getSolrWriteService($solrConnection)
     {
-        if (version_compare(Base::getSolrExtensionVersion(), '8.0.0', '<')) {
-            return $solrConnection;
-        }
-
         return $solrConnection->getWriteService();
     }
 }

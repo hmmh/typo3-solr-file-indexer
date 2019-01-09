@@ -56,7 +56,6 @@ class FileInitializer extends AbstractInitializer
      * configuration.
      *
      * @return mixed TRUE if initialization was successful, FALSE on error.
-     * @see Tx_Solr_IndexQueueInitializer::initialize()
      */
     public function initialize()
     {
