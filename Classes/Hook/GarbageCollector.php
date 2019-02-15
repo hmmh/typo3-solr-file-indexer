@@ -30,7 +30,7 @@ use ApacheSolrForTypo3\Solr\Domain\Index\Queue\RecordMonitor\Helper\Configuratio
 use ApacheSolrForTypo3\Solr\Util;
 use HMMH\SolrFileIndexer\Base;
 use HMMH\SolrFileIndexer\IndexQueue\Queue;
-use HMMH\SolrFileIndexer\Service\Adapter\SolrConnection;
+use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
@@ -144,7 +144,7 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
      */
     protected function collectRecordGarbageForDisabledRootpages($table, $uid, $rootPages)
     {
-        $solr = Base::getObjectManager()->get(SolrConnection::class);
+        $connectionAdapter = Base::getObjectManager()->get(ConnectionAdapter::class);
 
         $indexQueueItems = $this->queue->getItems($table, $uid);
         foreach ($indexQueueItems as $indexQueueItem) {
@@ -154,11 +154,11 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
                 $enableCommitsSetting = $solrConfiguration->getEnableCommits();
 
                 // a site can have multiple connections (cores / languages)
-                $solrConnections = $solr->getConnectionsBySite($site);
+                $solrConnections = $connectionAdapter->getConnectionsBySite($site);
                 foreach ($solrConnections as $connection) {
-                    $solr->deleteByQuery($connection, 'type:' . $table . ' AND uid:' . intval($uid));
+                    $connectionAdapter->deleteByQuery($connection, 'type:' . $table . ' AND uid:' . intval($uid));
                     if ($enableCommitsSetting) {
-                        $solr->commit($connection, false, false);
+                        $connectionAdapter->commit($connection, false, false);
                     }
                 }
             }
