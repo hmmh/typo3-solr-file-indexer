@@ -1,10 +1,10 @@
 <?php
-namespace HMMH\SolrFileIndexer\Command;
+namespace HMMH\SolrFileIndexer\Task;
 
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2017 Sascha Wilking <sascha.wilking@hmmh.de> hmmh
+ *  (c) 2019 Sascha Wilking <sascha.wilking@hmmh.de> hmmh
  *
  *  All rights reserved
  *
@@ -25,20 +25,33 @@ namespace HMMH\SolrFileIndexer\Command;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use ApacheSolrForTypo3\Solr\Domain\Index\Queue\QueueInitializationService;
+use ApacheSolrForTypo3\Solr\Domain\Site\Site;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use HMMH\SolrFileIndexer\Base;
-use ApacheSolrForTypo3\Solr\Domain\Index\Queue\QueueInitializationService;
-use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
-use ApacheSolrForTypo3\Solr\Site;
+use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 
 /**
- * SOLR Command Controller
+ * Class DeleteByType
  *
- * @package HMMH\SolrFileIndexer\Command
- *
+ * @package HMMH\SolrFileIndexer\Task
  */
-class SolrCommandController extends CommandController
+class DeleteByTypeTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
 {
+    /**
+     * @var int
+     */
+    public $siteRootPageId = 0;
+
+    /**
+     * @var string
+     */
+    public $type = 'sys_file_metadata';
+
+    /**
+     * @var bool
+     */
+    public $reindexing = true;
 
     /**
      * @var \HMMH\SolrFileIndexer\Service\ConnectionAdapter
@@ -53,32 +66,40 @@ class SolrCommandController extends CommandController
     protected $site;
 
     /**
-     * @param \HMMH\SolrFileIndexer\Service\ConnectionAdapter $connectionAdapter
-     */
-    public function injectConnectionAdapter(\HMMH\SolrFileIndexer\Service\ConnectionAdapter $connectionAdapter)
-    {
-        $this->connectionAdapter = $connectionAdapter;
-    }
-
-    /**
-     * @param int    $siteRootPageId Site Root Page ID
-     * @param string $type           Type (sys_file_metadata)
-     * @param bool   $reindexing     Reindexing (0,1)
+     * This is the main method that is called when a task is executed
+     * It MUST be implemented by all classes inheriting from this one
+     * Note that there is no error handling, errors and failures are expected
+     * to be handled and logged by the client implementations.
+     * Should return TRUE on successful execution, FALSE on error.
      *
-     * @return void
+     * @return bool Returns TRUE on successful execution, FALSE on error
      */
-    public function deleteByTypeCommand($siteRootPageId, $type = 'sys_file_metadata', $reindexing = true)
+    public function execute()
     {
-        $this->setSite($siteRootPageId);
+        $this->connectionAdapter = Base::getObjectManager()->get(ConnectionAdapter::class);
+
+        $this->setSite($this->siteRootPageId);
 
         try {
-            $this->deleteByType($type);
-            if ((bool)$reindexing === true) {
-                $this->reindexByType($type);
+            $this->deleteByType($this->type);
+            if ((bool)$this->reindexing === true) {
+                $this->reindexByType($this->type);
             }
         } catch (\Exception $e) {
             // do nothing
         }
+
+        return true;
+    }
+
+    /**
+     * This method returns the destination mail address as additional information
+     *
+     * @return string Information to display
+     */
+    public function getAdditionalInformation()
+    {
+        return 'Site Root Page ID: ' . $this->siteRootPageId . ', Reindexing: ' . ($this->reindexing ? 'Yes' : 'No');
     }
 
     /**

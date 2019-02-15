@@ -53,7 +53,10 @@ class FileIndexerTest extends UnitTestCase
 
         $this->instance = $this->getAccessibleMock(
             FileIndexer::class,
-            ['setLogging', 'getSolrConnectionsByItem', 'getIndexableFile', 'indexItem', 'fetchFile']
+            ['setLogging', 'getSolrConnectionsByItem', 'getIndexableFile', 'indexItem', 'fetchFile'],
+            [],
+            '',
+            false
         );
     }
 
@@ -120,7 +123,7 @@ class FileIndexerTest extends UnitTestCase
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'][] = $addDocumentUrl;
 
         $item = new Item([]);
-        $document = new Apache_Solr_Document();
+        $document = new \ApacheSolrForTypo3\Solr\System\Solr\Document\Document();
 
         $this->instance->expects($this->never())->method('fetchFile');
 
@@ -136,7 +139,7 @@ class FileIndexerTest extends UnitTestCase
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'][] = FileIndexerTest::class;
 
         $item = new Item([]);
-        $document = new Apache_Solr_Document();
+        $document = new \ApacheSolrForTypo3\Solr\System\Solr\Document\Document();
 
         $this->instance->_callRef('addDocumentUrl', $item, $document);
 
@@ -149,7 +152,7 @@ class FileIndexerTest extends UnitTestCase
     public function addDocumentUrlWithoutHookCallFetchFile()
     {
         $item = new Item([]);
-        $document = new Apache_Solr_Document();
+        $document = new \ApacheSolrForTypo3\Solr\System\Solr\Document\Document();
 
         $this->instance->expects($this->once())->method('fetchFile');
 

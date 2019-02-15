@@ -84,19 +84,11 @@ class ConnectionAdapterTest extends UnitTestCase
      */
     public function getConnectionByPageIdReturnObjectByVersion()
     {
-        if (version_compare(Base::getSolrExtensionVersion(), '8.0.0', '<')) {
-            $this->connectionManagerProphecy->getConnectionByPageId(1)->willReturn(new \ApacheSolrForTypo3\Solr\SolrService);
-        } else {
-            $this->connectionManagerProphecy->getConnectionByPageId(1)->willReturn(new \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection);
-        }
-
+        $solrConnection = $this->prophesize(\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection::class);
+        $this->connectionManagerProphecy->getConnectionByPageId(1)->willReturn($solrConnection->reveal());
         $result = $this->instance->getConnectionByPageId(1);
 
-        if (version_compare(Base::getSolrExtensionVersion(), '8.0.0', '<')) {
-            $this->assertInstanceOf(\ApacheSolrForTypo3\Solr\SolrService::class, $result);
-        } else {
-            $this->assertInstanceOf(\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection::class, $result);
-        }
+        $this->assertInstanceOf(\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection::class, $result);
     }
 
     /**
@@ -105,19 +97,11 @@ class ConnectionAdapterTest extends UnitTestCase
     public function getConnectionsBySiteReturnObjectByVersion()
     {
         $siteMock = $this->getAccessibleMock(Site::class, ['dummy'], [], '', false);
-        if (version_compare(Base::getSolrExtensionVersion(), '8.0.0', '<')) {
-            $this->connectionManagerProphecy->getConnectionsBySite($siteMock)->willReturn([new \ApacheSolrForTypo3\Solr\SolrService]);
-        } else {
-            $this->connectionManagerProphecy->getConnectionsBySite($siteMock)->willReturn([new \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection]);
-        }
-
+        $solrConnection = $this->prophesize(\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection::class);
+        $this->connectionManagerProphecy->getConnectionsBySite($siteMock)->willReturn([$solrConnection->reveal()]);
         $result = $this->instance->getConnectionsBySite($siteMock);
 
-        if (version_compare(Base::getSolrExtensionVersion(), '8.0.0', '<')) {
-            $this->assertInstanceOf(\ApacheSolrForTypo3\Solr\SolrService::class, $result[0]);
-        } else {
-            $this->assertInstanceOf(\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection::class, $result[0]);
-        }
+        $this->assertInstanceOf(\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection::class, $result[0]);
     }
 
     /**
@@ -127,22 +111,21 @@ class ConnectionAdapterTest extends UnitTestCase
     {
         $instance = $this->getAccessibleMock(ConnectionAdapter::class, ['dummy']);
 
-        if (version_compare(Base::getSolrExtensionVersion(), '8.0.0', '<')) {
-            $solrConnection = new \ApacheSolrForTypo3\Solr\SolrService;
-        } else {
-            $solrWriteServiceMock = $this->getAccessibleMock(
-                \ApacheSolrForTypo3\Solr\System\Solr\Service\SolrWriteService::class,
-                ['dummy'],
-                [],
-                '',
-                false
-            );
-            $solrConnection = $this->getAccessibleMock(
-                \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection::class,
-                ['getWriteService']
-            );
-            $solrConnection->expects($this->once())->method('getWriteService')->willReturn($solrWriteServiceMock);
-        }
+        $solrWriteServiceMock = $this->getAccessibleMock(
+            \ApacheSolrForTypo3\Solr\System\Solr\Service\SolrWriteService::class,
+            ['dummy'],
+            [],
+            '',
+            false
+        );
+        $solrConnection = $this->getAccessibleMock(
+            \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection::class,
+            ['getWriteService'],
+            [],
+            '',
+            false
+        );
+        $solrConnection->expects($this->once())->method('getWriteService')->willReturn($solrWriteServiceMock);
 
         $result = $instance->_callRef('getSolrWriteService', $solrConnection);
 

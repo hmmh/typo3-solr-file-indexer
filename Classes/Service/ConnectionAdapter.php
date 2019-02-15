@@ -26,7 +26,7 @@ namespace HMMH\SolrFileIndexer\Service;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use ApacheSolrForTypo3\Solr\Site;
+use ApacheSolrForTypo3\Solr\Domain\Site\Site;
 use HMMH\SolrFileIndexer\Base;
 use \ApacheSolrForTypo3\Solr\ConnectionManager;
 use TYPO3\CMS\Core\SingletonInterface;

@@ -74,7 +74,10 @@ class FileInitializerTest extends UnitTestCase
 
         $this->instance = $this->getAccessibleMock(
             FileInitializer::class,
-            ['getMetadataForSiteroot', 'getAllEnabledMetadata']
+            ['getMetadataForSiteroot', 'getAllEnabledMetadata'],
+            [],
+            '',
+            false
         );
 
         $this->siteProphecy = $this->prophesize(Site::class);
@@ -144,7 +147,10 @@ class FileInitializerTest extends UnitTestCase
     {
         $this->instance = $this->getAccessibleMock(
             FileInitializer::class,
-            ['getAllEnabledMetadata']
+            ['getAllEnabledMetadata'],
+            [],
+            '',
+            false
         );
         $this->inject($this->instance, 'site', $this->site);
 
@@ -168,7 +174,10 @@ class FileInitializerTest extends UnitTestCase
     {
         $this->instance = $this->getAccessibleMock(
             FileInitializer::class,
-            ['getAllEnabledMetadata']
+            ['getAllEnabledMetadata'],
+            [],
+            '',
+            false
         );
         $this->inject($this->instance, 'site', $this->site);
 
@@ -192,7 +201,10 @@ class FileInitializerTest extends UnitTestCase
     {
         $this->instance = $this->getAccessibleMock(
             FileInitializer::class,
-            ['getAllEnabledMetadata']
+            ['getAllEnabledMetadata'],
+            [],
+            '',
+            false
         );
         $this->inject($this->instance, 'site', $this->site);
 
@@ -216,7 +228,10 @@ class FileInitializerTest extends UnitTestCase
     {
         $this->instance = $this->getAccessibleMock(
             FileInitializer::class,
-            ['getAllEnabledMetadata']
+            ['getAllEnabledMetadata'],
+            [],
+            '',
+            false
         );
         $this->inject($this->instance, 'site', $this->site);
 
