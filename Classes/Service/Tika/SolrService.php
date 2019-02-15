@@ -27,14 +27,11 @@ namespace HMMH\SolrFileIndexer\Service\Tika;
  ***************************************************************/
 
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
-use HMMH\SolrFileIndexer\Base;
 use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
 use HMMH\SolrFileIndexer\Interfaces\ServiceInterface;
-use HMMH\SolrFileIndexer\Service\Adapter\SolrConnection;
-use HMMH\SolrFileIndexer\Service\Adapter\SolrExtractingQuery;
+use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\PathUtility;
 
 /**
  * Class SolrService
@@ -46,9 +43,9 @@ class SolrService implements ServiceInterface
     /**
      * Solr adapter
      *
-     * @var SolrConnection
+     * @var ConnectionAdapter
      */
-    protected $solr;
+    protected $connectionAdapter;
 
     /**
      * Solr connection
@@ -65,8 +62,8 @@ class SolrService implements ServiceInterface
      */
     public function __construct(ExtensionConfig $extensionConfig)
     {
-        $this->solr = GeneralUtility::makeInstance(SolrConnection::class);
-        $this->solrConnection = $this->solr->getConnectionByPageId((int)$extensionConfig->getPageId());
+        $this->connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
+        $this->solrConnection = $this->connectionAdapter->getConnectionByPageId((int)$extensionConfig->getPageId());
     }
 
     /**
@@ -80,11 +77,7 @@ class SolrService implements ServiceInterface
         $query = GeneralUtility::makeInstance(\ApacheSolrForTypo3\Solr\Domain\Search\Query\ExtractingQuery::class, $localTempFilePath);
         $query->setExtractOnly(true);
 
-        $response = $this->solr->extractByQuery($this->solrConnection, $query);
-
-        if (PathUtility::basename($localTempFilePath) !== $file->getName()) {
-            unlink($localTempFilePath);
-        }
+        $response = $this->connectionAdapter->extractByQuery($this->solrConnection, $query);
 
         return $response[0];
     }

@@ -1,11 +1,11 @@
 <?php
-namespace HMMH\SolrFileIndexer\Service\Adapter;
+namespace HMMH\SolrFileIndexer\Service;
 
 /***************************************************************
  *
  *  Copyright notice
  *
- *  (c) 2018 Sascha Wilking <sascha.wilking@hmmh.de>, hmmh
+ *  (c) 2019 Sascha Wilking <sascha.wilking@hmmh.de>, hmmh
  *
  *  All rights reserved
  *
@@ -32,11 +32,11 @@ use \ApacheSolrForTypo3\Solr\ConnectionManager;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
- * Class SolrConnection
+ * Class ConnectionAdapter
  *
- * @package HMMH\SolrFileIndexer\Service\Adapter
+ * @package HMMH\SolrFileIndexer\Service
  */
-class SolrConnection implements SingletonInterface
+class ConnectionAdapter implements SingletonInterface
 {
 
     /**

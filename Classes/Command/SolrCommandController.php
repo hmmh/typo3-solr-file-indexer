@@ -41,10 +41,9 @@ class SolrCommandController extends CommandController
 {
 
     /**
-     * @var \HMMH\SolrFileIndexer\Service\Adapter\SolrConnection
-     * @inject
+     * @var \HMMH\SolrFileIndexer\Service\ConnectionAdapter
      */
-    protected $solr;
+    protected $connectionAdapter;
 
     /**
      * The currently selected Site.
@@ -52,6 +51,14 @@ class SolrCommandController extends CommandController
      * @var Site
      */
     protected $site;
+
+    /**
+     * @param \HMMH\SolrFileIndexer\Service\ConnectionAdapter $connectionAdapter
+     */
+    public function injectConnectionAdapter(\HMMH\SolrFileIndexer\Service\ConnectionAdapter $connectionAdapter)
+    {
+        $this->connectionAdapter = $connectionAdapter;
+    }
 
     /**
      * @param int    $siteRootPageId Site Root Page ID
@@ -78,14 +85,12 @@ class SolrCommandController extends CommandController
      * @param string $type
      *
      * @return void
+     * @throws \ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException
      */
     protected function deleteByType($type)
     {
-        $solrServers = $this->solr->getConnectionsBySite($this->site);
-        foreach ($solrServers as $solrServer) {
-            $this->solr->commit($solrServer);
-            $this->solr->deleteByType($solrServer, trim($type), true);
-        }
+        $solrConnection = $this->connectionAdapter->getConnectionByPageId($this->site->getRootPageId());
+        $this->connectionAdapter->deleteByType($solrConnection, trim($type), true);
     }
 
     /**
@@ -96,7 +101,7 @@ class SolrCommandController extends CommandController
     protected function reindexByType($type)
     {
         $itemIndexQueue = Base::getObjectManager()->get(QueueInitializationService::class);
-        $itemIndexQueue->initializeBySiteAndIndexConfiguration ($this->site, $type);
+        $itemIndexQueue->initializeBySiteAndIndexConfiguration($this->site, $type);
     }
 
     /**

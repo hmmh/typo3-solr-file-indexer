@@ -31,7 +31,7 @@ use ApacheSolrForTypo3\Solr\IndexQueue\Item;
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
 use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
 use HMMH\SolrFileIndexer\Interfaces\DocumentUrlInterface;
-use HMMH\SolrFileIndexer\Service\Adapter\SolrConnection;
+use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\Service\ServiceFactory;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Resource\File;
@@ -108,16 +108,20 @@ class FileIndexer extends Indexer
         if (!($document instanceof Document) && $this->extensionConfiguration->ignoreLocalization()) {
             $document = parent::itemToDocument($item, 0);
         }
-        $baseContent = $document->getField('content');
-        if (!empty($baseContent['value']) && is_string($baseContent['value'])) {
-            $content .= $baseContent['value'];
+        $baseContent = $document['content'];
+        if (!empty($baseContent) && is_string($baseContent)) {
+            $content .= $baseContent;
         }
-        $content .= $this->txtFromFile($this->fetchFile($item));
+        try {
+            $content .= $this->txtFromFile($this->fetchFile($item));
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            return null;
+        }
 
         $content = $this->emitPostAddContentAfterSignal($document, $content);
 
         $document->setField('content', $content);
-        $url = $document->getField('url');
+        $url = $document['url'];
         if ($url === false) {
             $this->addDocumentUrl($item, $document);
         }
@@ -325,7 +329,7 @@ class FileIndexer extends Indexer
      */
     protected function removeOriginalFromIndex($uid)
     {
-        $connectionAdapter = GeneralUtility::makeInstance(SolrConnection::class);
+        $connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
         $connectionAdapter->deleteByQuery($this->solr, 'type:' . self::FILE_TABLE . ' AND uid:' . (int)$uid);
     }
 

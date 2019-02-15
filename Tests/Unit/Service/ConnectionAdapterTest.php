@@ -1,5 +1,5 @@
 <?php
-namespace HMMH\SolrFileIndexer\Tests\Unit\Service\Adapter;
+namespace HMMH\SolrFileIndexer\Tests\Unit\Service;
 
 /***************************************************************
  *
@@ -29,7 +29,7 @@ namespace HMMH\SolrFileIndexer\Tests\Unit\Service\Adapter;
 use ApacheSolrForTypo3\Solr\ConnectionManager;
 use ApacheSolrForTypo3\Solr\Site;
 use HMMH\SolrFileIndexer\Base;
-use HMMH\SolrFileIndexer\Service\Adapter\SolrConnection;
+use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use Nimut\TestingFramework\MockObject\AccessibleMockObjectInterface;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use PHPUnit_Framework_MockObject_MockObject;
@@ -37,15 +37,15 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Prophecy\Prophecy\ProphecySubjectInterface;
 
 /**
- * Class SolrConnectionTest
+ * Class ConnectionAdapterTest
  *
- * @package HMMH\SolrFileIndexer\Tests\Unit\Service\Adapter
+ * @package HMMH\SolrFileIndexer\Tests\Unit\Service
  */
-class SolrConnectionTest extends UnitTestCase
+class ConnectionAdapterTest extends UnitTestCase
 {
 
     /**
-     * @var SolrConnection|AccessibleMockObjectInterface|PHPUnit_Framework_MockObject_MockObject
+     * @var ConnectionAdapter|AccessibleMockObjectInterface|PHPUnit_Framework_MockObject_MockObject
      */
     protected $instance;
 
@@ -63,7 +63,7 @@ class SolrConnectionTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->instance = new SolrConnection();
+        $this->instance = new ConnectionAdapter();
 
         $this->connectionManagerProphecy = $this->prophesize(ConnectionManager::class);
         $this->connectionManager = $this->connectionManagerProphecy->reveal();
@@ -125,7 +125,7 @@ class SolrConnectionTest extends UnitTestCase
      */
     public function getSolrWriteServiceReturnObjectByVersion()
     {
-        $instance = $this->getAccessibleMock(SolrConnection::class, ['dummy']);
+        $instance = $this->getAccessibleMock(ConnectionAdapter::class, ['dummy']);
 
         if (version_compare(Base::getSolrExtensionVersion(), '8.0.0', '<')) {
             $solrConnection = new \ApacheSolrForTypo3\Solr\SolrService;
@@ -146,10 +146,6 @@ class SolrConnectionTest extends UnitTestCase
 
         $result = $instance->_callRef('getSolrWriteService', $solrConnection);
 
-        if (version_compare(Base::getSolrExtensionVersion(), '8.0.0', '<')) {
-            $this->assertInstanceOf(\ApacheSolrForTypo3\Solr\SolrService::class, $result);
-        } else {
-            $this->assertInstanceOf(\ApacheSolrForTypo3\Solr\System\Solr\Service\SolrWriteService::class, $result);
-        }
+        $this->assertInstanceOf(\ApacheSolrForTypo3\Solr\System\Solr\Service\SolrWriteService::class, $result);
     }
 }
