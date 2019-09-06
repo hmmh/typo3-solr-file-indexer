@@ -93,7 +93,8 @@ class Queue extends \ApacheSolrForTypo3\Solr\IndexQueue\Queue
                 'item_uid',
                 'indexing_configuration',
                 'indexing_priority',
-                'changed'
+                'changed',
+                'errors'
             ]
         );
 
@@ -142,7 +143,8 @@ class Queue extends \ApacheSolrForTypo3\Solr\IndexQueue\Queue
             'item_uid' => $itemUid,
             'indexing_configuration' => $indexingConfigurationName,
             'indexing_priority' => !empty($indexingConfiguration['indexingPriority']) ? (int)$indexingConfiguration['indexingPriority'] : 0,
-            'changed' => $this->getItemChangedTime($itemType, $itemUid)
+            'changed' => $this->getItemChangedTime($itemType, $itemUid),
+            'errors' => ''
         ];
 
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable(self::TABLE_INDEXQUEUE_ITEM);
