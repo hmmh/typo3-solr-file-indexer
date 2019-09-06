@@ -89,7 +89,8 @@ class FileInitializer extends AbstractInitializer
                     'item_uid' => (int)$metadata['uid'],
                     'indexing_configuration' => $this->indexingConfigurationName,
                     'indexing_priority' => $this->getIndexingPriority(),
-                    'changed' => (int)$metadata['changed']
+                    'changed' => (int)$metadata['changed'],
+                    'errors' => ''
                 ];
             }
         }
