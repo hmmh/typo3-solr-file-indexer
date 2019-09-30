@@ -122,7 +122,7 @@ class FileIndexer extends Indexer
 
         $document->setField('content', $content);
         $url = $document['url'];
-        if ($url === false) {
+        if (empty($url)) {
             $this->addDocumentUrl($item, $document);
         }
 
