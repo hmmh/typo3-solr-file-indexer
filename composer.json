@@ -15,9 +15,9 @@
   ],
 
   "require": {
-    "php": ">=7.2",
-    "typo3/cms-core": ">=9.5",
-    "typo3-ter/solr": ">=9.0"
+    "php": ">=7.2.0",
+    "typo3/cms-core": "^9.5.0 || ^10.0",
+    "apache-solr-for-typo3/solr": "^9.0 || ^10.0"
   },
 
   "require-dev": {
