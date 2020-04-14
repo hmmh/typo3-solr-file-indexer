@@ -45,7 +45,7 @@ class ExtensionConfig implements SingletonInterface
      */
     public function __construct()
     {
-        $this->extConfig = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['solr_file_indexer']);
+        $this->extConfig = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['solr_file_indexer'];
     }
 
     /**

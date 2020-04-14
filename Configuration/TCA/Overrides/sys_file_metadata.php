@@ -10,7 +10,7 @@ $tmpColum = [
             'renderType' => 'selectCheckBox',
             'default' => '',
             'foreign_table' => 'pages',
-            'foreign_table_where' => 'AND is_siteroot=1 ORDER BY pages.title'
+            'foreign_table_where' => 'AND is_siteroot=1 AND sys_language_uid=0 ORDER BY pages.uid'
         ]
     ]
 ];
