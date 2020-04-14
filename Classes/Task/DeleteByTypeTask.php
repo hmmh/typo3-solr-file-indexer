@@ -110,8 +110,10 @@ class DeleteByTypeTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
      */
     protected function deleteByType($type)
     {
-        $solrConnection = $this->connectionAdapter->getConnectionByPageId($this->site->getRootPageId());
-        $this->connectionAdapter->deleteByType($solrConnection, trim($type), true);
+        $solrConnections = $this->connectionAdapter->getConnectionsBySite($this->site);
+        foreach ($solrConnections as $solrConnection) {
+            $this->connectionAdapter->deleteByType($solrConnection, trim($type), true);
+        }
     }
 
     /**
