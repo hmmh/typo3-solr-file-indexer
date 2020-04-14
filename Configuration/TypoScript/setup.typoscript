@@ -6,6 +6,7 @@ plugin.tx_solr {
         initialization = HMMH\SolrFileIndexer\IndexQueue\FileInitializer
         indexer = HMMH\SolrFileIndexer\Indexer\FileIndexer
         allowedFileTypes = 'pdf','doc','docx','xlsx'
+        additionalPageIds = 0
 
         fields {
           title = title
