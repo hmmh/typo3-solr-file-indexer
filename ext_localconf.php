@@ -14,7 +14,7 @@ $signalSlotDispatcher->connect(
 );
 
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][\HMMH\SolrFileIndexer\Task\DeleteByTypeTask::class] = [
-    'extension' => $_EXTKEY,
+    'extension' => 'solr_file_indexer',
     'title' => 'Remove type:sys_file_metadata from solr index',
     'description' => '',
     'additionalFields' => \HMMH\SolrFileIndexer\Task\DeleteByTypeTaskAdditionalFieldProvider::class
