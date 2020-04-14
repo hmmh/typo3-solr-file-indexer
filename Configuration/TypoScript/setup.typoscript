@@ -31,7 +31,12 @@ plugin.tx_solr {
           }
 
           description = description
-          keywords = keywords
+          
+          keywords = SOLR_MULTIVALUE
+          keywords {
+            field = keywords
+          }
+          
           author = creator
         }
       }
