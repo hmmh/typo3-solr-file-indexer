@@ -73,8 +73,8 @@ class ServiceFactory
 
         if ($extensionConfig->useTika()) {
             if ($this->isTikaActive()) {
-                $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tika']);
-                return $this->getTikaExtensionService($configuration['extractor']);
+                $configuration = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tika'];
+                return $this->getTikaExtensionService($configuration['extractor'], $configuration);
             }
             throw new UnknownPackageException('Package tika does not exists or is inactive');
         }
@@ -111,11 +111,12 @@ class ServiceFactory
 
     /**
      * @param string $tikaServiceType
+     * @param array  $configuration
      *
      * @return \ApacheSolrForTypo3\Tika\Service\Tika\ServiceInterface
      */
-    protected function getTikaExtensionService($tikaServiceType)
+    protected function getTikaExtensionService(string $tikaServiceType, array $configuration)
     {
-        return \ApacheSolrForTypo3\Tika\Service\Tika\ServiceFactory::getTika($tikaServiceType);
+        return \ApacheSolrForTypo3\Tika\Service\Tika\ServiceFactory::getTika($tikaServiceType, $configuration);
     }
 }
