@@ -25,7 +25,7 @@
   },
 
   "suggest": {
-    "apache-solr-for-typo3/tika": ">=2.4"
+    "apache-solr-for-typo3/tika": ">=4.0"
   },
 
   "replace": {
