@@ -21,11 +21,11 @@
   },
 
   "require-dev": {
-    "nimut/testing-framework": "^3.0"
+    "nimut/testing-framework": "^5.0"
   },
 
   "suggest": {
-    "apache-solr-for-typo3/tika": ">=2.4"
+    "apache-solr-for-typo3/tika": ">=4.0"
   },
 
   "replace": {

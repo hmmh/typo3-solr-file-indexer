@@ -33,6 +33,7 @@ use Nimut\TestingFramework\MockObject\AccessibleMockObjectInterface;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 use ApacheSolrForTypo3\Solr\IndexQueue\Item;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 /**
  * Class FileIndexerTest
@@ -53,11 +54,24 @@ class FileIndexerTest extends UnitTestCase
 
         $this->instance = $this->getAccessibleMock(
             FileIndexer::class,
-            ['setLogging', 'getSolrConnectionsByItem', 'getIndexableFile', 'indexItem', 'fetchFile'],
+            ['setLogging', 'getSolrConnectionsByItem', 'getIndexableFile', 'indexItem', 'fetchFile', 'getSignalSlotDispatcher'],
             [],
             '',
             false
         );
+
+        $extConfig = [
+          'useTika' => '0',
+          'solrSite' => '1',
+        ];
+
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['solr_file_indexer'] = $extConfig;
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'] = null;
     }
 
     /**
@@ -68,7 +82,8 @@ class FileIndexerTest extends UnitTestCase
         $this->instance->expects($this->once())
             ->method('getSolrConnectionsByItem')->willReturn([]);
 
-        $result = $this->instance->index(new Item([]));
+        $item = $this->getMockBuilder(Item::class)->setMethods([])->disableOriginalConstructor()->getMock();
+        $result = $this->instance->index($item);
 
         $this->assertTrue($result);
     }
@@ -83,7 +98,8 @@ class FileIndexerTest extends UnitTestCase
 
         $this->instance->expects($this->exactly(2))->method('getIndexableFile');
 
-        $this->instance->index(new Item([]));
+        $item = $this->getMockBuilder(Item::class)->setMethods([])->disableOriginalConstructor()->getMock();
+        $result = $this->instance->index($item);
     }
 
     /**
@@ -97,7 +113,8 @@ class FileIndexerTest extends UnitTestCase
         $this->instance->expects($this->once())->method('getIndexableFile')->willReturn(null);
         $this->instance->expects($this->never())->method('indexItem');
 
-        $this->instance->index(new Item([]));
+        $item = $this->getMockBuilder(Item::class)->setMethods([])->disableOriginalConstructor()->getMock();
+        $result = $this->instance->index($item);
     }
 
     /**
@@ -111,7 +128,8 @@ class FileIndexerTest extends UnitTestCase
         $this->instance->expects($this->once())->method('getIndexableFile')->willReturn([]);
         $this->instance->expects($this->once())->method('indexItem');
 
-        $this->instance->index(new Item([]));
+        $item = $this->getMockBuilder(Item::class)->setMethods([])->disableOriginalConstructor()->getMock();
+        $result = $this->instance->index($item);
     }
 
     /**
@@ -122,7 +140,7 @@ class FileIndexerTest extends UnitTestCase
         $addDocumentUrl = $this->getMockClass(DocumentUrlInterface::class);
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'][] = $addDocumentUrl;
 
-        $item = new Item([]);
+        $item = $this->getMockBuilder(Item::class)->setMethods([])->disableOriginalConstructor()->getMock();
         $document = new \ApacheSolrForTypo3\Solr\System\Solr\Document\Document();
 
         $this->instance->expects($this->never())->method('fetchFile');
@@ -138,7 +156,7 @@ class FileIndexerTest extends UnitTestCase
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'][] = FileIndexerTest::class;
 
-        $item = new Item([]);
+        $item = $this->getMockBuilder(Item::class)->setMethods([])->disableOriginalConstructor()->getMock();
         $document = new \ApacheSolrForTypo3\Solr\System\Solr\Document\Document();
 
         $this->instance->_callRef('addDocumentUrl', $item, $document);
@@ -151,7 +169,7 @@ class FileIndexerTest extends UnitTestCase
      */
     public function addDocumentUrlWithoutHookCallFetchFile()
     {
-        $item = new Item([]);
+        $item = $this->getMockBuilder(Item::class)->setMethods([])->disableOriginalConstructor()->getMock();
         $document = new \ApacheSolrForTypo3\Solr\System\Solr\Document\Document();
 
         $this->instance->expects($this->once())->method('fetchFile');
@@ -164,18 +182,12 @@ class FileIndexerTest extends UnitTestCase
      */
     public function cleanupContentReturnTrimString()
     {
+        $dispatcher = $this->getMockBuilder(Dispatcher::class)->setMethods([])->disableOriginalConstructor()->getMock();
+        $this->instance->expects($this->once())->method('getSignalSlotDispatcher')->willReturn($dispatcher);
+
         $content = ' abcde ';
         $result = $this->instance->_callRef('cleanupContent', $content);
 
         $this->assertSame(trim($content), $result);
-    }
-
-    /**
-     * @test
-     */
-    public function getSignalSlotDispatcherReturnDispatcher()
-    {
-        $result = $this->instance->_callRef('getSignalSlotDispatcher');
-        $this->assertInstanceOf(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class, $result);
     }
 }

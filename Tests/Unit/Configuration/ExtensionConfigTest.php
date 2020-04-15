@@ -51,7 +51,7 @@ class ExtensionConfigTest extends UnitTestCase
           'solrSite' => '1',
         ];
 
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['solr_file_indexer'] = serialize($extConfig);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['solr_file_indexer'] = $extConfig;
 
         $this->instance = new ExtensionConfig();
     }
