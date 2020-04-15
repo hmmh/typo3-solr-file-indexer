@@ -99,24 +99,12 @@ class ServiceFactoryTest extends UnitTestCase
 
         $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tika'] = serialize($tikaConfig);
 
-        if (class_exists(SolrCellService::class)) {
-            $solrService = $this->getAccessibleMock(SolrCellService::class, ['dummy'], [], '', false);
+        $this->instance->expects($this->once())->method('getExtensionConfig')->willReturn(new ExtensionConfig());
+        $this->instance->expects($this->never())->method('getSolrService');
+        $this->instance->expects($this->once())->method('isTikaActive')->willReturn(false);
 
-            $this->instance->expects($this->once())->method('getExtensionConfig')->willReturn(new ExtensionConfig());
-            $this->instance->expects($this->once())->method('getTikaExtensionService')->with('solr')->willReturn($solrService);
-            $this->instance->expects($this->never())->method('getSolrService');
-            $this->instance->expects($this->once())->method('isTikaActive')->willReturn(true);
+        $this->expectException(UnknownPackageException::class);
 
-            $result = $this->instance->_callRef('getTikaService');
-            $this->assertInstanceOf(ServiceInterface::class, $result);
-        } else {
-            $this->instance->expects($this->once())->method('getExtensionConfig')->willReturn(new ExtensionConfig());
-            $this->instance->expects($this->never())->method('getSolrService');
-            $this->instance->expects($this->once())->method('isTikaActive')->willReturn(false);
-
-            $this->expectException(UnknownPackageException::class);
-
-            $this->instance->_callRef('getTikaService');
-        }
+        $this->instance->_callRef('getTikaService');
     }
 }
