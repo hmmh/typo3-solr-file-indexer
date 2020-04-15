@@ -78,7 +78,7 @@ class FileInitializer extends AbstractInitializer
         $indexRows = [];
 
         foreach ($this->getAllEnabledMetadata() as $metadata) {
-            $enableIndexing = GeneralUtility::trimExplode(',', $metadata['enable_indexing']);
+            $enableIndexing = GeneralUtility::trimExplode(',', (string)$metadata['enable_indexing']);
             $siteroot = $this->site->getRootPageId();
 
             if (in_array($siteroot, $enableIndexing)) {
