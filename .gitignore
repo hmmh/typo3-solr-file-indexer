@@ -3,7 +3,7 @@
 .settings/
 .idea/
 .editorconfig
-.dynamicReturnTypeMeta.json
+dynamicReturnTypeMeta.json
 atlassian-ide-plugin.xml
 .DS_Store
 index.php
