@@ -1,0 +1,7 @@
+services:
+  HMMH\SolrFileIndexer\Backend\Widgets\IndexableDocumentsWidget:
+    arguments: ['indexableDocuments']
+    tags:
+      - name: dashboard.widget
+        identifier: indexableDocuments
+        widgetGroups: 'solr_file_indexer'

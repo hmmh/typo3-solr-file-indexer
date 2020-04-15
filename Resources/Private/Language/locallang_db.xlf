@@ -9,6 +9,21 @@
 			<trans-unit id="sys_file_metadata.tabs.search" xml:space="preserve">
 				<source>Search</source>
 			</trans-unit>
+
+			<!-- Start Dashboard -->
+			<trans-unit id="dashboard.solr_file_indexer">
+				<source>SOLR File Indexer</source>
+			</trans-unit>
+			<trans-unit id="dashboard.solr_file_indexer.description">
+				<source>SOLR File Indexer dashboard</source>
+			</trans-unit>
+			<trans-unit id="widget_group.solr_file_indexer">
+				<source>SOLR File Indexer</source>
+			</trans-unit>
+			<trans-unit id="widgets.indexableDocuments.title">
+				<source>Indexable documents</source>
+			</trans-unit>
+			<!-- End Dashboard -->
 		</body>
 	</file>
 </xliff>
