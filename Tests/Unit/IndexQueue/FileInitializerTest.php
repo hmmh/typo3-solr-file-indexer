@@ -26,7 +26,7 @@ namespace HMMH\SolrFileIndexer\Tests\Unit\IndexQueue;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use ApacheSolrForTypo3\Solr\Site;
+use ApacheSolrForTypo3\Solr\Domain\Site\Site;
 use HMMH\SolrFileIndexer\IndexQueue\FileInitializer;
 use HMMH\SolrFileIndexer\IndexQueue\Queue;
 use Nimut\TestingFramework\MockObject\AccessibleMockObjectInterface;

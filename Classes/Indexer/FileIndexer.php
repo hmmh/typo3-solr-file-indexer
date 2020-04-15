@@ -233,7 +233,11 @@ class FileIndexer extends Indexer
     {
         try {
             $result = $this->getSignalSlotDispatcher()->dispatch(self::class, 'cleanupContent', [$content]);
-            $returnValue = $result[0];
+            if ($result === null) {
+                $returnValue = $content;
+            } else {
+                $returnValue = $result[0];
+            }
         } catch (InvalidSlotException $ise) {
             $returnValue = $content;
         } catch (InvalidSlotReturnException $isre) {
@@ -253,7 +257,11 @@ class FileIndexer extends Indexer
     {
         try {
             $result = $this->getSignalSlotDispatcher()->dispatch(self::class, 'addContentAfter', [$document, $content]);
-            $returnValue = $result[1];
+            if ($result === null) {
+                $returnValue = $content;
+            } else {
+                $returnValue = $result[1];
+            }
         } catch (InvalidSlotException $ise) {
             $returnValue = $content;
         } catch (InvalidSlotReturnException $isre) {

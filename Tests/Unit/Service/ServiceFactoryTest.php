@@ -69,7 +69,7 @@ class ServiceFactoryTest extends UnitTestCase
           'solrSite' => '1',
         ];
 
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['solr_file_indexer'] = serialize($extConfig);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['solr_file_indexer'] = $extConfig;
 
         $solrService = $this->getAccessibleMock(SolrService::class, ['dummy'], [], '', false);
 
@@ -91,7 +91,7 @@ class ServiceFactoryTest extends UnitTestCase
             'solrSite' => '1',
         ];
 
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['solr_file_indexer'] = serialize($extConfig);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['solr_file_indexer'] = $extConfig;
 
         $tikaConfig = [
             'extractor' => 'solr'

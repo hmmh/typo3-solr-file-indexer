@@ -27,8 +27,7 @@ namespace HMMH\SolrFileIndexer\Tests\Unit\Service;
  ***************************************************************/
 
 use ApacheSolrForTypo3\Solr\ConnectionManager;
-use ApacheSolrForTypo3\Solr\Site;
-use HMMH\SolrFileIndexer\Base;
+use ApacheSolrForTypo3\Solr\Domain\Site\Site;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use Nimut\TestingFramework\MockObject\AccessibleMockObjectInterface;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
@@ -96,7 +95,7 @@ class ConnectionAdapterTest extends UnitTestCase
      */
     public function getConnectionsBySiteReturnObjectByVersion()
     {
-        $siteMock = $this->getAccessibleMock(Site::class, ['dummy'], [], '', false);
+        $siteMock = $this->getAccessibleMock(Site::class, ['getSolrConnectionConfiguration'], [], '', false);
         $solrConnection = $this->prophesize(\ApacheSolrForTypo3\Solr\System\Solr\SolrConnection::class);
         $this->connectionManagerProphecy->getConnectionsBySite($siteMock)->willReturn([$solrConnection->reveal()]);
         $result = $this->instance->getConnectionsBySite($siteMock);
