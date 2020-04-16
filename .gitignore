@@ -14,6 +14,7 @@ typo3temp
 uploads
 vendor
 public
+!Resources/Public/
 composer.lock
 .Build
 Documentation/_make

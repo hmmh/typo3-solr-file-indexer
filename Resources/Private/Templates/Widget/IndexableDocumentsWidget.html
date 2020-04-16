@@ -3,12 +3,12 @@
 <f:section name="main">
 
 <f:for each="{roots}" as="root">
-  <div class="widget-number" style="height:auto;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #D7D7D7;">
+  <div class="widget-number">
     <div class="widget-number-content">
       <div class="widget-number-title">{root.host}</div>
-      <div style="display:flex;flex-direction:row;">
+      <div class="widget-element">
         <f:for each="{root.languages}" as="language">
-          <div style="margin-right:20px;">
+          <div class="widget-element-language">
             <div class="widget-number-subtitle"><small>{language.title}</small></div>
             <div class="widget-number-number">{language.count}</div>
           </div>
