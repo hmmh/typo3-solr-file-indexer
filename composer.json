@@ -29,7 +29,7 @@
   },
 
   "replace": {
-    "solr_file_indexer": "self.version"
+    "hmmh/solr-file-indexer": "self.version"
   },
 
   "autoload": {
