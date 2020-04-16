@@ -29,6 +29,11 @@ class IndexableDocumentsWidget extends AbstractWidget
      */
     protected $height = 4;
 
+    /**
+     * @inheritDoc
+     */
+    protected $iconIdentifier = 'content-widget-number';
+
     protected function initializeView(): void
     {
         parent::initializeView();
