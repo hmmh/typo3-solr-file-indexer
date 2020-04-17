@@ -29,7 +29,7 @@ class IndexableDocumentsDomainWidget extends AbstractBarChartWidget
     /**
      * @inheritDoc
      */
-    protected $templateName = 'IndexableDocumentsDomainWidget';
+    protected $templateName = 'SimpleChartWidget';
 
 
     protected function prepareChartData(): void
