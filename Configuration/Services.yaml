@@ -1,7 +1,13 @@
 services:
-  HMMH\SolrFileIndexer\Backend\Widgets\IndexableDocumentsWidget:
-    arguments: ['indexableDocuments']
+  HMMH\SolrFileIndexer\Backend\Widgets\IndexableDocumentsLanguageWidget:
+    arguments: ['indexableDocumentsLanguage']
     tags:
       - name: dashboard.widget
-        identifier: indexableDocuments
+        identifier: indexableDocumentsLanguage
+        widgetGroups: 'solr_file_indexer'
+  HMMH\SolrFileIndexer\Backend\Widgets\IndexableDocumentsDomainWidget:
+    arguments: ['indexableDocumentsDomain']
+    tags:
+      - name: dashboard.widget
+        identifier: indexableDocumentsDomain
         widgetGroups: 'solr_file_indexer'

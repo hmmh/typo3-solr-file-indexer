@@ -6,42 +6,9 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Dashboard\Widgets\AbstractWidget;
-use TYPO3\CMS\Dashboard\Widgets\Interfaces\AdditionalCssInterface;
 
-/**
- * This widget will show the number of pages
- */
-class IndexableDocumentsWidget extends AbstractWidget implements AdditionalCssInterface
+class WidgetService
 {
-
-    /**
-     * @var string
-     */
-    protected $title = 'LLL:EXT:solr_file_indexer/Resources/Private/Language/locallang_db.xlf:widgets.indexableDocuments.title';
-
-    /**
-     * @inheritDoc
-     */
-    protected $templateName = 'IndexableDocumentsWidget';
-
-    /**
-     * @inheritDoc
-     */
-    protected $height = 4;
-
-    /**
-     * @inheritDoc
-     */
-    protected $iconIdentifier = 'content-widget-number';
-
-    protected function initializeView(): void
-    {
-        parent::initializeView();
-
-        $this->view->assign('roots', $this->getIndexableDocuments());
-    }
-
     /**
      * @return array
      */
@@ -116,10 +83,5 @@ class IndexableDocumentsWidget extends AbstractWidget implements AdditionalCssIn
         }
 
         return $lang;
-    }
-
-    public function getCssFiles(): array
-    {
-        return ['EXT:solr_file_indexer/Resources/Public/Css/widget.css'];
     }
 }

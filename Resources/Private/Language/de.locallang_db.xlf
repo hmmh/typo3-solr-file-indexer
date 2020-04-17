@@ -21,7 +21,13 @@
 				<target>SOLR File Indexer</target>
 			</trans-unit>
 			<trans-unit id="widgets.indexableDocuments.title">
-				<target>Indexierbare Dokumente</target>
+				<target>Indexierbare Dokumente pro Sprache</target>
+			</trans-unit>
+			<trans-unit id="widgets.indexableDocumentsChart.title">
+				<target>Indexierbare Dokumente pro Domain</target>
+			</trans-unit>
+			<trans-unit id="widgets.indexableDocumentsChart.total">
+				<target>Gesamt</target>
 			</trans-unit>
 			<!-- End Dashboard -->
 		</body>
