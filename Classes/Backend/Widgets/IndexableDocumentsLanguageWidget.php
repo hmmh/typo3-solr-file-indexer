@@ -2,9 +2,6 @@
 declare(strict_types = 1);
 namespace HMMH\SolrFileIndexer\Backend\Widgets;
 
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Dashboard\Widgets\AbstractWidget;
 use TYPO3\CMS\Dashboard\Widgets\Interfaces\AdditionalCssInterface;
