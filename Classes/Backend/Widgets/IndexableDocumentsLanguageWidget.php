@@ -18,7 +18,7 @@ class IndexableDocumentsLanguageWidget extends AbstractWidget implements Additio
     /**
      * @var string
      */
-    protected $title = 'LLL:EXT:solr_file_indexer/Resources/Private/Language/locallang_db.xlf:widgets.indexableDocuments.title';
+    protected $title = 'LLL:EXT:solr_file_indexer/Resources/Private/Language/locallang_db.xlf:widgets.indexableDocumentsLanguage.title';
 
     /**
      * @inheritDoc

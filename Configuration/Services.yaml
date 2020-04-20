@@ -1,13 +1,21 @@
 services:
   HMMH\SolrFileIndexer\Backend\Widgets\IndexableDocumentsLanguageWidget:
-    arguments: ['indexableDocumentsLanguage']
+    arguments: ['sfiIndexableDocumentsLanguage']
     tags:
       - name: dashboard.widget
-        identifier: indexableDocumentsLanguage
+        identifier: sfiIndexableDocumentsLanguage
         widgetGroups: 'solr_file_indexer'
+
   HMMH\SolrFileIndexer\Backend\Widgets\IndexableDocumentsDomainWidget:
-    arguments: ['indexableDocumentsDomain']
+    arguments: ['sfiIndexableDocumentsDomain']
     tags:
       - name: dashboard.widget
-        identifier: indexableDocumentsDomain
+        identifier: sfiIndexableDocumentsDomain
+        widgetGroups: 'solr_file_indexer'
+
+  HMMH\SolrFileIndexer\Backend\Widgets\IndexedDocumentsWidget:
+    arguments: ['sfiIndexedDocuments']
+    tags:
+      - name: dashboard.widget
+        identifier: sfiIndexedDocuments
         widgetGroups: 'solr_file_indexer'

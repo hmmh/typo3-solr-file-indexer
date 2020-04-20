@@ -20,14 +20,17 @@
 			<trans-unit id="widget_group.solr_file_indexer">
 				<target>SOLR File Indexer</target>
 			</trans-unit>
-			<trans-unit id="widgets.indexableDocuments.title">
+			<trans-unit id="widgets.indexableDocumentsLanguage.title">
 				<target>Indexierbare Dokumente pro Sprache</target>
 			</trans-unit>
-			<trans-unit id="widgets.indexableDocumentsChart.title">
+			<trans-unit id="widgets.indexableDocumentsDomain.title">
 				<target>Indexierbare Dokumente pro Domain</target>
 			</trans-unit>
-			<trans-unit id="widgets.indexableDocumentsChart.total">
+			<trans-unit id="widgets.total">
 				<target>Gesamt</target>
+			</trans-unit>
+			<trans-unit id="widgets.indexedDocuments.title">
+				<target>Dokumente im Core</target>
 			</trans-unit>
 			<!-- End Dashboard -->
 		</body>

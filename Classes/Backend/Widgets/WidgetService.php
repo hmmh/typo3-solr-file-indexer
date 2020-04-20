@@ -2,10 +2,15 @@
 declare(strict_types = 1);
 namespace HMMH\SolrFileIndexer\Backend\Widgets;
 
+use ApacheSolrForTypo3\Solr\Domain\Search\Query\ParameterBuilder\ReturnFields;
+use ApacheSolrForTypo3\Solr\Domain\Search\Query\QueryBuilder;
+use ApacheSolrForTypo3\Solr\System\Solr\ResponseAdapter;
+use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class WidgetService
 {
@@ -42,6 +47,51 @@ class WidgetService
         ksort($roots);
 
         return $roots;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIndexedDocuments(): array
+    {
+        $cores = [];
+
+        try {
+            $connections = GeneralUtility::makeInstance(ConnectionAdapter::class)->getConnectionManager()->getAllConnections();
+        } catch (\ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException $e) {
+            return $cores;
+        }
+
+        foreach ($connections as $connection) {
+            /** @var \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $connection */
+            $readService = $connection->getReadService();
+            if ($readService->ping()) {
+                $coreOptions = $readService->getPrimaryEndpoint()->getOptions();
+                $hash = md5(serialize($coreOptions));
+                if (!isset($readConnections[$hash])) {
+                    $readConnections[$hash] = true;
+                    $queryBuilder = GeneralUtility::makeInstance(QueryBuilder::class);
+                    $searchQuery = $queryBuilder->newSearchQuery('');
+                    $query = $searchQuery->useQueryString('*:*')
+                        ->useFilter('type:sys_file_metadata')
+                        ->useReturnFields(ReturnFields::fromString('*'))
+                        ->getQuery();
+                    $query->setRows(0);
+                    $response = $readService->search($query);
+                    if ($response instanceof ResponseAdapter) {
+                        $data = $response->getParsedData();
+                        if (isset($data->response->numFound)) {
+                            $cores[] = [
+                                'options' => $coreOptions,
+                                'numFound' => (int)$data->response->numFound
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        return $cores;
     }
 
     /**

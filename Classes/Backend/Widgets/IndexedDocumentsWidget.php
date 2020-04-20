@@ -3,18 +3,18 @@ declare(strict_types = 1);
 namespace HMMH\SolrFileIndexer\Backend\Widgets;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Dashboard\Widgets\AbstractBarChartWidget;
+use TYPO3\CMS\Dashboard\Widgets\AbstractDoughnutChartWidget;
 
 /**
  * This widget will show the number of pages
  */
-class IndexableDocumentsDomainWidget extends AbstractBarChartWidget
+class IndexedDocumentsWidget extends AbstractDoughnutChartWidget
 {
 
     /**
      * @var string
      */
-    protected $title = 'LLL:EXT:solr_file_indexer/Resources/Private/Language/locallang_db.xlf:widgets.indexableDocumentsDomain.title';
+    protected $title = 'LLL:EXT:solr_file_indexer/Resources/Private/Language/locallang_db.xlf:widgets.indexedDocuments.title';
 
     /**
      * @inheritDoc
@@ -38,18 +38,12 @@ class IndexableDocumentsDomainWidget extends AbstractBarChartWidget
         $backgroundColor = [];
         $color = 0;
 
-        $roots = GeneralUtility::makeInstance(WidgetService::class)->getIndexableDocuments();
-        foreach ($roots as $root) {
-            $labels[] = $root['host'];
-            $backgroundColor[] = $this->chartColors[$color++];
-            $tmpCount = 0;
-            foreach ($root['languages'] as $language) {
-                if ($language['count'] > 0) {
-                    $tmpCount += $language['count'];
-                }
-            }
+        $cores = GeneralUtility::makeInstance(WidgetService::class)->getIndexedDocuments();
 
-            $data[] = $tmpCount;
+        foreach ($cores as $core) {
+            $labels[] = $core['options']['core'];
+            $data[] = $core['numFound'];
+            $backgroundColor[] = $this->chartColors[$color++];
 
             if ($color >= count($this->chartColors)) {
                 $color = 0;
@@ -60,7 +54,6 @@ class IndexableDocumentsDomainWidget extends AbstractBarChartWidget
             'labels' => $labels,
             'datasets' => [
                 [
-                    'label' => $this->getLanguageService()->sL('LLL:EXT:solr_file_indexer/Resources/Private/Language/locallang_db.xlf:widgets.total'),
                     'backgroundColor' => $backgroundColor,
                     'data' => $data
                 ]
