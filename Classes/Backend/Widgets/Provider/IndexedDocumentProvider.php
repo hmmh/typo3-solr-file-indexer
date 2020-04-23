@@ -1,26 +1,18 @@
 <?php
 declare(strict_types = 1);
-namespace HMMH\SolrFileIndexer\Backend\Widgets;
+namespace HMMH\SolrFileIndexer\Backend\Widgets\Provider;
 
+use HMMH\SolrFileIndexer\Backend\Widgets\WidgetService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Dashboard\Widgets\AbstractDoughnutChartWidget;
+use TYPO3\CMS\Dashboard\Widgets\ChartDataProviderInterface;
 
 /**
- * This widget will show the number of pages
+ * Class IndexedDocumentProvider
+ *
+ * @package HMMH\SolrFileIndexer\Backend\Widgets\Provider
  */
-class IndexedDocumentsWidget extends AbstractDoughnutChartWidget
+class IndexedDocumentProvider implements ChartDataProviderInterface
 {
-
-    /**
-     * @var string
-     */
-    protected $title = 'LLL:EXT:solr_file_indexer/Resources/Private/Language/locallang_db.xlf:widgets.indexedDocuments.title';
-
-    /**
-     * @inheritDoc
-     */
-    protected $height = 4;
-
     /**
      * @var array
      */
@@ -29,9 +21,7 @@ class IndexedDocumentsWidget extends AbstractDoughnutChartWidget
     /**
      * @inheritDoc
      */
-    protected $templateName = 'SimpleChartWidget';
-
-    protected function prepareChartData(): void
+    public function getChartData(): array
     {
         $labels = [];
         $data = [];
@@ -50,7 +40,7 @@ class IndexedDocumentsWidget extends AbstractDoughnutChartWidget
             }
         }
 
-        $this->chartData = [
+        return [
             'labels' => $labels,
             'datasets' => [
                 [

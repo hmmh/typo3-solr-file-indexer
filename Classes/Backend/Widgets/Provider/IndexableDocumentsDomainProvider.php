@@ -1,26 +1,19 @@
 <?php
 declare(strict_types = 1);
-namespace HMMH\SolrFileIndexer\Backend\Widgets;
+namespace HMMH\SolrFileIndexer\Backend\Widgets\Provider;
 
+use HMMH\SolrFileIndexer\Backend\Widgets\WidgetService;
+use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Dashboard\Widgets\AbstractBarChartWidget;
+use TYPO3\CMS\Dashboard\Widgets\ChartDataProviderInterface;
 
 /**
- * This widget will show the number of pages
+ * Class IndexableDocumentProvider
+ *
+ * @package HMMH\SolrFileIndexer\Backend\Widgets\Provider
  */
-class IndexableDocumentsDomainWidget extends AbstractBarChartWidget
+class IndexableDocumentsDomainProvider implements ChartDataProviderInterface
 {
-
-    /**
-     * @var string
-     */
-    protected $title = 'LLL:EXT:solr_file_indexer/Resources/Private/Language/locallang_db.xlf:widgets.indexableDocumentsDomain.title';
-
-    /**
-     * @inheritDoc
-     */
-    protected $height = 4;
-
     /**
      * @var array
      */
@@ -29,9 +22,7 @@ class IndexableDocumentsDomainWidget extends AbstractBarChartWidget
     /**
      * @inheritDoc
      */
-    protected $templateName = 'SimpleChartWidget';
-
-    protected function prepareChartData(): void
+    public function getChartData(): array
     {
         $labels = [];
         $data = [];
@@ -56,7 +47,7 @@ class IndexableDocumentsDomainWidget extends AbstractBarChartWidget
             }
         }
 
-        $this->chartData = [
+        return [
             'labels' => $labels,
             'datasets' => [
                 [
@@ -66,5 +57,10 @@ class IndexableDocumentsDomainWidget extends AbstractBarChartWidget
                 ]
             ],
         ];
+    }
+
+    protected function getLanguageService(): LanguageService
+    {
+        return $GLOBALS['LANG'];
     }
 }

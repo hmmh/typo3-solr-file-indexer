@@ -1,21 +1,8 @@
+imports:
+  - { resource: Backend/DashboardWidgets.yaml }
+
 services:
-  HMMH\SolrFileIndexer\Backend\Widgets\IndexableDocumentsLanguageWidget:
-    arguments: ['sfiIndexableDocumentsLanguage']
-    tags:
-      - name: dashboard.widget
-        identifier: sfiIndexableDocumentsLanguage
-        widgetGroups: 'solr_file_indexer'
 
-  HMMH\SolrFileIndexer\Backend\Widgets\IndexableDocumentsDomainWidget:
-    arguments: ['sfiIndexableDocumentsDomain']
-    tags:
-      - name: dashboard.widget
-        identifier: sfiIndexableDocumentsDomain
-        widgetGroups: 'solr_file_indexer'
-
-  HMMH\SolrFileIndexer\Backend\Widgets\IndexedDocumentsWidget:
-    arguments: ['sfiIndexedDocuments']
-    tags:
-      - name: dashboard.widget
-        identifier: sfiIndexedDocuments
-        widgetGroups: 'solr_file_indexer'
+  HMMH\SolrFileIndexer\:
+    resource: '../Classes/*'
+    exclude: '../Classes/Backend/Widgets/*'

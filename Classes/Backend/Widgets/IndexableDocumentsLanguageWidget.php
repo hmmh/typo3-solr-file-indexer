@@ -3,40 +3,46 @@ declare(strict_types = 1);
 namespace HMMH\SolrFileIndexer\Backend\Widgets;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Dashboard\Widgets\AbstractWidget;
-use TYPO3\CMS\Dashboard\Widgets\Interfaces\AdditionalCssInterface;
+use TYPO3\CMS\Dashboard\Widgets\AdditionalCssInterface;
+use TYPO3\CMS\Dashboard\Widgets\WidgetConfigurationInterface;
+use TYPO3\CMS\Dashboard\Widgets\WidgetInterface;
+use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * This widget will show the number of pages
  */
-class IndexableDocumentsLanguageWidget extends AbstractWidget implements AdditionalCssInterface
+class IndexableDocumentsLanguageWidget implements WidgetInterface, AdditionalCssInterface
 {
+    /**
+     * @var WidgetConfigurationInterface
+     */
+    private $configuration;
 
     /**
-     * @var string
+     * @var StandaloneView
      */
-    protected $title = 'LLL:EXT:solr_file_indexer/Resources/Private/Language/locallang_db.xlf:widgets.indexableDocumentsLanguage.title';
+    private $view;
 
     /**
-     * @inheritDoc
+     * @var array
      */
-    protected $templateName = 'IndexableDocumentsLanguageWidget';
+    private $options;
 
     /**
-     * @inheritDoc
+     * IndexableDocumentsLanguageWidget constructor.
+     *
+     * @param WidgetConfigurationInterface $configuration
+     * @param StandaloneView               $view
+     * @param array                        $options
      */
-    protected $height = 4;
-
-    /**
-     * @inheritDoc
-     */
-    protected $iconIdentifier = 'content-widget-number';
-
-    protected function initializeView(): void
-    {
-        parent::initializeView();
-
-        $this->view->assign('roots', GeneralUtility::makeInstance(WidgetService::class)->getIndexableDocuments());
+    public function __construct(
+        WidgetConfigurationInterface $configuration,
+        StandaloneView $view,
+        array $options = []
+    ) {
+        $this->configuration = $configuration;
+        $this->view = $view;
+        $this->options = $options;
     }
 
     /**
@@ -45,5 +51,25 @@ class IndexableDocumentsLanguageWidget extends AbstractWidget implements Additio
     public function getCssFiles(): array
     {
         return ['EXT:solr_file_indexer/Resources/Public/Css/widget.css'];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderWidgetContent(): string
+    {
+        $this->view->setTemplate('Widget/IndexableDocumentsLanguageWidget');
+
+        $widgetService = GeneralUtility::makeInstance(WidgetService::class);
+
+        $this->view->assignMultiple([
+            'icon' => $this->options['icon'],
+            'title' => $this->options['title'],
+            'roots' => $widgetService->getIndexableDocuments(),
+            'options' => $this->options,
+            'configuration' => $this->configuration
+        ]);
+
+        return $this->view->render();
     }
 }
