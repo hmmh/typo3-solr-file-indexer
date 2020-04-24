@@ -2,6 +2,7 @@
 declare(strict_types = 1);
 namespace HMMH\SolrFileIndexer\Backend\Widgets;
 
+use HMMH\SolrFileIndexer\Service\Widgets\IndexingService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Dashboard\Widgets\AdditionalCssInterface;
 use TYPO3\CMS\Dashboard\Widgets\WidgetConfigurationInterface;
@@ -60,7 +61,7 @@ class IndexableDocumentsLanguageWidget implements WidgetInterface, AdditionalCss
     {
         $this->view->setTemplate('Widget/IndexableDocumentsLanguageWidget');
 
-        $widgetService = GeneralUtility::makeInstance(WidgetService::class);
+        $widgetService = GeneralUtility::makeInstance(IndexingService::class);
 
         $this->view->assignMultiple([
             'icon' => $this->options['icon'],

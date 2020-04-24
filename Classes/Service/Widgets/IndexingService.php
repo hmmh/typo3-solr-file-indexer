@@ -1,6 +1,6 @@
 <?php
 declare(strict_types = 1);
-namespace HMMH\SolrFileIndexer\Backend\Widgets;
+namespace HMMH\SolrFileIndexer\Service\Widgets;
 
 use ApacheSolrForTypo3\Solr\Domain\Search\Query\ParameterBuilder\ReturnFields;
 use ApacheSolrForTypo3\Solr\Domain\Search\Query\QueryBuilder;
@@ -11,7 +11,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class WidgetService
+class IndexingService
 {
     /**
      * @return array

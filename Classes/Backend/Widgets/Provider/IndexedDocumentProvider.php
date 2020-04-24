@@ -2,7 +2,7 @@
 declare(strict_types = 1);
 namespace HMMH\SolrFileIndexer\Backend\Widgets\Provider;
 
-use HMMH\SolrFileIndexer\Backend\Widgets\WidgetService;
+use HMMH\SolrFileIndexer\Service\Widgets\IndexingService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Dashboard\Widgets\ChartDataProviderInterface;
 
@@ -28,7 +28,7 @@ class IndexedDocumentProvider implements ChartDataProviderInterface
         $backgroundColor = [];
         $color = 0;
 
-        $cores = GeneralUtility::makeInstance(WidgetService::class)->getIndexedDocuments();
+        $cores = GeneralUtility::makeInstance(IndexingService::class)->getIndexedDocuments();
 
         foreach ($cores as $core) {
             $labels[] = $core['options']['core'];
