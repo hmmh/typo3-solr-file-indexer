@@ -16,12 +16,13 @@
 
   "require": {
     "php": ">=7.2.0",
-    "typo3/cms-core": "^9.5.17 || ^10.4.2",
-    "apache-solr-for-typo3/solr": "^9.0 || ^10.0 || ^11.0"
+    "typo3/cms-core": "^10.4.14",
+    "typo3/cms-dashboard": "^10.4.14",
+    "apache-solr-for-typo3/solr": "^11.0.4"
   },
 
   "require-dev": {
-    "nimut/testing-framework": "^5.0"
+    "nimut/testing-framework": "^5.2"
   },
 
   "suggest": {
@@ -49,5 +50,11 @@
       "type": "composer",
       "url": "https:\/\/composer.typo3.org\/"
     }
-  ]
+  ],
+
+  "extra": {
+    "typo3/cms": {
+      "extension-key": "solr_file_indexer"
+    }
+  }
 }

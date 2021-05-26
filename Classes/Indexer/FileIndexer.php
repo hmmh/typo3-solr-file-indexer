@@ -34,6 +34,9 @@ use HMMH\SolrFileIndexer\Interfaces\DocumentUrlInterface;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\Service\ServiceFactory;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Error\Http\ServiceUnavailableException;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Http\ImmediateResponseException;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\FileRepository;
@@ -94,13 +97,17 @@ class FileIndexer extends Indexer
     }
 
     /**
-     * @param Item $item
-     * @param int  $language
+     * Converts an item array (record) to a Solr document by mapping the
+     * record's fields onto Solr document fields as configured in TypoScript.
      *
-     * @return Document
-     * @throws \TYPO3\CMS\Core\Package\Exception\UnknownPackageException
+     * @param Item $item An index queue item
+     * @param int $language Language Id
+     * @return Document|null The Solr document converted from the record
+     * @throws SiteNotFoundException
+     * @throws ServiceUnavailableException
+     * @throws ImmediateResponseException
      */
-    protected function itemToDocument(Item $item, $language = 0)
+    protected function itemToDocument(Item $item, int $language = 0): ?Document
     {
         $content = '';
 
