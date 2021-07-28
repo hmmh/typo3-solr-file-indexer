@@ -84,19 +84,21 @@ class Queue extends \ApacheSolrForTypo3\Solr\IndexQueue\Queue
     public function addMultipleItemsToQueue(array $items)
     {
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable(self::TABLE_INDEXQUEUE_ITEM);
-        $connection->bulkInsert(
-            self::TABLE_INDEXQUEUE_ITEM,
-            $items,
-            [
-                'root',
-                'item_type',
-                'item_uid',
-                'indexing_configuration',
-                'indexing_priority',
-                'changed',
-                'errors'
-            ]
-        );
+        foreach (array_chunk($items, 1000) as $chunk) {
+            $connection->bulkInsert(
+                self::TABLE_INDEXQUEUE_ITEM,
+                $chunk,
+                [
+                    'root',
+                    'item_type',
+                    'item_uid',
+                    'indexing_configuration',
+                    'indexing_priority',
+                    'changed',
+                    'errors'
+                ]
+            );
+        }
 
         return empty($connection->errorInfo());
     }
