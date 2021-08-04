@@ -26,6 +26,7 @@ namespace HMMH\SolrFileIndexer\IndexQueue;
  ***************************************************************/
 
 use ApacheSolrForTypo3\Solr\IndexQueue\Initializer\AbstractInitializer;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -102,7 +103,7 @@ class FileInitializer extends AbstractInitializer
      */
     protected function getAllEnabledMetadata()
     {
-        $allowedFileTypes = $this->indexingConfiguration['allowedFileTypes'];
+        $allowedFileTypes = self::getArrayOfAllowedFileTypes($this->indexingConfiguration['allowedFileTypes']);
 
         $changedField = $GLOBALS['TCA'][$this->type]['ctrl']['tstamp'];
         if (!empty($GLOBALS['TCA'][$this->type]['ctrl']['enablecolumns']['starttime'])) {
@@ -114,8 +115,8 @@ class FileInitializer extends AbstractInitializer
 
         $constraints[] = $queryBuilder->expr()->neq('meta.enable_indexing', $queryBuilder->createNamedParameter('', \PDO::PARAM_STR));
         $constraints[] = $queryBuilder->expr()->eq('meta.file', $queryBuilder->quoteIdentifier('file.uid'));
-        if (!empty($allowedFileTypes)) {
-            $constraints[] = $queryBuilder->expr()->in('file.extension', $allowedFileTypes);
+        if ($allowedFileTypes !== []) {
+            $constraints[] = $queryBuilder->expr()->in('extension', $queryBuilder->createNamedParameter($allowedFileTypes, Connection::PARAM_STR_ARRAY));
         }
 
         return $queryBuilder->select('meta.enable_indexing', 'meta.uid', 'meta.' . $changedField . ' as changed')
@@ -124,5 +125,20 @@ class FileInitializer extends AbstractInitializer
             ->where(...$constraints)
             ->execute()
             ->fetchAll();
+    }
+
+    /**
+     * In earlier versions $allowedFileTypes contained quotes. This is for backwards compatibility.
+     */
+    public static function getArrayOfAllowedFileTypes(string $allowedFileTypes): array
+    {
+        preg_match_all(
+            '/\w+/',
+            $allowedFileTypes,
+            $matches
+        );
+        $allowedFileTypes = $matches[0] ?? [];
+
+        return $allowedFileTypes;
     }
 }

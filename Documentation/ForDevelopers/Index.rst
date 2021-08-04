@@ -23,7 +23,7 @@ TypoScript Configuration
         sys_file_metadata {
           initialization = HMMH\SolrFileIndexer\IndexQueue\FileInitializer
           indexer = HMMH\SolrFileIndexer\Indexer\FileIndexer
-          allowedFileTypes = 'pdf','doc','docx','xlsx'
+          allowedFileTypes = pdf,doc,docx,xlsx
 
           fields {
             title = title
@@ -71,5 +71,5 @@ Specifies the allowed file types to be indexed.
       string
 
 :aspect:`Default`
-      'pdf','doc','docx','xlsx'
+      pdf,doc,docx,xlsx
 
