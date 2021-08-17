@@ -29,9 +29,11 @@ namespace HMMH\SolrFileIndexer\Hook;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\RecordMonitor\Helper\ConfigurationAwareRecordService;
 use ApacheSolrForTypo3\Solr\Util;
 use HMMH\SolrFileIndexer\Base;
+use HMMH\SolrFileIndexer\IndexQueue\FileInitializer;
 use HMMH\SolrFileIndexer\IndexQueue\Queue;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -120,13 +122,13 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
      */
     protected function getSysFile($uid, $indexingConfiguration)
     {
-        $allowedFileTypes = $indexingConfiguration['allowedFileTypes'];
+        $allowedFileTypes = FileInitializer::getArrayOfAllowedFileTypes($indexingConfiguration['allowedFileTypes']);
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
 
         $constraints[] = $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT));
-        if (!empty($allowedFileTypes)) {
-            $constraints[] = $queryBuilder->expr()->in('extension', $allowedFileTypes);
+        if ($allowedFileTypes !== []) {
+            $constraints[] = $queryBuilder->expr()->in('extension', $queryBuilder->createNamedParameter($allowedFileTypes, Connection::PARAM_STR_ARRAY));
         }
 
         return $queryBuilder->select('uid')
