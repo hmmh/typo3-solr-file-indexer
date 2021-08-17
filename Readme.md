@@ -31,7 +31,7 @@ plugin.tx_solr {
       sys_file_metadata {
         initialization = HMMH\SolrFileIndexer\IndexQueue\FileInitializer
         indexer = HMMH\SolrFileIndexer\Indexer\FileIndexer
-        allowedFileTypes = 'pdf','doc','docx','xlsx'
+        allowedFileTypes = pdf,doc,docx,xlsx
 
         fields {
           title = title
