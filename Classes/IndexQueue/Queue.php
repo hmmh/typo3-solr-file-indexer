@@ -100,7 +100,7 @@ class Queue extends \ApacheSolrForTypo3\Solr\IndexQueue\Queue
             );
         }
 
-        return empty($connection->errorInfo());
+        return true;
     }
 
     /**
