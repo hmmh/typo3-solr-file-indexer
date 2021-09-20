@@ -23,3 +23,10 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][\HMMH\SolrFileIn
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTypoScriptSetup(
     'module.tx_dashboard.view.templateRootPaths.20 = EXT:solr_file_indexer/Resources/Private/Templates'
 );
+
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][ApacheSolrForTypo3\Solr\System\Solr\Service\SolrWriteService::class] = [
+   'className' => HMMH\SolrFileIndexer\Service\WriteServiceAdapter::class
+];
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][ApacheSolrForTypo3\Solr\IndexQueue\RecordMonitor::class] = [
+   'className' => HMMH\SolrFileIndexer\IndexQueue\RecordMonitorAdapter::class
+];
