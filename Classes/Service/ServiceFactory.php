@@ -33,6 +33,7 @@ use HMMH\SolrFileIndexer\Interfaces\ServiceInterface;
 use HMMH\SolrFileIndexer\Service\Tika\SolrService;
 use TYPO3\CMS\Core\Package\Exception\UnknownPackageException;
 use TYPO3\CMS\Core\Package\PackageManager;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class ServiceFactory
@@ -79,7 +80,7 @@ class ServiceFactory
             throw new UnknownPackageException('Package tika does not exists or is inactive');
         }
 
-        return $this->getSolrService($extensionConfig);
+        return $this->getSolrService();
     }
 
     /**
@@ -87,7 +88,7 @@ class ServiceFactory
      */
     protected function getExtensionConfig()
     {
-        return Base::getObjectManager()->get(ExtensionConfig::class);
+        return GeneralUtility::makeInstance(ExtensionConfig::class);
     }
 
     /**
@@ -95,9 +96,9 @@ class ServiceFactory
      *
      * @return SolrService
      */
-    protected function getSolrService($extensionConfig)
+    protected function getSolrService()
     {
-        return Base::getObjectManager()->get(SolrService::class, $extensionConfig);
+        return GeneralUtility::makeInstance(SolrService::class);
     }
 
     /**
@@ -105,7 +106,7 @@ class ServiceFactory
      */
     protected function isTikaActive()
     {
-        $packageManager = Base::getObjectManager()->get(PackageManager::class);
+        $packageManager = GeneralUtility::makeInstance(PackageManager::class);
         return $packageManager->isPackageActive('tika');
     }
 

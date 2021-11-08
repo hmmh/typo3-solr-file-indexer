@@ -2,6 +2,10 @@ imports:
   - { resource: Backend/DashboardWidgets.yaml }
 
 services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
 
   HMMH\SolrFileIndexer\:
     resource: '../Classes/*'

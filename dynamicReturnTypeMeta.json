@@ -8,6 +8,11 @@
 			"method": "makeInstance",
 			"position": 0
 		},
+    {
+			"class": "\\Psr\\Container\\ContainerInterface",
+			"method": "get",
+			"position": 0
+		},
 		{
 			"class": "\\TYPO3\\CMS\\Extbase\\Object\\ObjectManagerInterface",
 			"method": "get",

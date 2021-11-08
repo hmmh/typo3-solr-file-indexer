@@ -151,7 +151,7 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
      */
     protected function collectRecordGarbageForDisabledRootpages($table, $uid, $rootPages)
     {
-        $connectionAdapter = Base::getObjectManager()->get(ConnectionAdapter::class);
+        $connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
 
         $indexQueueItems = $this->queue->getItems($table, $uid);
         foreach ($indexQueueItems as $indexQueueItem) {
