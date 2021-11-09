@@ -30,7 +30,7 @@ class IndexingService
                 )
             )
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         $roots = $this->getSiteRoots();
 
@@ -65,6 +65,7 @@ class IndexingService
             /** @var \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $connection */
             $readService = $connection->getReadService();
             if ($readService->ping()) {
+                // @extensionScannerIgnoreLine
                 $coreOptions = $readService->getPrimaryEndpoint()->getOptions();
                 $hash = md5(serialize($coreOptions));
                 if (!isset($readConnections[$hash])) {
@@ -79,9 +80,11 @@ class IndexingService
                     $response = $readService->search($query);
                     if ($response instanceof ResponseAdapter) {
                         $data = $response->getParsedData();
+                        // @extensionScannerIgnoreLine
                         if (isset($data->response->numFound)) {
                             $cores[] = [
                                 'options' => $coreOptions,
+                                // @extensionScannerIgnoreLine
                                 'numFound' => (int)$data->response->numFound
                             ];
                         }
@@ -125,6 +128,7 @@ class IndexingService
 
         foreach ($languages as $language) {
             /** @var \TYPO3\CMS\Core\Site\Entity\SiteLanguage $language */
+            // @extensionScannerIgnoreLine
             $lang[$language->getLanguageId()] = [
                 'title' => $language->getTitle(),
                 'count' => 0

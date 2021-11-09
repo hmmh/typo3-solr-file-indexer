@@ -141,7 +141,7 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
             ->where(...$constraints)
             ->setMaxResults(1)
             ->execute()
-            ->fetch();
+            ->fetchAssociative();
     }
 
     /**
@@ -187,7 +187,7 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
             )
             ->setMaxResults(1)
             ->execute()
-            ->fetch();
+            ->fetchAssociative();
 
         if (isset($metadata['uid'])) {
             $this->collectGarbage(self::FILE_TABLE, $metadata['uid']);

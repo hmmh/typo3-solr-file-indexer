@@ -83,6 +83,7 @@ class DeleteByTypeTaskAdditionalFieldProvider extends AbstractAdditionalFieldPro
         $result = true;
 
         if (empty($submittedData['task_siteRootPageId'])) {
+            // @extensionScannerIgnoreLine
             $this->addMessage('Missing site root page ID', FlashMessage::ERROR);
             $result = false;
         }

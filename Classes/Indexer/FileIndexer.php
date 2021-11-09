@@ -70,6 +70,11 @@ class FileIndexer extends Indexer
     protected $extensionConfiguration;
 
     /**
+     * @var ConnectionAdapter
+     */
+    protected $connectionAdapter;
+
+    /**
      * Indexes an item from the indexing queue.
      *
      * @param Item $item An index queue item
@@ -83,7 +88,9 @@ class FileIndexer extends Indexer
         $this->type = $item->getType();
         $this->setLogging($item);
 
-        $solrConnections = $this->getSolrConnectionsByItem($item);
+        $this->connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
+
+        $solrConnections = $this->connectionAdapter->getConnectionsBySite($item->getSite());
         foreach ($solrConnections as $systemLanguageUid => $solrConnection) {
             $this->solr = $solrConnection;
             // check whether we should move on at all
@@ -184,12 +191,16 @@ class FileIndexer extends Indexer
     protected function fetchFile(Item $item)
     {
         $sysFileUid = (int)$item->getRecord()['file'];
+        // @extensionScannerIgnoreLine
         if (array_key_exists($sysFileUid, $this->fileCache)) {
+            // @extensionScannerIgnoreLine
             return $this->fileCache[$sysFileUid];
         }
 
         $fileRepository = GeneralUtility::makeInstance(FileRepository::class);
-        return $this->fileCache[$sysFileUid] = $fileRepository->findByUid($sysFileUid);
+        // @extensionScannerIgnoreLine
+        $this->fileCache[$sysFileUid] = $fileRepository->findByUid($sysFileUid);
+        return $this->fileCache[$sysFileUid];
     }
 
     /**
@@ -344,8 +355,7 @@ class FileIndexer extends Indexer
      */
     protected function removeOriginalFromIndex($uid)
     {
-        $connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
-        $connectionAdapter->deleteByQuery($this->solr, 'type:' . self::FILE_TABLE . ' AND uid:' . (int)$uid);
+        $this->connectionAdapter->deleteByQuery($this->solr, 'type:' . self::FILE_TABLE . ' AND uid:' . (int)$uid);
     }
 
     /**

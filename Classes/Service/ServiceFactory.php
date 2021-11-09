@@ -106,7 +106,7 @@ class ServiceFactory
      */
     protected function isTikaActive()
     {
-        $packageManager = GeneralUtility::makeInstance(PackageManager::class);
+        $packageManager = GeneralUtility::getContainer()->get(PackageManager::class);
         return $packageManager->isPackageActive('tika');
     }
 
