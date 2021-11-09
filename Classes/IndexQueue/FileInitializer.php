@@ -124,7 +124,7 @@ class FileInitializer extends AbstractInitializer
             ->from('sys_file', 'file')
             ->where(...$constraints)
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
     }
 
     /**

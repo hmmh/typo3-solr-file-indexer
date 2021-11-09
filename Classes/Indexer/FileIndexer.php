@@ -30,6 +30,8 @@ use ApacheSolrForTypo3\Solr\IndexQueue\Indexer;
 use ApacheSolrForTypo3\Solr\IndexQueue\Item;
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
 use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
+use HMMH\SolrFileIndexer\Interfaces\AddContentInterface;
+use HMMH\SolrFileIndexer\Interfaces\CleanupContentInterface;
 use HMMH\SolrFileIndexer\Interfaces\DocumentUrlInterface;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\Service\ServiceFactory;
@@ -41,9 +43,6 @@ use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\FileRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
-use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException;
-use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException;
 
 /**
  * Class FileIndexer
@@ -58,11 +57,6 @@ class FileIndexer extends Indexer
      * @var array
      */
     protected $fileCache = [];
-
-    /**
-     * @var Dispatcher
-     */
-    protected $signalSlotDispatcher;
 
     /**
      * @var ExtensionConfig
@@ -249,20 +243,16 @@ class FileIndexer extends Indexer
      */
     protected function emitPostCleanContentSignal($content)
     {
-        try {
-            $result = $this->getSignalSlotDispatcher()->dispatch(self::class, 'cleanupContent', [$content]);
-            if ($result === null) {
-                $returnValue = $content;
-            } else {
-                $returnValue = $result[0];
-            }
-        } catch (InvalidSlotException $ise) {
-            $returnValue = $content;
-        } catch (InvalidSlotReturnException $isre) {
-            $returnValue = $content;
-        }
+        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['cleanupContent'])) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['cleanupContent'] as $classReference) {
+                $cleanupObject = GeneralUtility::makeInstance($classReference);
 
-        return $returnValue;
+                if ($cleanupObject instanceof CleanupContentInterface) {
+                    $content = $cleanupObject->cleanup($content);
+                }
+            }
+        }
+        return $content;
     }
 
     /**
@@ -273,32 +263,16 @@ class FileIndexer extends Indexer
      */
     protected function emitPostAddContentAfterSignal(Document $document, $content)
     {
-        try {
-            $result = $this->getSignalSlotDispatcher()->dispatch(self::class, 'addContentAfter', [$document, $content]);
-            if ($result === null) {
-                $returnValue = $content;
-            } else {
-                $returnValue = $result[1];
+        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addContentAfter'])) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addContentAfter'] as $classReference) {
+                $addObject = GeneralUtility::makeInstance($classReference);
+
+                if ($addObject instanceof AddContentInterface) {
+                    $content = $addObject->add($content);
+                }
             }
-        } catch (InvalidSlotException $ise) {
-            $returnValue = $content;
-        } catch (InvalidSlotReturnException $isre) {
-            $returnValue = $content;
         }
-
-        return $returnValue;
-    }
-
-    /**
-     * @return Dispatcher
-     */
-    protected function getSignalSlotDispatcher(): Dispatcher
-    {
-        if ($this->signalSlotDispatcher === null) {
-            $this->signalSlotDispatcher = GeneralUtility::makeInstance(Dispatcher::class);
-        }
-
-        return $this->signalSlotDispatcher;
+        return $content;
     }
 
     /**
@@ -332,7 +306,7 @@ class FileIndexer extends Indexer
                 )
                 ->setMaxResults(1)
                 ->execute()
-                ->fetch();
+                ->fetchAssociative();
 
             if (empty($metadata['uid'])) {
                 $indexableLanguage = true;
