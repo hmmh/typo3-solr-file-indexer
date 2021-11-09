@@ -23,7 +23,7 @@
 
   "suggest": {
     "typo3/cms-filemetadata": "^11.5.0",
-    "apache-solr-for-typo3/tika": ">=10.0"
+    "apache-solr-for-typo3/tika": ">=5.0"
   },
 
   "replace": {

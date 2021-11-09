@@ -28,7 +28,6 @@ namespace HMMH\SolrFileIndexer\Task;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\QueueInitializationService;
 use ApacheSolrForTypo3\Solr\Domain\Site\Site;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
-use HMMH\SolrFileIndexer\Base;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 

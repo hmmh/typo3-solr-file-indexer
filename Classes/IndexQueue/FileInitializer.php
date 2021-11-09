@@ -137,8 +137,6 @@ class FileInitializer extends AbstractInitializer
             $allowedFileTypes,
             $matches
         );
-        $allowedFileTypes = $matches[0] ?? [];
-
-        return $allowedFileTypes;
+        return $matches[0] ?? [];
     }
 }

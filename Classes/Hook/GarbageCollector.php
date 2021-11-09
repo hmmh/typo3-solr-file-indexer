@@ -28,8 +28,6 @@ namespace HMMH\SolrFileIndexer\Hook;
 
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\RecordMonitor\Helper\ConfigurationAwareRecordService;
 use ApacheSolrForTypo3\Solr\FrontendEnvironment;
-use ApacheSolrForTypo3\Solr\Util;
-use HMMH\SolrFileIndexer\Base;
 use HMMH\SolrFileIndexer\IndexQueue\FileInitializer;
 use HMMH\SolrFileIndexer\IndexQueue\Queue;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
@@ -69,7 +67,6 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
         $table,
         $uid,
         array $fields,
-        /** @noinspection PhpUnusedParameterInspection */
         DataHandler $tceMain
     ) {
         parent::processDatamap_afterDatabaseOperations($status, $table, $uid, $fields, $tceMain);
@@ -99,13 +96,10 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
     protected function updateItem($table, $uid, $record, $rootPages)
     {
         $recordService = GeneralUtility::makeInstance(ConfigurationAwareRecordService::class);
-        if (class_exists(FrontendEnvironment::class)) {
-            /** @var FrontendEnvironment $frontendEnvironment */
-            $frontendEnvironment = GeneralUtility::makeInstance(FrontendEnvironment::class);
-        }
+        $frontendEnvironment = GeneralUtility::makeInstance(FrontendEnvironment::class);
 
         foreach ($rootPages as $rootPageId) {
-            $solrConfiguration = $frontendEnvironment ? $frontendEnvironment->getSolrConfigurationFromPageId($rootPageId) : Util::getSolrConfigurationFromPageId($rootPageId);
+            $solrConfiguration = $frontendEnvironment->getSolrConfigurationFromPageId($rootPageId);
             $indexingConfigurationName = $recordService->getIndexingConfigurationName($table, $uid, $solrConfiguration);
             $indexingConfiguration = $solrConfiguration->getIndexQueueConfigurationByName($indexingConfigurationName);
 
