@@ -29,10 +29,6 @@
     "apache-solr-for-typo3/tika": ">=4.0"
   },
 
-  "replace": {
-    "hmmh/solr-file-indexer": "self.version"
-  },
-
   "autoload": {
     "psr-4": {
       "HMMH\\SolrFileIndexer\\": "Classes"
