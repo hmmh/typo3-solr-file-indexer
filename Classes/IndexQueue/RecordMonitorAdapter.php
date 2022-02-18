@@ -17,7 +17,7 @@ class RecordMonitorAdapter extends RecordMonitor
      * @param string $table
      * @return bool
      */
-    protected function skipMonitoringOfTable($table)
+    protected function skipMonitoringOfTable($table): bool
     {
         if ($table === 'sys_file_metadata') {
             return true;
