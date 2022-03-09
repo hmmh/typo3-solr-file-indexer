@@ -58,7 +58,7 @@ class FileInitializer extends AbstractInitializer
      *
      * @return mixed TRUE if initialization was successful, FALSE on error.
      */
-    public function initialize()
+    public function initialize(): bool
     {
         $initialized = false;
 

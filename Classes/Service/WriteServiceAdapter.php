@@ -17,7 +17,7 @@ class WriteServiceAdapter extends SolrWriteService
      * @param Query $query
      * @return array
      */
-    public function extractByQuery(Query $query)
+    public function extractByQuery(Query $query): array
     {
         try {
             $response = $this->createAndExecuteRequest($query);

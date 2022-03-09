@@ -75,7 +75,7 @@ class FileIndexer extends Indexer
      *
      * @return true
      */
-    public function index(Item $item)
+    public function index(Item $item): bool
     {
         $this->extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfig::class);
 
