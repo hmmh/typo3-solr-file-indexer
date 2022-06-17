@@ -24,8 +24,8 @@ $EM_CONF[$_EXTKEY] = [
     'version'          => '2.3.0-dev',
     'constraints'      => [
         'depends'   => [
-            'typo3' => '>=10.4.0',
-            'dashboard' => '>=10.4.0',
+            'typo3' => '10.4.10-10.4.99',
+            'dashboard' => '',
             'solr' => '>=11.0',
             'php' => '>=7.2'
         ],
