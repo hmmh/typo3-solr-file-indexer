@@ -41,13 +41,6 @@
     }
   },
 
-  "repositories": [
-    {
-      "type": "composer",
-      "url": "https:\/\/composer.typo3.org\/"
-    }
-  ],
-
   "extra": {
     "typo3/cms": {
       "extension-key": "solr_file_indexer"
