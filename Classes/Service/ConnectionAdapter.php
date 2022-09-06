@@ -27,9 +27,9 @@ namespace HMMH\SolrFileIndexer\Service;
  ***************************************************************/
 
 use ApacheSolrForTypo3\Solr\Domain\Site\Site;
-use HMMH\SolrFileIndexer\Base;
 use \ApacheSolrForTypo3\Solr\ConnectionManager;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class ConnectionAdapter
@@ -45,14 +45,20 @@ class ConnectionAdapter implements SingletonInterface
     protected $connectionManager = null;
 
     /**
+     * ConnectionAdapter constructor.
+     *
+     * @param ConnectionManager $connectionManager
+     */
+    public function __construct()
+    {
+        $this->connectionManager = GeneralUtility::makeInstance(ConnectionManager::class);
+    }
+
+    /**
      * @return ConnectionManager
      */
     public function getConnectionManager()
     {
-        if ($this->connectionManager === null) {
-            $this->connectionManager = Base::getObjectManager()->get(ConnectionManager::class);
-        }
-
         return $this->connectionManager;
     }
 

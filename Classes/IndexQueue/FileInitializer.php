@@ -58,7 +58,7 @@ class FileInitializer extends AbstractInitializer
      *
      * @return mixed TRUE if initialization was successful, FALSE on error.
      */
-    public function initialize()
+    public function initialize(): bool
     {
         $initialized = false;
 
@@ -116,7 +116,10 @@ class FileInitializer extends AbstractInitializer
         $constraints[] = $queryBuilder->expr()->neq('meta.enable_indexing', $queryBuilder->createNamedParameter('', \PDO::PARAM_STR));
         $constraints[] = $queryBuilder->expr()->eq('meta.file', $queryBuilder->quoteIdentifier('file.uid'));
         if ($allowedFileTypes !== []) {
-            $constraints[] = $queryBuilder->expr()->in('extension', $queryBuilder->createNamedParameter($allowedFileTypes, Connection::PARAM_STR_ARRAY));
+            $constraints[] = $queryBuilder->expr()->in(
+                'file.extension',
+                $queryBuilder->createNamedParameter($allowedFileTypes, Connection::PARAM_STR_ARRAY)
+            );
         }
 
         return $queryBuilder->select('meta.enable_indexing', 'meta.uid', 'meta.' . $changedField . ' as changed')
@@ -124,7 +127,7 @@ class FileInitializer extends AbstractInitializer
             ->from('sys_file', 'file')
             ->where(...$constraints)
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
     }
 
     /**
@@ -137,8 +140,6 @@ class FileInitializer extends AbstractInitializer
             $allowedFileTypes,
             $matches
         );
-        $allowedFileTypes = $matches[0] ?? [];
-
-        return $allowedFileTypes;
+        return $matches[0] ?? [];
     }
 }

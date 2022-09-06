@@ -57,12 +57,12 @@ class SolrService implements ServiceInterface
     /**
      * SolrService constructor.
      *
-     * @param ExtensionConfig $extensionConfig
      * @throws NoSolrConnectionFoundException
      */
-    public function __construct(ExtensionConfig $extensionConfig)
+    public function __construct()
     {
         $this->connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
+        $extensionConfig = GeneralUtility::makeInstance(ExtensionConfig::class);
         $this->solrConnection = $this->connectionAdapter->getConnectionByPageId((int)$extensionConfig->getPageId());
     }
 

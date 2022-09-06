@@ -28,8 +28,8 @@ namespace HMMH\SolrFileIndexer\Task;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\QueueInitializationService;
 use ApacheSolrForTypo3\Solr\Domain\Site\Site;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
-use HMMH\SolrFileIndexer\Base;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class DeleteByType
@@ -76,7 +76,7 @@ class DeleteByTypeTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
      */
     public function execute()
     {
-        $this->connectionAdapter = Base::getObjectManager()->get(ConnectionAdapter::class);
+        $this->connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
 
         $this->setSite($this->siteRootPageId);
 
@@ -123,7 +123,7 @@ class DeleteByTypeTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
      */
     protected function reindexByType($type)
     {
-        $itemIndexQueue = Base::getObjectManager()->get(QueueInitializationService::class);
+        $itemIndexQueue = GeneralUtility::makeInstance(QueueInitializationService::class);
         $itemIndexQueue->initializeBySiteAndIndexConfiguration($this->site, $type);
     }
 
@@ -132,7 +132,7 @@ class DeleteByTypeTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
      */
     protected function setSite($siteRootPageId)
     {
-        $siteRepository = Base::getObjectManager()->get(SiteRepository::class);
+        $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
         $this->site = $siteRepository->getSiteByPageId((int)$siteRootPageId);
     }
 }

@@ -27,6 +27,7 @@ namespace HMMH\SolrFileIndexer\Task;
 
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Scheduler\AbstractAdditionalFieldProvider;
+use TYPO3\CMS\Scheduler\Task\AbstractTask;
 
 /**
  * Class DeleteByTypeTaskAdditionalFieldProvider
@@ -47,9 +48,12 @@ class DeleteByTypeTaskAdditionalFieldProvider extends AbstractAdditionalFieldPro
     {
         $additionalFields = [];
 
+        $siteRootPageId = $task instanceof AbstractTask ? $task->siteRootPageId : null;
+        $reindexing = $task instanceof AbstractTask ? $task->reindexing : false;
+
         $fieldId = 'task_siteRootPageId';
         $fieldCode = '<input type="text" class="form-control" name="tx_scheduler[' . $fieldId . ']" id="' .
-            $fieldId . '" value="' . $task->siteRootPageId . '" >';
+            $fieldId . '" value="' . $siteRootPageId . '" >';
         $additionalFields[$fieldId] = [
             'code' => $fieldCode,
             'label' => 'Site Root Page ID',
@@ -58,7 +62,7 @@ class DeleteByTypeTaskAdditionalFieldProvider extends AbstractAdditionalFieldPro
         ];
 
         $fieldId = 'task_reindexing';
-        $checked = $task->reindexing ? 'checked="checked"' : '';
+        $checked = $reindexing ? 'checked="checked"' : '';
         $fieldCode = '<input type="checkbox" class="checkbox" name="tx_scheduler[' . $fieldId . ']" id="' .
             $fieldId . '" value="1" ' . $checked . '>';
         $additionalFields[$fieldId] = [
@@ -83,6 +87,7 @@ class DeleteByTypeTaskAdditionalFieldProvider extends AbstractAdditionalFieldPro
         $result = true;
 
         if (empty($submittedData['task_siteRootPageId'])) {
+            // @extensionScannerIgnoreLine
             $this->addMessage('Missing site root page ID', FlashMessage::ERROR);
             $result = false;
         }

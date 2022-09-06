@@ -2,7 +2,17 @@ imports:
   - { resource: Backend/DashboardWidgets.yaml }
 
 services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
 
   HMMH\SolrFileIndexer\:
     resource: '../Classes/*'
     exclude: '../Classes/Backend/Widgets/*'
+
+  HMMH\SolrFileIndexer\Listener\RemoveFile:
+    tags:
+      - name: event.listener
+        identifier: 'tx-solr-file-indexer-reove-file'
+        event: TYPO3\CMS\Core\Resource\Event\AfterFileRemovedFromIndexEvent
