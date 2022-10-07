@@ -21,7 +21,7 @@ class IndexingService
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $queryBuilder = $connectionPool->getQueryBuilderForTable('sys_file_metadata');
 
-        $result = $queryBuilder->select('uid', 'enable_indexing', 'sys_language_uid')
+        $res = $queryBuilder->select('uid', 'enable_indexing', 'sys_language_uid')
             ->from('sys_file_metadata')
             ->where(
                 $queryBuilder->expr()->neq(
@@ -29,8 +29,13 @@ class IndexingService
                     $queryBuilder->createNamedParameter('', Connection::PARAM_STR)
                 )
             )
-            ->execute()
-            ->fetchAllAssociative();
+            ->execute();
+
+        if (method_exists($res, 'fetchAllAssociative')) {
+            $result = $res->fetchAllAssociative();
+        } else {
+            $result = $res->fetchAll();
+        }
 
         $roots = $this->getSiteRoots();
 

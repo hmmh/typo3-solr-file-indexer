@@ -122,12 +122,17 @@ class FileInitializer extends AbstractInitializer
             );
         }
 
-        return $queryBuilder->select('meta.enable_indexing', 'meta.uid', 'meta.' . $changedField . ' as changed')
+        $result = $queryBuilder->select('meta.enable_indexing', 'meta.uid', 'meta.' . $changedField . ' as changed')
             ->from('sys_file_metadata', 'meta')
             ->from('sys_file', 'file')
             ->where(...$constraints)
-            ->execute()
-            ->fetchAllAssociative();
+            ->execute();
+
+        if (method_exists($result, 'fetchAllAssociative')) {
+            return $result->fetchAllAssociative();
+        } else {
+            return $result->fetchAll();
+        }
     }
 
     /**

@@ -292,7 +292,7 @@ class FileIndexer extends Indexer
             (int)$record[$languageField] === 0
         ) {
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
-            $metadata = $queryBuilder->select('uid')
+            $result = $queryBuilder->select('uid')
                 ->from(self::FILE_TABLE)
                 ->where(
                     $queryBuilder->expr()->eq(
@@ -305,8 +305,13 @@ class FileIndexer extends Indexer
                     )
                 )
                 ->setMaxResults(1)
-                ->execute()
-                ->fetchAssociative();
+                ->execute();
+
+            if (method_exists($result, 'fetchAssociative')) {
+                $metadata = $result->fetchAssociative();
+            } else {
+                $metadata = $result->fetch();
+            }
 
             if (empty($metadata['uid'])) {
                 $indexableLanguage = true;

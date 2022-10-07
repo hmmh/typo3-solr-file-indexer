@@ -130,12 +130,17 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
             $constraints[] = $queryBuilder->expr()->in('extension', $queryBuilder->createNamedParameter($allowedFileTypes, Connection::PARAM_STR_ARRAY));
         }
 
-        return $queryBuilder->select('uid')
+        $result = $queryBuilder->select('uid')
             ->from('sys_file')
             ->where(...$constraints)
             ->setMaxResults(1)
-            ->execute()
-            ->fetchAssociative();
+            ->execute();
+
+        if (method_exists($result, 'fetchAssociative')) {
+            return $result->fetchAssociative();
+        } else {
+            return $result->fetch();
+        }
     }
 
     /**
@@ -174,14 +179,19 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
     public function deleteFile($fileUid)
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
-        $metadata = $queryBuilder->select('uid')
+        $result = $queryBuilder->select('uid')
             ->from(self::FILE_TABLE)
             ->where(
                 $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
             )
             ->setMaxResults(1)
-            ->execute()
-            ->fetchAssociative();
+            ->execute();
+
+        if (method_exists($result, 'fetchAssociative')) {
+            $metadata = $result->fetchAssociative();
+        } else {
+            $metadata = $result->fetch();
+        }
 
         if (isset($metadata['uid'])) {
             $this->collectGarbage(self::FILE_TABLE, $metadata['uid']);
