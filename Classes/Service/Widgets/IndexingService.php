@@ -5,6 +5,7 @@ namespace HMMH\SolrFileIndexer\Service\Widgets;
 use ApacheSolrForTypo3\Solr\Domain\Search\Query\ParameterBuilder\ReturnFields;
 use ApacheSolrForTypo3\Solr\Domain\Search\Query\QueryBuilder;
 use ApacheSolrForTypo3\Solr\System\Solr\ResponseAdapter;
+use HMMH\SolrFileIndexer\Legacy\DbalResult;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -31,11 +32,7 @@ class IndexingService
             )
             ->execute();
 
-        if (method_exists($res, 'fetchAllAssociative')) {
-            $result = $res->fetchAllAssociative();
-        } else {
-            $result = $res->fetchAll();
-        }
+        $result = DbalResult::fetchAll($res);
 
         $roots = $this->getSiteRoots();
 

@@ -26,6 +26,7 @@ namespace HMMH\SolrFileIndexer\IndexQueue;
  ***************************************************************/
 
 use ApacheSolrForTypo3\Solr\IndexQueue\Initializer\AbstractInitializer;
+use HMMH\SolrFileIndexer\Legacy\DbalResult;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -128,11 +129,7 @@ class FileInitializer extends AbstractInitializer
             ->where(...$constraints)
             ->execute();
 
-        if (method_exists($result, 'fetchAllAssociative')) {
-            return $result->fetchAllAssociative();
-        } else {
-            return $result->fetchAll();
-        }
+        return DbalResult::fetchAll($result);
     }
 
     /**
