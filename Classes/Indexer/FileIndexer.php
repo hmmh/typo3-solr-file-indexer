@@ -33,6 +33,7 @@ use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
 use HMMH\SolrFileIndexer\Interfaces\AddContentInterface;
 use HMMH\SolrFileIndexer\Interfaces\CleanupContentInterface;
 use HMMH\SolrFileIndexer\Interfaces\DocumentUrlInterface;
+use HMMH\SolrFileIndexer\Legacy\DbalResult;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\Service\ServiceFactory;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -292,7 +293,7 @@ class FileIndexer extends Indexer
             (int)$record[$languageField] === 0
         ) {
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
-            $metadata = $queryBuilder->select('uid')
+            $result = $queryBuilder->select('uid')
                 ->from(self::FILE_TABLE)
                 ->where(
                     $queryBuilder->expr()->eq(
@@ -305,8 +306,9 @@ class FileIndexer extends Indexer
                     )
                 )
                 ->setMaxResults(1)
-                ->execute()
-                ->fetchAssociative();
+                ->execute();
+
+            $metadata = DbalResult::fetch($result);
 
             if (empty($metadata['uid'])) {
                 $indexableLanguage = true;

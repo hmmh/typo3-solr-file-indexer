@@ -30,6 +30,7 @@ use ApacheSolrForTypo3\Solr\Domain\Index\Queue\RecordMonitor\Helper\Configuratio
 use ApacheSolrForTypo3\Solr\FrontendEnvironment;
 use HMMH\SolrFileIndexer\IndexQueue\FileInitializer;
 use HMMH\SolrFileIndexer\IndexQueue\Queue;
+use HMMH\SolrFileIndexer\Legacy\DbalResult;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
@@ -130,12 +131,13 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
             $constraints[] = $queryBuilder->expr()->in('extension', $queryBuilder->createNamedParameter($allowedFileTypes, Connection::PARAM_STR_ARRAY));
         }
 
-        return $queryBuilder->select('uid')
+        $result = $queryBuilder->select('uid')
             ->from('sys_file')
             ->where(...$constraints)
             ->setMaxResults(1)
-            ->execute()
-            ->fetchAssociative();
+            ->execute();
+
+        return DbalResult::fetch($result);
     }
 
     /**
@@ -174,14 +176,15 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
     public function deleteFile($fileUid)
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
-        $metadata = $queryBuilder->select('uid')
+        $result = $queryBuilder->select('uid')
             ->from(self::FILE_TABLE)
             ->where(
                 $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
             )
             ->setMaxResults(1)
-            ->execute()
-            ->fetchAssociative();
+            ->execute();
+
+        $metadata = DbalResult::fetch($result);
 
         if (isset($metadata['uid'])) {
             $this->collectGarbage(self::FILE_TABLE, $metadata['uid']);
