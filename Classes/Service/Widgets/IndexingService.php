@@ -5,6 +5,7 @@ namespace HMMH\SolrFileIndexer\Service\Widgets;
 use ApacheSolrForTypo3\Solr\Domain\Search\Query\ParameterBuilder\ReturnFields;
 use ApacheSolrForTypo3\Solr\Domain\Search\Query\QueryBuilder;
 use ApacheSolrForTypo3\Solr\System\Solr\ResponseAdapter;
+use HMMH\SolrFileIndexer\Legacy\DbalResult;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -21,7 +22,7 @@ class IndexingService
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $queryBuilder = $connectionPool->getQueryBuilderForTable('sys_file_metadata');
 
-        $result = $queryBuilder->select('uid', 'enable_indexing', 'sys_language_uid')
+        $res = $queryBuilder->select('uid', 'enable_indexing', 'sys_language_uid')
             ->from('sys_file_metadata')
             ->where(
                 $queryBuilder->expr()->neq(
@@ -29,8 +30,9 @@ class IndexingService
                     $queryBuilder->createNamedParameter('', Connection::PARAM_STR)
                 )
             )
-            ->execute()
-            ->fetchAllAssociative();
+            ->execute();
+
+        $result = DbalResult::fetchAll($res);
 
         $roots = $this->getSiteRoots();
 
