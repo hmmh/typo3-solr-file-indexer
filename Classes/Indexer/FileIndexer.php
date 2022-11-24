@@ -232,7 +232,7 @@ class FileIndexer extends Indexer
      */
     protected function cleanupContent($content): string
     {
-        $content = trim($content);
+        $content = trim($content ?? '');
 
         return $this->emitPostCleanContentSignal($content);
     }
