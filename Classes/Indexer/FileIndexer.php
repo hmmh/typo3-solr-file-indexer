@@ -204,7 +204,7 @@ class FileIndexer extends Indexer
      */
     protected function addDocumentUrl(Item $item, Document $document)
     {
-        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'])) {
+        if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'] ?? false) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'] as $classReference) {
                 $documentUrlObject = GeneralUtility::makeInstance($classReference);
 
@@ -232,7 +232,7 @@ class FileIndexer extends Indexer
      */
     protected function cleanupContent($content): string
     {
-        $content = trim($content);
+        $content = trim($content ?? '');
 
         return $this->emitPostCleanContentSignal($content);
     }
@@ -244,7 +244,7 @@ class FileIndexer extends Indexer
      */
     protected function emitPostCleanContentSignal($content)
     {
-        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['cleanupContent'])) {
+        if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['cleanupContent'] ?? false) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['cleanupContent'] as $classReference) {
                 $cleanupObject = GeneralUtility::makeInstance($classReference);
 
@@ -264,7 +264,7 @@ class FileIndexer extends Indexer
      */
     protected function emitPostAddContentAfterSignal(Document $document, $content)
     {
-        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addContentAfter'])) {
+        if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addContentAfter'] ?? false) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addContentAfter'] as $classReference) {
                 $addObject = GeneralUtility::makeInstance($classReference);
 
