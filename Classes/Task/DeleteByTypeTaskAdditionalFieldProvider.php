@@ -104,6 +104,6 @@ class DeleteByTypeTaskAdditionalFieldProvider extends AbstractAdditionalFieldPro
     public function saveAdditionalFields(array $submittedData, \TYPO3\CMS\Scheduler\Task\AbstractTask $task)
     {
         $task->siteRootPageId = (int)$submittedData['task_siteRootPageId'];
-        $task->reindexing = (int)$submittedData['task_reindexing'];
+        $task->reindexing = (int)($submittedData['task_reindexing'] ?? 0);
     }
 }

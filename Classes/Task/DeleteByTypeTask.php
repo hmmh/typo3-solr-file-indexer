@@ -25,9 +25,9 @@ namespace HMMH\SolrFileIndexer\Task;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use ApacheSolrForTypo3\Solr\Domain\Index\Queue\QueueInitializationService;
 use ApacheSolrForTypo3\Solr\Domain\Site\Site;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
+use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -123,8 +123,8 @@ class DeleteByTypeTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
      */
     protected function reindexByType($type)
     {
-        $itemIndexQueue = GeneralUtility::makeInstance(QueueInitializationService::class);
-        $itemIndexQueue->initializeBySiteAndIndexConfiguration($this->site, $type);
+        $queue = GeneralUtility::makeInstance(Queue::class);
+        $queue->getInitializationService()->initializeBySiteAndIndexConfiguration($this->site, $type);
     }
 
     /**
