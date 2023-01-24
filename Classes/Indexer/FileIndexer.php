@@ -36,6 +36,8 @@ use HMMH\SolrFileIndexer\Interfaces\DocumentUrlInterface;
 use HMMH\SolrFileIndexer\Legacy\DbalResult;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\Service\ServiceFactory;
+use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Context\FileProcessingAspect;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Error\Http\ServiceUnavailableException;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
@@ -78,6 +80,9 @@ class FileIndexer extends Indexer
      */
     public function index(Item $item): bool
     {
+        $context = GeneralUtility::makeInstance(Context::class);
+        $context->setAspect('fileProcessing', new FileProcessingAspect(false));
+
         $this->extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfig::class);
 
         $this->type = $item->getType();
