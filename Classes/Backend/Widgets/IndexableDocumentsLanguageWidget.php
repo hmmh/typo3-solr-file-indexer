@@ -64,13 +64,21 @@ class IndexableDocumentsLanguageWidget implements WidgetInterface, AdditionalCss
         $widgetService = GeneralUtility::makeInstance(IndexingService::class);
 
         $this->view->assignMultiple([
-            'icon' => $this->options['icon'],
-            'title' => $this->options['title'],
+            'icon' => $this->options['icon'] ?? null,
+            'title' => $this->options['title'] ?? null,
             'roots' => $widgetService->getIndexableDocuments(),
             'options' => $this->options,
             'configuration' => $this->configuration
         ]);
 
         return $this->view->render();
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return [];
     }
 }

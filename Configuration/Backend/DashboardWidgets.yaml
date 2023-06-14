@@ -53,9 +53,3 @@ services:
         iconIdentifier: 'content-widget-chart-pie'
         height: 'medium'
         width: 'small'
-  #HMMH\SolrFileIndexer\Backend\Widgets\IndexedDocumentsWidget:
-  #  arguments: ['sfiIndexedDocuments']
-  #  tags:
-  #    - name: dashboard.widget
-  #      identifier: sfiIndexedDocuments
-  #      widgetGroups: 'solr_file_indexer'

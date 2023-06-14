@@ -92,7 +92,7 @@ class FileIndexer extends Indexer
 
         $solrConnections = $this->connectionAdapter->getConnectionsBySite($item->getSite());
         foreach ($solrConnections as $systemLanguageUid => $solrConnection) {
-            $this->solr = $solrConnection;
+            $this->currentlyUsedSolrConnection = $solrConnection;
             // check whether we should move on at all
             $indexableFile = $this->getIndexableFile($item, (int)$systemLanguageUid);
             if ($indexableFile !== null) {
@@ -336,7 +336,7 @@ class FileIndexer extends Indexer
      */
     protected function removeOriginalFromIndex($uid)
     {
-        $this->connectionAdapter->deleteByQuery($this->solr, 'type:' . self::FILE_TABLE . ' AND uid:' . (int)$uid);
+        $this->connectionAdapter->deleteByQuery($this->currentlyUsedSolrConnection, 'type:' . self::FILE_TABLE . ' AND uid:' . (int)$uid);
     }
 
     /**
