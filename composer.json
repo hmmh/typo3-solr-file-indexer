@@ -16,14 +16,14 @@
 
   "require": {
     "php": ">=7.4.0",
-    "typo3/cms-core": "~10.4.29 || ~11.5.11",
-    "typo3/cms-dashboard": "~10.4.29 || ~11.5.11",
-    "apache-solr-for-typo3/solr": "~11.2.0 || ~11.5.0"
+    "typo3/cms-core": "~11.5.11 || 12.4.*@dev",
+    "typo3/cms-dashboard": "~11.5.11 || 12.4.*@dev",
+    "apache-solr-for-typo3/solr": "~11.5.0 || 12.0.0-beta-1"
   },
 
   "suggest": {
-    "typo3/cms-filemetadata": "~10.4.29 || ~11.5.11",
-    "apache-solr-for-typo3/tika": ">=5.0"
+    "typo3/cms-filemetadata": "~11.5.11 || 12.4.*@dev",
+    "apache-solr-for-typo3/tika": ">=11.0"
   },
 
   "autoload": {
