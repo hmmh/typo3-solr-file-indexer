@@ -29,6 +29,7 @@ use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
 use ApacheSolrForTypo3\Solr\IndexQueue\Indexer;
 use ApacheSolrForTypo3\Solr\IndexQueue\Item;
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
+use ApacheSolrForTypo3\Solr\System\Solr\SolrConnection;
 use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
 use HMMH\SolrFileIndexer\Interfaces\AddContentInterface;
 use HMMH\SolrFileIndexer\Interfaces\CleanupContentInterface;
@@ -92,7 +93,10 @@ class FileIndexer extends Indexer
 
         $solrConnections = $this->connectionAdapter->getConnectionsBySite($item->getSite());
         foreach ($solrConnections as $systemLanguageUid => $solrConnection) {
+            // EXT:solr 12
             $this->currentlyUsedSolrConnection = $solrConnection;
+            // EXT:solr 11
+            $this->solr = $solrConnection;
             // check whether we should move on at all
             $indexableFile = $this->getIndexableFile($item, (int)$systemLanguageUid);
             if ($indexableFile !== null) {
@@ -336,7 +340,14 @@ class FileIndexer extends Indexer
      */
     protected function removeOriginalFromIndex($uid)
     {
-        $this->connectionAdapter->deleteByQuery($this->currentlyUsedSolrConnection, 'type:' . self::FILE_TABLE . ' AND uid:' . (int)$uid);
+        if ($this->solr instanceof SolrConnection) {
+            // EXT:solr 11
+            $connection = $this->solr;
+        } else {
+            // EXT:solr 12
+            $connection = $this->currentlyUsedSolrConnection;
+        }
+        $this->connectionAdapter->deleteByQuery($connection, 'type:' . self::FILE_TABLE . ' AND uid:' . (int)$uid);
     }
 
     /**
