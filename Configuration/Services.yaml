@@ -10,5 +10,5 @@ services:
   HMMH\SolrFileIndexer\Listener\RemoveFile:
     tags:
       - name: event.listener
-        identifier: 'tx-solr-file-indexer-reove-file'
+        identifier: 'tx-solr-file-indexer-remove-file'
         event: TYPO3\CMS\Core\Resource\Event\AfterFileRemovedFromIndexEvent
