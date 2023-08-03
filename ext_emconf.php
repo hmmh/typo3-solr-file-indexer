@@ -10,7 +10,7 @@
  * "version" and "dependencies" must not be touched!
  ***************************************************************/
 
-$EM_CONF[$_EXTKEY] = [
+$EM_CONF['solr_file_indexer'] = [
     'title'            => 'Solr file indexing',
     'description'      => 'This extension gives you the capability to index individual documents using Solr.',
     'category'         => 'plugin',
@@ -21,13 +21,12 @@ $EM_CONF[$_EXTKEY] = [
     'uploadfolder'     => '0',
     'createDirs'       => '',
     'clearCacheOnLoad' => 0,
-    'version'          => '2.6.0-dev',
+    'version'          => '3.0-dev',
     'constraints'      => [
         'depends'   => [
-            'typo3' => '11.5.23-12.4.99',
-            'dashboard' => '11.5.23-12.4.99',
-            'solr' => '>=11.5',
-            'php' => '>=7.4'
+            'typo3' => '12.4.0-12.4.99',
+            'solr' => '>=12.0',
+            'php' => '>=8.1'
         ],
         'conflicts' => [],
         'suggests'  => [],
