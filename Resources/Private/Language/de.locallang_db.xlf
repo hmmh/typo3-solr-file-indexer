@@ -9,30 +9,6 @@
 			<trans-unit id="sys_file_metadata.tabs.search" xml:space="preserve">
 				<target>Suche</target>
 			</trans-unit>
-
-			<!-- Start Dashboard -->
-			<trans-unit id="dashboard.solr_file_indexer">
-				<target>SOLR File Indexer</target>
-			</trans-unit>
-			<trans-unit id="dashboard.solr_file_indexer.description">
-				<target>SOLR File Indexer Dashboard</target>
-			</trans-unit>
-			<trans-unit id="widget_group.solr_file_indexer">
-				<target>SOLR File Indexer</target>
-			</trans-unit>
-			<trans-unit id="widgets.indexableDocumentsLanguage.title">
-				<target>Indexierbare Dokumente pro Sprache</target>
-			</trans-unit>
-			<trans-unit id="widgets.indexableDocumentsDomain.title">
-				<target>Indexierbare Dokumente pro Domain</target>
-			</trans-unit>
-			<trans-unit id="widgets.total">
-				<target>Gesamt</target>
-			</trans-unit>
-			<trans-unit id="widgets.indexedDocuments.title">
-				<target>Dokumente im Core</target>
-			</trans-unit>
-			<!-- End Dashboard -->
 		</body>
 	</file>
 </xliff>
