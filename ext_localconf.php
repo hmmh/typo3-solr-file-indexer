@@ -19,6 +19,3 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][\HMMH\SolrFileIn
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][ApacheSolrForTypo3\Solr\System\Solr\Service\SolrWriteService::class] = [
    'className' => HMMH\SolrFileIndexer\Service\WriteServiceAdapter::class
 ];
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][ApacheSolrForTypo3\Solr\IndexQueue\RecordMonitor::class] = [
-   'className' => HMMH\SolrFileIndexer\IndexQueue\RecordMonitorAdapter::class
-];
