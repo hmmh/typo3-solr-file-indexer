@@ -34,7 +34,6 @@ use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
 use HMMH\SolrFileIndexer\Interfaces\AddContentInterface;
 use HMMH\SolrFileIndexer\Interfaces\CleanupContentInterface;
 use HMMH\SolrFileIndexer\Interfaces\DocumentUrlInterface;
-use HMMH\SolrFileIndexer\Legacy\DbalResult;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\Service\ServiceFactory;
 use TYPO3\CMS\Core\Context\Context;
@@ -317,7 +316,7 @@ class FileIndexer extends Indexer
                 ->setMaxResults(1)
                 ->execute();
 
-            $metadata = DbalResult::fetch($result);
+            $metadata = $result->fetchAssociative();
 
             if (empty($metadata['uid'])) {
                 $indexableLanguage = true;
