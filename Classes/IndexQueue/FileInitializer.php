@@ -114,12 +114,12 @@ class FileInitializer extends AbstractInitializer
         $allowedFileTypes = self::getArrayOfAllowedFileTypes($this->indexingConfiguration['allowedFileTypes']);
 
         $collections = $this->collectionRepository->findForSolr($this->site->getRootPageId());
-        foreach ($collections as $aCollection) {
-            $aCollection->loadContents();
+        foreach ($collections as $collection) {
+            $collection->loadContents();
         }
 
-        foreach ($collections as $bCollection) {
-            foreach ($bCollection as $file) {
+        foreach ($collections as $collection) {
+            foreach ($collection as $file) {
                 /** @var \TYPO3\CMS\Core\Resource\File|\TYPO3\CMS\Core\Resource\FileReference $file */
                 if (!in_array($file->getExtension(), $allowedFileTypes)) {
                     continue;

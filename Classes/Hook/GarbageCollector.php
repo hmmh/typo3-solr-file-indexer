@@ -26,14 +26,7 @@ namespace HMMH\SolrFileIndexer\Hook;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use ApacheSolrForTypo3\Solr\Domain\Index\Queue\RecordMonitor\Helper\ConfigurationAwareRecordService;
-use ApacheSolrForTypo3\Solr\FrontendEnvironment;
-use HMMH\SolrFileIndexer\IndexQueue\FileInitializer;
-use HMMH\SolrFileIndexer\IndexQueue\Queue;
-use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
+use HMMH\SolrFileIndexer\Service\IndexHandler;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -42,14 +35,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *
  * @package HMMH\SolrFileIndexer\Hook
  */
-class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
+class GarbageCollector
 {
     const FILE_TABLE = 'sys_file_metadata';
-
-    /**
-     * @var Queue
-     */
-    protected $queue;
 
     /**
      * Hooks into TCE Main and watches all record updates. If a change is
@@ -69,124 +57,9 @@ class GarbageCollector extends \ApacheSolrForTypo3\Solr\GarbageCollector
         array $fields,
         DataHandler $tceMain
     ): void {
-        parent::processDatamap_afterDatabaseOperations($status, $table, $uid, $fields, $tceMain);
-
         if ($table === self::FILE_TABLE && $status === 'update') {
-            $this->queue = GeneralUtility::makeInstance(Queue::class);
-
-            $record = (array)BackendUtility::getRecord($table, $uid, '*', '', false);
-            $rootPages = empty($record['enable_indexing']) ? null : GeneralUtility::trimExplode(',', $record['enable_indexing']);
-
-            if (empty($rootPages)) {
-                $this->collectGarbage($table, $uid);
-            } else {
-                $this->collectRecordGarbageForDisabledRootpages($table, $uid, $rootPages);
-                $this->updateItem($table, $uid, $record, $rootPages);
-            }
-        }
-    }
-
-    /**
-     * @param string $table The item's type, usually a table name.
-     * @param string $uid The item's uid, usually an integer uid, could be a
-     *      different value for non-database-record types.
-     * @param array $record sys_file_metadata
-     * @param array $rootPages
-     */
-    protected function updateItem($table, $uid, $record, $rootPages)
-    {
-        $recordService = GeneralUtility::makeInstance(ConfigurationAwareRecordService::class);
-        $frontendEnvironment = GeneralUtility::makeInstance(FrontendEnvironment::class);
-
-        foreach ($rootPages as $rootPageId) {
-            $solrConfiguration = $frontendEnvironment->getSolrConfigurationFromPageId($rootPageId);
-            $indexingConfigurationName = $recordService->getIndexingConfigurationName($table, $uid, $solrConfiguration);
-            $indexingConfiguration = $solrConfiguration->getIndexQueueConfigurationByName($indexingConfigurationName);
-
-            $file = $this->getSysFile($record['file'], $indexingConfiguration);
-            if (!$file) {
-                $this->collectGarbage($table, $uid);
-                continue;
-            }
-
-            $this->queue->saveItemForRootpage($table, $uid, $rootPageId, $indexingConfigurationName, $indexingConfiguration);
-        }
-    }
-
-    /**
-     * @param int $uid
-     * @param array $indexingConfiguration
-     *
-     * @return mixed
-     */
-    protected function getSysFile($uid, $indexingConfiguration)
-    {
-        $allowedFileTypes = FileInitializer::getArrayOfAllowedFileTypes($indexingConfiguration['allowedFileTypes']);
-
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-
-        $constraints[] = $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT));
-        if ($allowedFileTypes !== []) {
-            $constraints[] = $queryBuilder->expr()->in('extension', $queryBuilder->createNamedParameter($allowedFileTypes, Connection::PARAM_STR_ARRAY));
-        }
-
-        $result = $queryBuilder->select('uid')
-            ->from('sys_file')
-            ->where(...$constraints)
-            ->setMaxResults(1)
-            ->execute();
-
-        return $result->fetchAssociative();
-    }
-
-    /**
-     * @param string $table
-     * @param int $uid
-     * @param array $rootPages
-     */
-    protected function collectRecordGarbageForDisabledRootpages($table, $uid, $rootPages)
-    {
-        $connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
-
-        $indexQueueItems = $this->queue->getItems($table, $uid);
-        foreach ($indexQueueItems as $indexQueueItem) {
-            if (!in_array($indexQueueItem->getRootPageUid(), $rootPages)) {
-                $site = $indexQueueItem->getSite();
-                $solrConfiguration = $site->getSolrConfiguration();
-                $enableCommitsSetting = $solrConfiguration->getEnableCommits();
-
-                // a site can have multiple connections (cores / languages)
-                $solrConnections = $connectionAdapter->getConnectionsBySite($site);
-                foreach ($solrConnections as $connection) {
-                    $connectionAdapter->deleteByQuery($connection, 'type:' . $table . ' AND uid:' . intval($uid));
-                    if ($enableCommitsSetting) {
-                        $connectionAdapter->commit($connection, false, false);
-                    }
-                }
-            }
-        }
-
-        $this->queue->deleteItemsForDisabledRootpages($table, $uid, $rootPages);
-    }
-
-    /**
-     * @param $fileUid
-     */
-    public function deleteFile($fileUid)
-    {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
-        $result = $queryBuilder->select('uid')
-            ->from(self::FILE_TABLE)
-            ->where(
-                $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
-            )
-            ->setMaxResults(1)
-            ->execute();
-
-        $metadata = $result->fetchAssociative();
-
-        if (isset($metadata['uid'])) {
-            $this->collectGarbage(self::FILE_TABLE, $metadata['uid']);
+            $indexHandler = GeneralUtility::makeInstance(IndexHandler::class);
+            $indexHandler->updateMetadata($uid);
         }
     }
 }

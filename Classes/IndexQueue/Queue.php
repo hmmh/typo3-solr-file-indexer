@@ -25,6 +25,7 @@ namespace HMMH\SolrFileIndexer\IndexQueue;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Doctrine\DBAL\ArrayParameterType;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -51,7 +52,7 @@ class Queue extends \ApacheSolrForTypo3\Solr\IndexQueue\Queue
             ->where(
                 $queryBuilder->expr()->eq('item_type', $queryBuilder->createNamedParameter($itemType, \PDO::PARAM_STR)),
                 $queryBuilder->expr()->eq('item_uid', $queryBuilder->createNamedParameter($itemUid, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->notIn('root', $queryBuilder->createNamedParameter($rootPages, Connection::PARAM_INT_ARRAY))
+                $queryBuilder->expr()->notIn('root', $queryBuilder->createNamedParameter($rootPages, ArrayParameterType::INTEGER))
             )
             ->execute();
     }

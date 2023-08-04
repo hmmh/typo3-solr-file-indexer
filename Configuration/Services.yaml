@@ -12,3 +12,9 @@ services:
       - name: event.listener
         identifier: 'tx-solr-file-indexer-remove-file'
         event: TYPO3\CMS\Core\Resource\Event\AfterFileRemovedFromIndexEvent
+
+  HMMH\SolrFileIndexer\Listener\AddMetadata:
+    tags:
+      - name: event.listener
+        identifier: 'tx-solr-file-indexer-add-metadata'
+        event: TYPO3\CMS\Core\Resource\Event\AfterFileMetaDataCreatedEvent

@@ -27,24 +27,23 @@ namespace HMMH\SolrFileIndexer\Listener;
  ***************************************************************/
 
 use HMMH\SolrFileIndexer\Service\IndexHandler;
-use TYPO3\CMS\Core\Resource\Event\AfterFileRemovedFromIndexEvent;
+use TYPO3\CMS\Core\Resource\Event\AfterFileMetaDataCreatedEvent;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Class RemoveFile
+ * Class AddMetadata
  *
  * @package HMMH\SolrFileIndexer\Listener
  */
-class RemoveFile
+class AddMetadata
 {
 
     /**
-     * @param AfterFileRemovedFromIndexEvent $event
+     * @param AfterFileMetaDataCreatedEvent $event
      */
-    public function __invoke(AfterFileRemovedFromIndexEvent $event): void
+    public function __invoke(AfterFileMetaDataCreatedEvent $event): void
     {
-        $fileUid = $event->getFileUid();
         $indexHandler = GeneralUtility::makeInstance(IndexHandler::class);
-        $indexHandler->deleteFile($fileUid);
+        $indexHandler->updateMetadata($event->getMetaDataUid());
     }
 }
