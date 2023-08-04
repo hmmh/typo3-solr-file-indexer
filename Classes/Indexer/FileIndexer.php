@@ -174,12 +174,10 @@ class FileIndexer extends Indexer
     protected function getIndexableFile(Item $item, $languageId)
     {
         $record = $item->getRecord();
-        $rootPage = $item->getRootPageUid();
-        $allowedRootPages = empty($record['enable_indexing']) ? [] : GeneralUtility::trimExplode(',', $record['enable_indexing']);
         $indexableLanguage = $this->checkLanguageForIndexing($languageId, $record);
 
         $storedFile = $this->fetchFile($item);
-        if ($storedFile !== null && $indexableLanguage && in_array($rootPage, $allowedRootPages)) {
+        if ($storedFile !== null && $indexableLanguage) {
             return $storedFile;
         }
 

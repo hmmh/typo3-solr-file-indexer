@@ -25,9 +25,10 @@ namespace HMMH\SolrFileIndexer\IndexQueue;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use ApacheSolrForTypo3\Solr\Domain\Index\Queue\QueueItemRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Initializer\AbstractInitializer;
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
+use ApacheSolrForTypo3\Solr\System\Records\Pages\PagesRepository;
+use HMMH\SolrFileIndexer\Resource\FileCollectionRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -41,15 +42,25 @@ class FileInitializer extends AbstractInitializer
     /**
      * @var Queue
      */
-    protected $queue;
+    protected Queue $queue;
 
     /**
-     * FileInitializer constructor.
+     * @var FileCollectionRepository
      */
-    public function __construct()
+    protected FileCollectionRepository $collectionRepository;
+
+    /**
+     * @param QueueItemRepository|null $queueItemRepository
+     * @param PagesRepository|null     $pagesRepository
+     */
+    public function __construct(
+        QueueItemRepository $queueItemRepository = null,
+        PagesRepository $pagesRepository = null
+    )
     {
-        parent::__construct();
+        parent::__construct($queueItemRepository, $pagesRepository);
         $this->queue = GeneralUtility::makeInstance(Queue::class);
+        $this->collectionRepository = GeneralUtility::makeInstance(FileCollectionRepository::class);
     }
 
     /**
@@ -79,20 +90,15 @@ class FileInitializer extends AbstractInitializer
         $indexRows = [];
 
         foreach ($this->getAllEnabledMetadata() as $metadata) {
-            $enableIndexing = GeneralUtility::trimExplode(',', (string)$metadata['enable_indexing']);
-            $siteroot = $this->site->getRootPageId();
-
-            if (in_array($siteroot, $enableIndexing)) {
-                $indexRows[] = [
-                    'root' => $siteroot,
-                    'item_type' => $this->type,
-                    'item_uid' => (int)$metadata['uid'],
-                    'indexing_configuration' => $this->indexingConfigurationName,
-                    'indexing_priority' => $this->getIndexingPriority(),
-                    'changed' => (int)$metadata['changed'],
-                    'errors' => ''
-                ];
-            }
+            $indexRows[] = [
+                'root' => $this->site->getRootPageId(),
+                'item_type' => $this->type,
+                'item_uid' => (int)$metadata['uid'],
+                'indexing_configuration' => $this->indexingConfigurationName,
+                'indexing_priority' => $this->getIndexingPriority(),
+                'changed' => (int)$metadata['changed'],
+                'errors' => ''
+            ];
         }
 
         return $indexRows;
@@ -103,32 +109,36 @@ class FileInitializer extends AbstractInitializer
      */
     protected function getAllEnabledMetadata()
     {
+        $files = [];
+
         $allowedFileTypes = self::getArrayOfAllowedFileTypes($this->indexingConfiguration['allowedFileTypes']);
 
-        $changedField = $GLOBALS['TCA'][$this->type]['ctrl']['tstamp'];
-        if (!empty($GLOBALS['TCA'][$this->type]['ctrl']['enablecolumns']['starttime'])) {
-            $changedField = 'GREATEST(' . $GLOBALS['TCA'][$this->type]['ctrl']['enablecolumns']['starttime'] . ',' .
-                $GLOBALS['TCA'][$this->type]['ctrl']['tstamp'] . ')';
+        $collections = $this->collectionRepository->findForSolr($this->site->getRootPageId());
+        foreach ($collections as $aCollection) {
+            $aCollection->loadContents();
         }
 
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-
-        $constraints[] = $queryBuilder->expr()->neq('meta.enable_indexing', $queryBuilder->createNamedParameter('', \PDO::PARAM_STR));
-        $constraints[] = $queryBuilder->expr()->eq('meta.file', $queryBuilder->quoteIdentifier('file.uid'));
-        if ($allowedFileTypes !== []) {
-            $constraints[] = $queryBuilder->expr()->in(
-                'file.extension',
-                $queryBuilder->createNamedParameter($allowedFileTypes, Connection::PARAM_STR_ARRAY)
-            );
+        foreach ($collections as $bCollection) {
+            foreach ($bCollection as $file) {
+                /** @var \TYPO3\CMS\Core\Resource\File|\TYPO3\CMS\Core\Resource\FileReference $file */
+                if (!in_array($file->getExtension(), $allowedFileTypes)) {
+                    continue;
+                }
+                if ($file instanceof \TYPO3\CMS\Core\Resource\File) {
+                    $metadata = $file->getMetaData()->get();
+                } elseif ($file instanceof \TYPO3\CMS\Core\Resource\FileReference) {
+                    $metadata = $file->getOriginalFile()->getMetaData()->get();
+                } else {
+                    continue;
+                }
+                $files[] = [
+                    'uid' => $metadata['uid'],
+                    'changed' => $metadata[$GLOBALS['TCA'][$this->type]['ctrl']['tstamp']]
+                ];
+            }
         }
 
-        $result = $queryBuilder->select('meta.enable_indexing', 'meta.uid', 'meta.' . $changedField . ' as changed')
-            ->from('sys_file_metadata', 'meta')
-            ->from('sys_file', 'file')
-            ->where(...$constraints)
-            ->execute();
-
-        return $result->fetchAllAssociative();
+        return $files;
     }
 
     /**
@@ -136,11 +146,7 @@ class FileInitializer extends AbstractInitializer
      */
     public static function getArrayOfAllowedFileTypes(string $allowedFileTypes): array
     {
-        preg_match_all(
-            '/\w+/',
-            $allowedFileTypes,
-            $matches
-        );
+        preg_match_all('/\w+/u', $allowedFileTypes, $matches);
         return $matches[0] ?? [];
     }
 }

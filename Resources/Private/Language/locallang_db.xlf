@@ -9,6 +9,12 @@
 			<trans-unit id="sys_file_metadata.tabs.search" xml:space="preserve">
 				<source>Search</source>
 			</trans-unit>
+			<trans-unit id="sys_file_collection.tabs.search" xml:space="preserve">
+				<source>Search</source>
+			</trans-unit>
+			<trans-unit id="use_for_solr" xml:space="preserve">
+				<source>Use files for Solr search</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>
