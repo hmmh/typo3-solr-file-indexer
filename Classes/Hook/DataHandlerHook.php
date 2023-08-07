@@ -29,7 +29,9 @@ namespace HMMH\SolrFileIndexer\Hook;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Initializer\AbstractInitializer;
 use HMMH\SolrFileIndexer\IndexQueue\FileInitializer;
+use HMMH\SolrFileIndexer\IndexQueue\Queue;
 use HMMH\SolrFileIndexer\Resource\FileCollectionRepository;
+use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\Service\IndexHandler;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -52,13 +54,8 @@ class DataHandlerHook
      * @param array $fields The record's data, not used
      * @param DataHandler $tceMain TYPO3 Core Engine parent object, not used
      */
-    public function processDatamap_afterDatabaseOperations(
-        $status,
-        $table,
-        $uid,
-        array $fields,
-        DataHandler $dataHandler
-    ): void {
+    public function processDatamap_afterDatabaseOperations($status, $table, $uid, array $fields, DataHandler $dataHandler): void
+    {
         if ($table === 'sys_file_metadata' && $status === 'update') {
             $indexHandler = GeneralUtility::makeInstance(IndexHandler::class);
             $indexHandler->updateMetadata($uid);
@@ -101,6 +98,36 @@ class DataHandlerHook
                         $fileInitializer->addMultipleItemsToQueue($indexRows);
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * @param             $table
+     * @param             $id
+     * @param             $recordToDelete
+     * @param             $recordWasDeleted
+     * @param DataHandler $dataHandler
+     *
+     * @return void
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function processCmdmap_deleteAction($table, $id, $recordToDelete, $recordWasDeleted, DataHandler $dataHandler)
+    {
+        if ($table === 'sys_file_collection' && !empty($recordToDelete['use_for_solr'])) {
+            $rootPages = GeneralUtility::trimExplode(',', $recordToDelete['use_for_solr']);
+            $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
+            $connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
+            $indexingConfigurationName = 'sys_file_metadata';
+            foreach ($rootPages as $rootPageUid) {
+                $solrSite = $siteRepository->getSiteByPageId((int)$rootPageUid);
+                $solrConnections = $connectionAdapter->getConnectionsBySite($solrSite);
+                foreach ($solrConnections as $solrConnection) {
+                    $connectionAdapter->deleteByType($solrConnection, $indexingConfigurationName);
+                }
+                $queue = GeneralUtility::makeInstance(Queue::class);
+                $queue->getInitializationService()->initializeBySiteAndIndexConfiguration($solrSite, $indexingConfigurationName);
             }
         }
     }

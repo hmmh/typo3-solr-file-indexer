@@ -31,12 +31,19 @@ class FileCollectionRepository extends \TYPO3\CMS\Core\Resource\FileCollectionRe
      */
     public function findForSolr(int $rootPage)
     {
-        $expressionBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable($this->table)
-            ->expr();
+        $result = null;
 
-        return $this->queryMultipleRecords([
-            $expressionBuilder->inSet('use_for_solr', $rootPage)
-        ]);
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($this->table);
+
+        $queryBuilder->select('*')
+            ->from($this->table)
+            ->where($queryBuilder->expr()->inSet('use_for_solr', $rootPage));
+
+        $data = $queryBuilder->executeQuery()->fetchAllAssociative();
+        if (!empty($data)) {
+            $result = $this->createMultipleDomainObjects($data);
+        }
+
+        return $result;
     }
 }
