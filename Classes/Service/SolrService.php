@@ -1,5 +1,5 @@
 <?php
-namespace HMMH\SolrFileIndexer\Service\Tika;
+namespace HMMH\SolrFileIndexer\Service;
 
 /***************************************************************
  *
@@ -29,14 +29,13 @@ namespace HMMH\SolrFileIndexer\Service\Tika;
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
 use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
 use HMMH\SolrFileIndexer\Interfaces\ServiceInterface;
-use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class SolrService
  *
- * @package HMMH\SolrFileIndexer\Service\Tika
+ * @package HMMH\SolrFileIndexer\Service
  */
 class SolrService implements ServiceInterface
 {

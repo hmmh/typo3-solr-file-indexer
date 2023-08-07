@@ -29,6 +29,7 @@ use ApacheSolrForTypo3\Solr\Domain\Site\Site;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
+use HMMH\SolrFileIndexer\Service\InitializerFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -46,7 +47,7 @@ class DeleteByTypeTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
     /**
      * @var string
      */
-    public $type = 'sys_file_metadata';
+    public $type = InitializerFactory::CONFIGURATION_NAME;
 
     /**
      * @var bool

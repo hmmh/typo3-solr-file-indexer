@@ -39,7 +39,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class FileInitializer extends AbstractInitializer
 {
-
     /**
      * @var Queue
      */
@@ -74,9 +73,8 @@ class FileInitializer extends AbstractInitializer
     {
         $initialized = false;
 
-        $files = $this->getAllEnabledMetadata();
-
-        $indexRows = $this->getIndexRows($files);
+        $fileMetadata = $this->getAllEnabledMetadata();
+        $indexRows = $this->getIndexRows($fileMetadata);
 
         if (!empty($indexRows)) {
             $initialized = $this->addMultipleItemsToQueue($indexRows);
@@ -102,9 +100,9 @@ class FileInitializer extends AbstractInitializer
      */
     public function getMetadataFromCollection(AbstractFileCollection $collection): array
     {
-        $allowedFileTypes = self::getArrayOfAllowedFileTypes($this->indexingConfiguration['allowedFileTypes']);
+        $allowedFileTypes = $this->getArrayOfAllowedFileTypes();
 
-        $files = [];
+        $fileMetadata = [];
 
         foreach ($collection as $file) {
             /** @var \TYPO3\CMS\Core\Resource\File|\TYPO3\CMS\Core\Resource\FileReference $file */
@@ -118,25 +116,25 @@ class FileInitializer extends AbstractInitializer
             } else {
                 continue;
             }
-            $files[] = [
+            $fileMetadata[] = [
                 'uid' => $metadata['uid'],
                 'changed' => $metadata[$GLOBALS['TCA'][$this->type]['ctrl']['tstamp']]
             ];
         }
 
-        return $files;
+        return $fileMetadata;
     }
 
     /**
-     * @param array $files
+     * @param array $fileMetadata
      *
      * @return array
      */
-    public function getIndexRows(array $files)
+    public function getIndexRows(array $fileMetadata)
     {
         $indexRows = [];
 
-        foreach ($files as $metadata) {
+        foreach ($fileMetadata as $metadata) {
             $indexRows[] = [
                 'root' => $this->site->getRootPageId(),
                 'item_type' => $this->type,
@@ -173,9 +171,9 @@ class FileInitializer extends AbstractInitializer
     /**
      * In earlier versions $allowedFileTypes contained quotes. This is for backwards compatibility.
      */
-    public static function getArrayOfAllowedFileTypes(string $allowedFileTypes): array
+    public function getArrayOfAllowedFileTypes(): array
     {
-        preg_match_all('/\w+/u', $allowedFileTypes, $matches);
+        preg_match_all('/\w+/u', $this->indexingConfiguration['allowedFileTypes'], $matches);
         return $matches[0] ?? [];
     }
 }

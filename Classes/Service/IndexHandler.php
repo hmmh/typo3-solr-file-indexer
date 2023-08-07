@@ -2,12 +2,9 @@
 
 namespace HMMH\SolrFileIndexer\Service;
 
-use ApacheSolrForTypo3\Solr\Domain\Index\Queue\RecordMonitor\Helper\ConfigurationAwareRecordService;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\GarbageHandler;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
-use ApacheSolrForTypo3\Solr\FrontendEnvironment;
 use Doctrine\DBAL\ArrayParameterType;
-use HMMH\SolrFileIndexer\IndexQueue\FileInitializer;
 use HMMH\SolrFileIndexer\IndexQueue\Queue;
 use HMMH\SolrFileIndexer\Resource\FileCollectionRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -88,17 +85,17 @@ class IndexHandler
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Doctrine\DBAL\Exception
      */
-    public function initializeBySite(Site $site)
+    public function reindexRootpage(int $rootPageId)
     {
         $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
-        $solrSite = $siteRepository->getSiteByPageId($site->getRootPageId());
+        $solrSite = $siteRepository->getSiteByPageId($rootPageId);
 
         $connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
         $solrConnections = $connectionAdapter->getConnectionsBySite($solrSite);
         foreach ($solrConnections as $solrConnection) {
-            $connectionAdapter->deleteByType($solrConnection, 'sys_file_metadata');
+            $connectionAdapter->deleteByType($solrConnection, InitializerFactory::CONFIGURATION_NAME);
         }
-        $this->queue->getInitializationService()->initializeBySiteAndIndexConfiguration($solrSite, 'sys_file_metadata');
+        $this->queue->getInitializationService()->initializeBySiteAndIndexConfiguration($solrSite, InitializerFactory::CONFIGURATION_NAME);
     }
 
     /**
@@ -111,21 +108,20 @@ class IndexHandler
      */
     protected function updateItem(int $uid, array $record, array $rootPages): void
     {
-        $recordService = GeneralUtility::makeInstance(ConfigurationAwareRecordService::class);
-        $frontendEnvironment = GeneralUtility::makeInstance(FrontendEnvironment::class);
+        $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
 
         foreach ($rootPages as $rootPageId) {
-            $solrConfiguration = $frontendEnvironment->getSolrConfigurationFromPageId($rootPageId);
-            $indexingConfigurationName = $recordService->getIndexingConfigurationName(self::FILE_TABLE, $uid, $solrConfiguration);
-            $indexingConfiguration = $solrConfiguration->getIndexQueueConfigurationByName($indexingConfigurationName);
+            $solrSite = $siteRepository->getSiteByPageId($rootPageId);
+            $solrConfiguration = $solrSite->getSolrConfiguration();
+            $indexingConfiguration = $solrConfiguration->getIndexQueueConfigurationByName(InitializerFactory::CONFIGURATION_NAME);
 
-            $file = $this->getSysFile($record['file'], $indexingConfiguration);
+            $file = $this->getSysFile($record['file'], $rootPageId);
             if (!$file) {
                 $this->collectGarbage($uid);
                 continue;
             }
 
-            $this->queue->saveItemForRootpage(self::FILE_TABLE, $uid, $rootPageId, $indexingConfigurationName, $indexingConfiguration);
+            $this->queue->saveItemForRootpage(self::FILE_TABLE, $uid, $rootPageId, InitializerFactory::CONFIGURATION_NAME, $indexingConfiguration);
         }
     }
 
@@ -135,9 +131,11 @@ class IndexHandler
      *
      * @return mixed
      */
-    protected function getSysFile(int $uid, array $indexingConfiguration)
+    protected function getSysFile(int $uid, int $rootPageId)
     {
-        $allowedFileTypes = FileInitializer::getArrayOfAllowedFileTypes($indexingConfiguration['allowedFileTypes']);
+        $fileInitializer = InitializerFactory::createFileInitializerForRootPage($rootPageId);
+
+        $allowedFileTypes = $fileInitializer->getArrayOfAllowedFileTypes();
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
 

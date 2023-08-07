@@ -26,7 +26,6 @@ namespace HMMH\SolrFileIndexer\IndexQueue;
  ***************************************************************/
 
 use Doctrine\DBAL\ArrayParameterType;
-use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 

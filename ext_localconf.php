@@ -4,9 +4,7 @@ if (!defined('TYPO3')) {
     die('Access denied.');
 }
 
-use ApacheSolrForTypo3\Solr\System\Solr\Service\SolrWriteService;
 use HMMH\SolrFileIndexer\Hook\DataHandlerHook;
-use HMMH\SolrFileIndexer\Service\WriteServiceAdapter;
 use HMMH\SolrFileIndexer\Task\DeleteByTypeTask;
 use HMMH\SolrFileIndexer\Task\DeleteByTypeTaskAdditionalFieldProvider;
 
@@ -18,8 +16,4 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][DeleteByTypeTask
     'title' => 'Remove type:sys_file_metadata from solr index',
     'description' => '',
     'additionalFields' => DeleteByTypeTaskAdditionalFieldProvider::class
-];
-
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][SolrWriteService::class] = [
-   'className' => WriteServiceAdapter::class
 ];

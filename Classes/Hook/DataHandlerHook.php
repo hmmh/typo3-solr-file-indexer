@@ -26,13 +26,10 @@ namespace HMMH\SolrFileIndexer\Hook;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
-use ApacheSolrForTypo3\Solr\IndexQueue\Initializer\AbstractInitializer;
 use HMMH\SolrFileIndexer\IndexQueue\FileInitializer;
-use HMMH\SolrFileIndexer\IndexQueue\Queue;
 use HMMH\SolrFileIndexer\Resource\FileCollectionRepository;
-use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\Service\IndexHandler;
+use HMMH\SolrFileIndexer\Service\InitializerFactory;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -43,6 +40,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class DataHandlerHook
 {
+    const TABLE_METADATA = 'sys_file_metadata';
+    const TABLE_COLLECTION = 'sys_file_collection';
+
     /**
      * Hooks into TCE Main and watches all record updates. If a change is
      * detected that would remove the record from the website, we try to find
@@ -56,49 +56,16 @@ class DataHandlerHook
      */
     public function processDatamap_afterDatabaseOperations($status, $table, $uid, array $fields, DataHandler $dataHandler): void
     {
-        if ($table === 'sys_file_metadata' && $status === 'update') {
-            $indexHandler = GeneralUtility::makeInstance(IndexHandler::class);
-            $indexHandler->updateMetadata($uid);
+        if ($table === self::TABLE_METADATA && $status === 'update') {
+            $this->updateFileMetadata($uid);
         }
 
-        if ($table === 'sys_file_collection' && $status === 'update' && $this->hasRelevantFieldUpdates($fields)) {
-            /** @var IndexHandler $indexHandler */
-            $indexHandler = GeneralUtility::makeInstance(IndexHandler::class);
-            foreach ($indexHandler->getAllSites() as $site) {
-                $indexHandler->initializeBySite($site);
-            }
+        if ($table === self::TABLE_COLLECTION && $status === 'update' && $this->hasRelevantFieldUpdates($fields)) {
+            $this->updateFileCollection();
         }
 
-        if ($table === 'sys_file_collection' && $status === 'new') {
-            if (str_starts_with((string)$uid, 'NEW')) {
-                $uid = $dataHandler->substNEWwithIDs[$uid];
-            }
-            if (!empty($fields['use_for_solr'])) {
-                $collectionRespository = GeneralUtility::makeInstance(FileCollectionRepository::class);
-                $collection = $collectionRespository->findByUid($uid);
-                $collection->loadContents();
-
-                $rootPages = GeneralUtility::trimExplode(',', $fields['use_for_solr']);
-
-                $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
-                $indexingConfigurationName = 'sys_file_metadata';
-                foreach ($rootPages as $rootPageUid) {
-                    $solrSite = $siteRepository->getSiteByPageId((int)$rootPageUid);
-                    $solrConfiguration = $solrSite->getSolrConfiguration();
-                    $initializerClass = $solrConfiguration->getIndexQueueInitializerClassByConfigurationName($indexingConfigurationName);
-                    /** @var AbstractInitializer $fileInitializer */
-                    $fileInitializer = GeneralUtility::makeInstance($initializerClass);
-                    $fileInitializer->setSite($solrSite);
-                    $fileInitializer->setType($solrConfiguration->getIndexQueueTypeOrFallbackToConfigurationName($indexingConfigurationName));
-                    $fileInitializer->setIndexingConfigurationName($indexingConfigurationName);
-                    $fileInitializer->setIndexingConfiguration($solrConfiguration->getIndexQueueConfigurationByName($indexingConfigurationName));
-                    $files = $fileInitializer->getMetadataFromCollection($collection);
-                    $indexRows = $fileInitializer->getIndexRows($files);
-                    if (!empty($indexRows)) {
-                        $fileInitializer->addMultipleItemsToQueue($indexRows);
-                    }
-                }
-            }
+        if ($table === self::TABLE_COLLECTION && $status === 'new') {
+            $this->newFileCollection($uid, $fields, $dataHandler);
         }
     }
 
@@ -115,20 +82,81 @@ class DataHandlerHook
      */
     public function processCmdmap_deleteAction($table, $id, $recordToDelete, $recordWasDeleted, DataHandler $dataHandler)
     {
-        if ($table === 'sys_file_collection' && !empty($recordToDelete['use_for_solr'])) {
-            $rootPages = GeneralUtility::trimExplode(',', $recordToDelete['use_for_solr']);
-            $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
-            $connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
-            $indexingConfigurationName = 'sys_file_metadata';
-            foreach ($rootPages as $rootPageUid) {
-                $solrSite = $siteRepository->getSiteByPageId((int)$rootPageUid);
-                $solrConnections = $connectionAdapter->getConnectionsBySite($solrSite);
-                foreach ($solrConnections as $solrConnection) {
-                    $connectionAdapter->deleteByType($solrConnection, $indexingConfigurationName);
+        if ($table === self::TABLE_COLLECTION && !empty($recordToDelete['use_for_solr'])) {
+            $this->deleteFileCollection($recordToDelete);
+        }
+    }
+
+    /**
+     * @param int $uid
+     *
+     * @return void
+     * @throws \Doctrine\DBAL\Exception
+     */
+    protected function updateFileMetadata(int $uid): void
+    {
+        /** @var IndexHandler $indexHandler */
+        $indexHandler = GeneralUtility::makeInstance(IndexHandler::class);
+        $indexHandler->updateMetadata($uid);
+    }
+
+    protected function updateFileCollection(): void
+    {
+        /** @var IndexHandler $indexHandler */
+        $indexHandler = GeneralUtility::makeInstance(IndexHandler::class);
+        foreach ($indexHandler->getAllSites() as $site) {
+            $indexHandler->reindexRootpage($site->getRootPageId());
+        }
+    }
+
+    /**
+     * @param mixed       $uid
+     * @param array       $fields
+     * @param DataHandler $dataHandler
+     *
+     * @return void
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException
+     */
+    protected function newFileCollection(mixed $uid, array $fields, DataHandler $dataHandler): void
+    {
+        if (str_starts_with((string)$uid, 'NEW')) {
+            $uid = $dataHandler->substNEWwithIDs[$uid];
+        }
+        if (!empty($fields['use_for_solr'])) {
+            $collectionRespository = GeneralUtility::makeInstance(FileCollectionRepository::class);
+            $collection = $collectionRespository->findByUid($uid);
+            $collection->loadContents();
+
+            $rootPages = GeneralUtility::trimExplode(',', $fields['use_for_solr']);
+
+            foreach ($rootPages as $rootPageId) {
+                /** @var FileInitializer $fileInitializer */
+                $fileInitializer = InitializerFactory::createFileInitializerForRootPage($rootPageId);
+                $files = $fileInitializer->getMetadataFromCollection($collection);
+                $indexRows = $fileInitializer->getIndexRows($files);
+                if (!empty($indexRows)) {
+                    $fileInitializer->addMultipleItemsToQueue($indexRows);
                 }
-                $queue = GeneralUtility::makeInstance(Queue::class);
-                $queue->getInitializationService()->initializeBySiteAndIndexConfiguration($solrSite, $indexingConfigurationName);
             }
+        }
+    }
+
+    /**
+     * @param array $recordToDelete
+     *
+     * @return void
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Doctrine\DBAL\Exception
+     */
+    protected function deleteFileCollection(array $recordToDelete): void
+    {
+        /** @var IndexHandler $indexHandler */
+        $indexHandler = GeneralUtility::makeInstance(IndexHandler::class);
+        $rootPages = GeneralUtility::trimExplode(',', $recordToDelete['use_for_solr']);
+
+        foreach ($rootPages as $rootPageId) {
+            $indexHandler->reindexRootpage($rootPageId);
         }
     }
 
