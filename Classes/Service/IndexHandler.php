@@ -4,6 +4,7 @@ namespace HMMH\SolrFileIndexer\Service;
 
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\RecordMonitor\Helper\ConfigurationAwareRecordService;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\GarbageHandler;
+use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\FrontendEnvironment;
 use Doctrine\DBAL\ArrayParameterType;
 use HMMH\SolrFileIndexer\IndexQueue\FileInitializer;
@@ -35,10 +36,7 @@ class IndexHandler
     public function updateMetadata(int $uid): void
     {
         $collectionRespository = GeneralUtility::makeInstance(FileCollectionRepository::class);
-
-        $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
-        $sites = $siteFinder->getAllSites();
-        $this->queue = GeneralUtility::makeInstance(Queue::class);
+        $sites = $this->getAllSites();
 
         $record = (array)BackendUtility::getRecord(self::FILE_TABLE, $uid, '*', '', false);
         $rootPages = [];
@@ -72,6 +70,35 @@ class IndexHandler
             $this->collectRecordGarbageForDisabledRootpages($uid, $rootPages);
             $this->updateItem($uid, $record, $rootPages);
         }
+    }
+
+    /**
+     * @return Site[]
+     */
+    public function getAllSites()
+    {
+        $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
+        return $siteFinder->getAllSites();
+    }
+
+    /**
+     * @param Site $site
+     *
+     * @return void
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function initializeBySite(Site $site)
+    {
+        $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
+        $solrSite = $siteRepository->getSiteByPageId($site->getRootPageId());
+
+        $connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
+        $solrConnections = $connectionAdapter->getConnectionsBySite($solrSite);
+        foreach ($solrConnections as $solrConnection) {
+            $connectionAdapter->deleteByType($solrConnection, 'sys_file_metadata');
+        }
+        $this->queue->getInitializationService()->initializeBySiteAndIndexConfiguration($solrSite, 'sys_file_metadata');
     }
 
     /**

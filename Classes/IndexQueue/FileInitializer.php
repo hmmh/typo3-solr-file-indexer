@@ -29,6 +29,7 @@ use ApacheSolrForTypo3\Solr\Domain\Index\Queue\QueueItemRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Initializer\AbstractInitializer;
 use ApacheSolrForTypo3\Solr\System\Records\Pages\PagesRepository;
 use HMMH\SolrFileIndexer\Resource\FileCollectionRepository;
+use TYPO3\CMS\Core\Resource\Collection\AbstractFileCollection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -73,23 +74,69 @@ class FileInitializer extends AbstractInitializer
     {
         $initialized = false;
 
-        $indexRows = $this->getMetadataForSiteroot();
+        $files = $this->getAllEnabledMetadata();
+
+        $indexRows = $this->getIndexRows($files);
 
         if (!empty($indexRows)) {
-            $initialized = $this->queue->addMultipleItemsToQueue($indexRows);
+            $initialized = $this->addMultipleItemsToQueue($indexRows);
         }
 
         return $initialized;
     }
 
     /**
+     * @param array $indexRows
+     *
+     * @return bool
+     */
+    public function addMultipleItemsToQueue(array $indexRows): bool
+    {
+        return $this->queue->addMultipleItemsToQueue($indexRows);
+    }
+
+    /**
+     * @param AbstractFileCollection $collection
+     *
      * @return array
      */
-    protected function getMetadataForSiteroot()
+    public function getMetadataFromCollection(AbstractFileCollection $collection): array
+    {
+        $allowedFileTypes = self::getArrayOfAllowedFileTypes($this->indexingConfiguration['allowedFileTypes']);
+
+        $files = [];
+
+        foreach ($collection as $file) {
+            /** @var \TYPO3\CMS\Core\Resource\File|\TYPO3\CMS\Core\Resource\FileReference $file */
+            if (!in_array($file->getExtension(), $allowedFileTypes)) {
+                continue;
+            }
+            if ($file instanceof \TYPO3\CMS\Core\Resource\File) {
+                $metadata = $file->getMetaData()->get();
+            } elseif ($file instanceof \TYPO3\CMS\Core\Resource\FileReference) {
+                $metadata = $file->getOriginalFile()->getMetaData()->get();
+            } else {
+                continue;
+            }
+            $files[] = [
+                'uid' => $metadata['uid'],
+                'changed' => $metadata[$GLOBALS['TCA'][$this->type]['ctrl']['tstamp']]
+            ];
+        }
+
+        return $files;
+    }
+
+    /**
+     * @param array $files
+     *
+     * @return array
+     */
+    public function getIndexRows(array $files)
     {
         $indexRows = [];
 
-        foreach ($this->getAllEnabledMetadata() as $metadata) {
+        foreach ($files as $metadata) {
             $indexRows[] = [
                 'root' => $this->site->getRootPageId(),
                 'item_type' => $this->type,
@@ -111,31 +158,13 @@ class FileInitializer extends AbstractInitializer
     {
         $files = [];
 
-        $allowedFileTypes = self::getArrayOfAllowedFileTypes($this->indexingConfiguration['allowedFileTypes']);
-
         $collections = $this->collectionRepository->findForSolr($this->site->getRootPageId());
         foreach ($collections as $collection) {
             $collection->loadContents();
         }
 
         foreach ($collections as $collection) {
-            foreach ($collection as $file) {
-                /** @var \TYPO3\CMS\Core\Resource\File|\TYPO3\CMS\Core\Resource\FileReference $file */
-                if (!in_array($file->getExtension(), $allowedFileTypes)) {
-                    continue;
-                }
-                if ($file instanceof \TYPO3\CMS\Core\Resource\File) {
-                    $metadata = $file->getMetaData()->get();
-                } elseif ($file instanceof \TYPO3\CMS\Core\Resource\FileReference) {
-                    $metadata = $file->getOriginalFile()->getMetaData()->get();
-                } else {
-                    continue;
-                }
-                $files[] = [
-                    'uid' => $metadata['uid'],
-                    'changed' => $metadata[$GLOBALS['TCA'][$this->type]['ctrl']['tstamp']]
-                ];
-            }
+            $files = array_merge($files, $this->getMetadataFromCollection($collection));
         }
 
         return $files;
