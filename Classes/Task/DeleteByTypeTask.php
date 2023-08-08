@@ -124,8 +124,10 @@ class DeleteByTypeTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
      */
     protected function reindexByType($type)
     {
+        $solrConfiguration = $this->site->getSolrConfiguration();
+        $indexingConfigurationNames = $solrConfiguration->getIndexQueueConfigurationNamesByTableName($type);
         $queue = GeneralUtility::makeInstance(Queue::class);
-        $queue->getInitializationService()->initializeBySiteAndIndexConfiguration($this->site, $type);
+        $queue->getInitializationService()->initializeBySiteAndIndexConfigurations($this->site, $indexingConfigurationNames);
     }
 
     /**
