@@ -1,6 +1,6 @@
 <?php
 
-namespace HMMH\SolrFileIndexer\Service;
+namespace HMMH\SolrFileIndexer\IndexQueue;
 
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Initializer\AbstractInitializer;

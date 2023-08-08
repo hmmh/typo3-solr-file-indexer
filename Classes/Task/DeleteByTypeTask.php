@@ -29,7 +29,7 @@ use ApacheSolrForTypo3\Solr\Domain\Site\Site;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
-use HMMH\SolrFileIndexer\Service\InitializerFactory;
+use HMMH\SolrFileIndexer\IndexQueue\InitializerFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**

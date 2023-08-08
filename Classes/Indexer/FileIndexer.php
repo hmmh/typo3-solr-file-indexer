@@ -36,6 +36,7 @@ use HMMH\SolrFileIndexer\Interfaces\CleanupContentInterface;
 use HMMH\SolrFileIndexer\Interfaces\DocumentUrlInterface;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\Service\ServiceFactory;
+use HMMH\SolrFileIndexer\Utility\BaseUtility;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\FileProcessingAspect;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -287,7 +288,7 @@ class FileIndexer extends Indexer
      */
     protected function checkLanguageForIndexing($languageId, $record)
     {
-        $languageField = $this->getLanguageField();
+        $languageField = BaseUtility::getMetadataLanguageField();
         $indexableLanguage = (int)$record[$languageField] === $languageId;
 
         if ($this->extensionConfiguration->ignoreLocalization() === true &&
@@ -300,7 +301,7 @@ class FileIndexer extends Indexer
                 ->from(self::FILE_TABLE)
                 ->where(
                     $queryBuilder->expr()->eq(
-                        $this->getLanguageParentField(),
+                        BaseUtility::getMetadataLanguageParentField(),
                         $queryBuilder->createNamedParameter($record['uid'], \PDO::PARAM_INT)
                     ),
                     $queryBuilder->expr()->eq(
@@ -320,7 +321,7 @@ class FileIndexer extends Indexer
 
         if ($languageId > 0) {
             if ((int)$record[$languageField] > 0) {
-                $this->removeOriginalFromIndex($record[$this->getLanguageParentField()]);
+                $this->removeOriginalFromIndex($record[BaseUtility::getMetadataLanguageParentField()]);
             } else {
                 $this->removeOriginalFromIndex($record['uid']);
             }
@@ -336,21 +337,5 @@ class FileIndexer extends Indexer
     {
         $connection = $this->currentlyUsedSolrConnection;
         $this->connectionAdapter->deleteByQuery($connection, 'type:' . self::FILE_TABLE . ' AND uid:' . (int)$uid);
-    }
-
-    /**
-     * @return string
-     */
-    protected function getLanguageField()
-    {
-        return $GLOBALS['TCA'][self::FILE_TABLE]['ctrl']['languageField'];
-    }
-
-    /**
-     * @return string
-     */
-    protected function getLanguageParentField()
-    {
-        return $GLOBALS['TCA'][self::FILE_TABLE]['ctrl']['transOrigPointerField'];
     }
 }

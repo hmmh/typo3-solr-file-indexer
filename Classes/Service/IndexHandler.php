@@ -5,6 +5,7 @@ namespace HMMH\SolrFileIndexer\Service;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\GarbageHandler;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use Doctrine\DBAL\ArrayParameterType;
+use HMMH\SolrFileIndexer\IndexQueue\InitializerFactory;
 use HMMH\SolrFileIndexer\IndexQueue\Queue;
 use HMMH\SolrFileIndexer\Resource\FileCollectionRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;

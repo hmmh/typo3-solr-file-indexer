@@ -29,7 +29,9 @@ namespace HMMH\SolrFileIndexer\Hook;
 use HMMH\SolrFileIndexer\IndexQueue\FileInitializer;
 use HMMH\SolrFileIndexer\Resource\FileCollectionRepository;
 use HMMH\SolrFileIndexer\Service\IndexHandler;
-use HMMH\SolrFileIndexer\Service\InitializerFactory;
+use HMMH\SolrFileIndexer\IndexQueue\InitializerFactory;
+use HMMH\SolrFileIndexer\Utility\BaseUtility;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -95,6 +97,11 @@ class DataHandlerHook
      */
     protected function updateFileMetadata(int $uid): void
     {
+        $record = BackendUtility::getRecord('sys_file_metadata', $uid);
+        if ($record[BaseUtility::getMetadataLanguageField()] > 0) {
+            $uid = $record[BaseUtility::getMetadataLanguageParentField()];
+        }
+
         /** @var IndexHandler $indexHandler */
         $indexHandler = GeneralUtility::makeInstance(IndexHandler::class);
         $indexHandler->updateMetadata($uid);

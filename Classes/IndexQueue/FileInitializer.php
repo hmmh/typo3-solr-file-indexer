@@ -29,6 +29,7 @@ use ApacheSolrForTypo3\Solr\Domain\Index\Queue\QueueItemRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Initializer\AbstractInitializer;
 use ApacheSolrForTypo3\Solr\System\Records\Pages\PagesRepository;
 use HMMH\SolrFileIndexer\Resource\FileCollectionRepository;
+use HMMH\SolrFileIndexer\Utility\BaseUtility;
 use TYPO3\CMS\Core\Resource\Collection\AbstractFileCollection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -118,7 +119,7 @@ class FileInitializer extends AbstractInitializer
             }
             $fileMetadata[] = [
                 'uid' => $metadata['uid'],
-                'changed' => $metadata[$GLOBALS['TCA'][$this->type]['ctrl']['tstamp']]
+                'changed' => $metadata[BaseUtility::getMetadataTstampField()]
             ];
         }
 
