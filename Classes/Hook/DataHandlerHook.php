@@ -26,6 +26,7 @@ namespace HMMH\SolrFileIndexer\Hook;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use HMMH\SolrFileIndexer\IndexQueue\FileInitializer;
 use HMMH\SolrFileIndexer\Resource\FileCollectionRepository;
 use HMMH\SolrFileIndexer\Service\IndexHandler;
@@ -136,14 +137,20 @@ class DataHandlerHook
             $collection->loadContents();
 
             $rootPages = GeneralUtility::trimExplode(',', $fields['use_for_solr']);
+            $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
 
             foreach ($rootPages as $rootPageId) {
-                /** @var FileInitializer $fileInitializer */
-                $fileInitializer = InitializerFactory::createFileInitializerForRootPage($rootPageId);
-                $files = $fileInitializer->getMetadataFromCollection($collection);
-                $indexRows = $fileInitializer->getIndexRows($files);
-                if (!empty($indexRows)) {
-                    $fileInitializer->addMultipleItemsToQueue($indexRows);
+                $solrSite = $siteRepository->getSiteByPageId($rootPageId);
+                $solrConfiguration = $solrSite->getSolrConfiguration();
+                $indexingConfigurationNames = $solrConfiguration->getIndexQueueConfigurationNamesByTableName(self::TABLE_METADATA);
+                foreach ($indexingConfigurationNames as $indexingConfigurationName) {
+                    /** @var FileInitializer $fileInitializer */
+                    $fileInitializer = InitializerFactory::createFileInitializerForRootPage($rootPageId, $indexingConfigurationName);
+                    $files = $fileInitializer->getMetadataFromCollection($collection);
+                    $indexRows = $fileInitializer->getIndexRows($files);
+                    if (!empty($indexRows)) {
+                        $fileInitializer->addMultipleItemsToQueue($indexRows);
+                    }
                 }
             }
         }

@@ -114,27 +114,32 @@ class IndexHandler
         foreach ($rootPages as $rootPageId) {
             $solrSite = $siteRepository->getSiteByPageId($rootPageId);
             $solrConfiguration = $solrSite->getSolrConfiguration();
-            $indexingConfiguration = $solrConfiguration->getIndexQueueConfigurationByName(InitializerFactory::CONFIGURATION_NAME);
+            $indexingConfigurationNames = $solrConfiguration->getIndexQueueConfigurationNamesByTableName(self::FILE_TABLE);
+            foreach ($indexingConfigurationNames as $indexingConfigurationName) {
+                $indexingConfiguration = $solrConfiguration->getIndexQueueConfigurationByName($indexingConfigurationName);
 
-            $file = $this->getSysFile($record['file'], $rootPageId);
-            if (!$file) {
-                $this->collectGarbage($uid);
-                continue;
+                $file = $this->getSysFile($record['file'], $rootPageId, $indexingConfigurationName);
+                if (!$file) {
+                    $this->collectGarbage($uid);
+                    continue;
+                }
+
+                $this->queue->saveItemForRootpage(self::FILE_TABLE, $uid, $rootPageId, $indexingConfigurationName, $indexingConfiguration);
             }
-
-            $this->queue->saveItemForRootpage(self::FILE_TABLE, $uid, $rootPageId, InitializerFactory::CONFIGURATION_NAME, $indexingConfiguration);
         }
     }
 
     /**
-     * @param int $uid
-     * @param array $indexingConfiguration
+     * @param int    $uid
+     * @param int    $rootPageId
+     * @param string $indexingConfigurationName
      *
-     * @return mixed
+     * @return false|mixed[]
+     * @throws \Doctrine\DBAL\Exception
      */
-    protected function getSysFile(int $uid, int $rootPageId)
+    protected function getSysFile(int $uid, int $rootPageId, string $indexingConfigurationName)
     {
-        $fileInitializer = InitializerFactory::createFileInitializerForRootPage($rootPageId);
+        $fileInitializer = InitializerFactory::createFileInitializerForRootPage($rootPageId, $indexingConfigurationName);
 
         $allowedFileTypes = $fileInitializer->getArrayOfAllowedFileTypes();
 
