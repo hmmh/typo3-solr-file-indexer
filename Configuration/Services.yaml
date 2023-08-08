@@ -18,3 +18,9 @@ services:
       - name: event.listener
         identifier: 'tx-solr-file-indexer-add-metadata'
         event: TYPO3\CMS\Core\Resource\Event\AfterFileMetaDataCreatedEvent
+
+  HMMH\SolrFileIndexer\Task\ItemQueueWorkerTask:
+    tags:
+      - name: 'console.command'
+        command: 'solr_file_indexer:item-queue-worker'
+        schedulable: true
