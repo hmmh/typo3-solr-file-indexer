@@ -25,20 +25,10 @@ namespace HMMH\SolrFileIndexer\Task;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
-use HMMH\SolrFileIndexer\IndexQueue\InitializerFactory;
-use HMMH\SolrFileIndexer\Resource\FileCollectionRepository;
-use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
-use HMMH\SolrFileIndexer\Resource\MetadataRepository;
 use HMMH\SolrFileIndexer\Service\ItemQueueWorker;
-use HMMH\SolrFileIndexer\Utility\BaseUtility;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Site\Entity\Site;
-use TYPO3\CMS\Core\Site\SiteFinder;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use ApacheSolrForTypo3\Solr\FrontendEnvironment;
 
 /**
  * Class DeleteByType

@@ -4,7 +4,6 @@ namespace HMMH\SolrFileIndexer\Resource;
 
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\expr;
 
 class IndexItemRepository
 {
@@ -33,7 +32,7 @@ class IndexItemRepository
         $whereExpressions = [
             $queryBuilder->expr()->eq('root', $item['root']),
             $queryBuilder->expr()->eq('item_uid', $item['item_uid']),
-            $queryBuilder->expr()->eq($GLOBALS['TCA']['tx_solrfileindexer_items']['ctrl']['origUid'], $item['t3_origuid']),
+            $queryBuilder->expr()->eq('localized_uid', $item['localized_uid']),
             $queryBuilder->expr()->eq($GLOBALS['TCA']['tx_solrfileindexer_items']['ctrl']['languageField'], $item['sys_language_uid']),
             $queryBuilder->expr()->eq('indexing_configuration', $queryBuilder->createNamedParameter($item['indexing_configuration']))
         ];
@@ -60,7 +59,7 @@ class IndexItemRepository
                     'root' => $item['root'],
                     'item_type' => 'sys_file_metadata',
                     'item_uid' => $item['item_uid'],
-                    $GLOBALS['TCA']['tx_solrfileindexer_items']['ctrl']['origUid'] => $item['t3_origuid'],
+                    'localized_uid' => $item['localized_uid'],
                     $GLOBALS['TCA']['tx_solrfileindexer_items']['ctrl']['languageField'] => $item['sys_language_uid'],
                     'indexing_configuration' => $item['indexing_configuration'],
                     'changed' => $item['changed']
@@ -85,6 +84,9 @@ class IndexItemRepository
             ->fetchAllAssociative();
     }
 
+    /**
+     * @return void
+     */
     public function removeObsoleteEntries()
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_solrfileindexer_items');
@@ -93,5 +95,61 @@ class IndexItemRepository
                 $queryBuilder->expr()->eq($GLOBALS['TCA']['tx_solrfileindexer_items']['ctrl']['editlock'], 1)
             )
             ->executeStatement();
+    }
+
+    /**
+     * @param int    $rootPage
+     * @param string $type
+     * @param string $indexingConfigurationName
+     *
+     * @return \mixed[][]
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getItems(int $rootPage, string $type, string $indexingConfigurationName)
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_solrfileindexer_items');
+
+        $whereExpressions = [
+            $queryBuilder->expr()->eq('root', $rootPage),
+            $queryBuilder->expr()->eq('item_type', $queryBuilder->createNamedParameter($type)),
+            $queryBuilder->expr()->eq('indexing_configuration', $queryBuilder->createNamedParameter($indexingConfigurationName)),
+            $queryBuilder->expr()->eq($GLOBALS['TCA']['tx_solrfileindexer_items']['ctrl']['editlock'], 0)
+        ];
+
+        return $queryBuilder->select('root', 'item_type', 'item_uid', 'indexing_configuration', 'changed')
+            ->from('tx_solrfileindexer_items')
+            ->where(...$whereExpressions)
+            ->executeQuery()
+            ->fetchAllAssociative();
+    }
+
+    /**
+     * @param int    $itemUid
+     * @param int    $rootPage
+     * @param int    $sysLanguageUid
+     * @param string $type
+     * @param string $configurationName
+     *
+     * @return false|mixed[]
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function findIndexableItem(int $itemUid, int $rootPage, int $sysLanguageUid, string $type, string $configurationName)
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_solrfileindexer_items');
+
+        $whereExpressions = [
+            $queryBuilder->expr()->eq('root', $rootPage),
+            $queryBuilder->expr()->eq('item_uid', $itemUid),
+            $queryBuilder->expr()->eq($GLOBALS['TCA']['tx_solrfileindexer_items']['ctrl']['languageField'], $sysLanguageUid),
+            $queryBuilder->expr()->eq('item_type', $queryBuilder->createNamedParameter($type)),
+            $queryBuilder->expr()->eq('indexing_configuration', $queryBuilder->createNamedParameter($configurationName)),
+            $queryBuilder->expr()->eq($GLOBALS['TCA']['tx_solrfileindexer_items']['ctrl']['editlock'], 0)
+        ];
+
+        return $queryBuilder->select('*')
+            ->from('tx_solrfileindexer_items')
+            ->where(...$whereExpressions)
+            ->executeQuery()
+            ->fetchAssociative();
     }
 }

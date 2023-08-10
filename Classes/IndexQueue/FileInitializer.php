@@ -29,6 +29,7 @@ use ApacheSolrForTypo3\Solr\Domain\Index\Queue\QueueItemRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Initializer\AbstractInitializer;
 use ApacheSolrForTypo3\Solr\System\Records\Pages\PagesRepository;
 use HMMH\SolrFileIndexer\Resource\FileCollectionRepository;
+use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
 use HMMH\SolrFileIndexer\Utility\BaseUtility;
 use TYPO3\CMS\Core\Resource\Collection\AbstractFileCollection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -74,11 +75,15 @@ class FileInitializer extends AbstractInitializer
     {
         $initialized = false;
 
-        $fileMetadata = $this->getAllEnabledMetadata();
-        $indexRows = $this->getIndexRows($fileMetadata);
+        try {
+            $items = $this->getFileIndexerItems();
+            $indexRows = $this->getIndexRows($items);
 
-        if (!empty($indexRows)) {
-            $initialized = $this->addMultipleItemsToQueue($indexRows);
+            if (!empty($indexRows)) {
+                $initialized = $this->addMultipleItemsToQueue($indexRows);
+            }
+        } catch (\Exception) {
+
         }
 
         return $initialized;
@@ -131,23 +136,36 @@ class FileInitializer extends AbstractInitializer
      *
      * @return array
      */
-    public function getIndexRows(array $fileMetadata)
+    public function getIndexRows(array $items)
     {
-        $indexRows = [];
+        $indexRows = $itemUids = [];
 
-        foreach ($fileMetadata as $metadata) {
-            $indexRows[] = [
-                'root' => $this->site->getRootPageId(),
-                'item_type' => $this->type,
-                'item_uid' => (int)$metadata['uid'],
-                'indexing_configuration' => $this->indexingConfigurationName,
-                'indexing_priority' => $this->getIndexingPriority(),
-                'changed' => (int)$metadata['changed'],
-                'errors' => ''
-            ];
+        foreach ($items as $item) {
+            if (!in_array($item['item_uid'], $itemUids)) {
+                $indexRows[] = [
+                    'root' => $item['root'],
+                    'item_type' => $item['item_type'],
+                    'item_uid' => $item['item_uid'],
+                    'indexing_configuration' => $item['indexing_configuration'],
+                    'indexing_priority' => $this->getIndexingPriority(),
+                    'changed' => $item['changed'],
+                    'errors' => ''
+                ];
+
+                $itemUids[] = $item['item_uid'];
+            }
         }
 
         return $indexRows;
+    }
+
+    /**
+     * In earlier versions $allowedFileTypes contained quotes. This is for backwards compatibility.
+     */
+    public function getArrayOfAllowedFileTypes(): array
+    {
+        preg_match_all('/\w+/u', $this->indexingConfiguration['allowedFileTypes'], $matches);
+        return $matches[0] ?? [];
     }
 
     /**
@@ -170,11 +188,13 @@ class FileInitializer extends AbstractInitializer
     }
 
     /**
-     * In earlier versions $allowedFileTypes contained quotes. This is for backwards compatibility.
+     * @return \mixed[][]
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function getArrayOfAllowedFileTypes(): array
+    protected function getFileIndexerItems()
     {
-        preg_match_all('/\w+/u', $this->indexingConfiguration['allowedFileTypes'], $matches);
-        return $matches[0] ?? [];
+        /** @var IndexItemRepository $indexItemRepository */
+        $indexItemRepository = GeneralUtility::makeInstance(IndexItemRepository::class);
+        return $indexItemRepository->getItems($this->site->getRootPageId(), $this->type, $this->indexingConfigurationName);
     }
 }

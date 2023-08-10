@@ -9,7 +9,6 @@ return [
         'crdate' => 'crdate',
         'editlock' => 'editlock',
         'languageField' => 'sys_language_uid',
-        'origUid' => 't3_origuid',
         'hideAtCopy' => true,
         'hideTable' => true,
     ]

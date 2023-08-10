@@ -2,9 +2,11 @@
 
 namespace HMMH\SolrFileIndexer\Service;
 
-use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\GarbageHandler;
+use ApacheSolrForTypo3\Solr\Domain\Index\Queue\QueueItemRepository;
+use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\FrontendEnvironment;
 use HMMH\SolrFileIndexer\IndexQueue\InitializerFactory;
+use HMMH\SolrFileIndexer\IndexQueue\Queue;
 use HMMH\SolrFileIndexer\Resource\FileCollectionRepository;
 use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
 use HMMH\SolrFileIndexer\Resource\MetadataRepository;
@@ -34,7 +36,8 @@ class ItemQueueWorker
         protected IndexItemRepository $indexItemRepository,
         protected MetadataRepository $metadataRepository,
         protected FileCollectionRepository $fileCollectionRepository,
-        protected FrontendEnvironment $frontendEnvironment
+        protected FrontendEnvironment $frontendEnvironment,
+        protected QueueItemRepository $queueItemRepository
     ) {
         $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
     }
@@ -56,8 +59,18 @@ class ItemQueueWorker
             }
         }
 
+        /** @var Queue $queue */
+        $queue = GeneralUtility::makeInstance(Queue::class);
+
         foreach ($this->items as $item) {
             $this->indexItemRepository->save($item);
+            $queue->saveItemForRootpage(
+                'sys_file_metadata',
+                $item['item_uid'],
+                $item['root'],
+                $item['indexing_configuration'],
+                []
+            );
         }
 
         $this->collectGarbage();
@@ -111,7 +124,7 @@ class ItemQueueWorker
                     $this->items[] = [
                         'root' => $site->getRootPageId(),
                         'item_uid' => $result['uid'],
-                        't3_origuid' => $result['orig'],
+                        'localized_uid' => $result['localized'],
                         'indexing_configuration' => $indexingConfigurationName,
                         'sys_language_uid' => $language->getLanguageId(),
                         'changed' => $result['changed']
@@ -147,21 +160,21 @@ class ItemQueueWorker
     protected function prepareMetadata(SiteLanguage $language, array $metadata): array
     {
         $uid = $metadata['uid'];
-        $orig = 0;
+        $localizedUid = 0;
         $changed = $metadata[BaseUtility::getMetadataTstampField()];
 
         if ($language->getLanguageId() > 0) {
-            $result = $this->metadataRepository->findLocalizedEntry($metadata['uid'], $language->getLanguageId());
+            $result = $this->metadataRepository->findLocalizedEntry($uid, $language->getLanguageId());
+            $localizedUid = $uid;
             if (!empty($result)) {
-                $orig = $uid;
-                $uid = $result['uid'];
+                $localizedUid = $result['uid'];
                 $changed = $result[BaseUtility::getMetadataTstampField()];
             }
         }
 
         return [
             'uid' => $uid,
-            'orig' => $orig,
+            'localized' => $localizedUid,
             'changed' => $changed
         ];
     }
@@ -169,16 +182,34 @@ class ItemQueueWorker
     protected function collectGarbage()
     {
         $obsoleteEntries = $this->indexItemRepository->findLockedEntries();
+        $connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
+        $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
 
         foreach ($obsoleteEntries as $entry) {
-            $this->getGarbageHandler()->collectGarbage('sys_file_metadata', $entry['item_uid']);
+            $site = $this->siteFinder->getSiteByRootPageId($entry['root']);
+            if (!empty($entry['localized_uid'])) {
+                $itemUid = $entry['localized_uid'];
+            } else {
+                $itemUid = $entry['item_uid'];
+            }
+
+            $this->queueItemRepository->deleteItems([$site], [$entry['indexing_configuration']], [$entry['item_type']], [$itemUid]);
+
+            $solrSite = $siteRepository->getSiteByPageId($entry['root']);
+            $solrConfiguration = $solrSite->getSolrConfiguration();
+            $enableCommitsSetting = $solrConfiguration->getEnableCommits();
+
+            $solrConnections = $connectionAdapter->getConnectionsBySite($solrSite);
+            foreach ($solrConnections as $systemLanguageUid => $solrConnection) {
+                if ($systemLanguageUid === $entry[$GLOBALS['TCA']['tx_solrfileindexer_items']['ctrl']['languageField']]) {
+                    $connectionAdapter->deleteByQuery($solrConnection, 'type:' . $entry['item_type'] . ' AND uid:' . intval($itemUid));
+                    if ($enableCommitsSetting) {
+                        $connectionAdapter->commit($solrConnection, false, false);
+                    }
+                }
+            }
         }
 
         $this->indexItemRepository->removeObsoleteEntries();
-    }
-
-    protected function getGarbageHandler(): GarbageHandler
-    {
-        return GeneralUtility::makeInstance(GarbageHandler::class);
     }
 }

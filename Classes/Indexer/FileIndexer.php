@@ -34,9 +34,11 @@ use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
 use HMMH\SolrFileIndexer\Interfaces\AddContentInterface;
 use HMMH\SolrFileIndexer\Interfaces\CleanupContentInterface;
 use HMMH\SolrFileIndexer\Interfaces\DocumentUrlInterface;
+use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\Service\ServiceFactory;
 use HMMH\SolrFileIndexer\Utility\BaseUtility;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\FileProcessingAspect;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -173,6 +175,7 @@ class FileIndexer extends Indexer
     {
         $record = $item->getRecord();
         $indexableLanguage = $this->checkLanguageForIndexing($languageId, $record);
+        $indexableLanguage2 = $this->setRecordForLanguage($item, $languageId);
 
         $storedFile = $this->fetchFile($item);
         if ($storedFile !== null && $indexableLanguage) {
@@ -180,6 +183,41 @@ class FileIndexer extends Indexer
         }
 
         return null;
+    }
+
+    /**
+     * @param Item $item
+     * @param int  $sysLanguageUid
+     *
+     * @return bool
+     * @throws \Doctrine\DBAL\Exception
+     */
+    protected function setRecordForLanguage(Item $item, int $sysLanguageUid): bool
+    {
+        $record = $item->getRecord();
+
+        /** @var IndexItemRepository $indexItemRepository */
+        $indexItemRepository = GeneralUtility::makeInstance(IndexItemRepository::class);
+        $indexItem = $indexItemRepository->findIndexableItem(
+            $record['uid'],
+            $item->getRootPageUid(),
+            $sysLanguageUid,
+            $item->getType(),
+            $item->getIndexingConfigurationName()
+        );
+
+        if (empty($indexItem)) {
+            return false;
+        }
+
+        if ($sysLanguageUid > 0 && $indexItem['item_uid'] !== $indexItem['localized_uid']) {
+            $translatedRecord = BackendUtility::getRecord('sys_file_metadata', $indexItem['localized_uid']);
+            if (!empty($translatedRecord)) {
+                $item->setRecord($translatedRecord);
+            }
+        }
+
+        return true;
     }
 
     /**

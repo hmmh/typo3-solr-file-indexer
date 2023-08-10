@@ -21,4 +21,5 @@ CREATE TABLE tx_solrfileindexer_items (
 	item_uid int(11) DEFAULT '0' NOT NULL,
 	indexing_configuration varchar(255) DEFAULT '' NOT NULL,
 	changed int(11) DEFAULT '0' NOT NULL,
+	localized_uid int(11) DEFAULT '0' NOT NULL,
 );
