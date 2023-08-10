@@ -193,7 +193,7 @@ class ItemQueueWorker
                 $itemUid = $entry['item_uid'];
             }
 
-            $this->queueItemRepository->deleteItems([$site], [$entry['indexing_configuration']], [$entry['item_type']], [$itemUid]);
+            $this->queueItemRepository->deleteItems([$site], [$entry['indexing_configuration']], [$entry['item_type']], [$entry['item_uid']]);
 
             $solrSite = $siteRepository->getSiteByPageId($entry['root']);
             $solrConfiguration = $solrSite->getSolrConfiguration();
