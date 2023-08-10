@@ -26,8 +26,9 @@ namespace HMMH\SolrFileIndexer\Service;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use ApacheSolrForTypo3\Solr\Domain\Search\Query\ExtractingQuery;
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
-use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
+use ApacheSolrForTypo3\Solr\System\Solr\SolrConnection;
 use HMMH\SolrFileIndexer\Interfaces\ServiceInterface;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -61,8 +62,16 @@ class SolrService implements ServiceInterface
     public function __construct()
     {
         $this->connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
-        $extensionConfig = GeneralUtility::makeInstance(ExtensionConfig::class);
-        $this->solrConnection = $this->connectionAdapter->getConnectionByPageId((int)$extensionConfig->getPageId());
+    }
+
+    /**
+     * @param SolrConnection $solrConnection
+     *
+     * @return void
+     */
+    public function setSolrConnection(SolrConnection $solrConnection): void
+    {
+        $this->solrConnection = $solrConnection;
     }
 
     /**
@@ -73,11 +82,11 @@ class SolrService implements ServiceInterface
     {
         $localTempFilePath = $file->getForLocalProcessing(false);
 
-        $query = GeneralUtility::makeInstance(\ApacheSolrForTypo3\Solr\Domain\Search\Query\ExtractingQuery::class, $localTempFilePath);
+        $query = GeneralUtility::makeInstance(ExtractingQuery::class, $localTempFilePath);
         $query->setExtractOnly(true);
 
         $response = $this->connectionAdapter->extractByQuery($this->solrConnection, $query);
 
-        return (string)$response[0];
+        return $response[0] ?? '';
     }
 }

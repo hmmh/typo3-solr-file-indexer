@@ -55,20 +55,4 @@ class ExtensionConfig implements SingletonInterface
     {
         return (bool)$this->extConfig['useTika'];
     }
-
-    /**
-     * @return int
-     */
-    public function getPageId(): int
-    {
-        return (int)$this->extConfig['solrSite'];
-    }
-
-    /**
-     * @return bool
-     */
-    public function ignoreLocalization(): bool
-    {
-        return (bool)$this->extConfig['ignoreLocalization'];
-    }
 }

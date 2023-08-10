@@ -36,6 +36,7 @@ use HMMH\SolrFileIndexer\Interfaces\DocumentUrlInterface;
 use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\Service\ServiceFactory;
+use HMMH\SolrFileIndexer\Service\SolrService;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\FileProcessingAspect;
@@ -119,7 +120,7 @@ class FileIndexer extends Indexer
         $content = '';
 
         $document = parent::itemToDocument($item, $language);
-        if (!($document instanceof Document) && $this->extensionConfiguration->ignoreLocalization()) {
+        if (!($document instanceof Document)) {
             $document = parent::itemToDocument($item, 0);
         }
         $baseContent = $document['content'];
@@ -153,6 +154,9 @@ class FileIndexer extends Indexer
     {
         try {
             $service = ServiceFactory::getTika();
+            if ($service instanceof SolrService) {
+                $service->setSolrConnection($this->currentlyUsedSolrConnection);
+            }
             $content = $service->extractText($file);
             $content = $this->cleanupContent($content);
         } catch (NoSolrConnectionFoundException $e) {
