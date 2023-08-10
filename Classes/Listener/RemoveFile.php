@@ -26,7 +26,7 @@ namespace HMMH\SolrFileIndexer\Listener;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use HMMH\SolrFileIndexer\Service\IndexHandler;
+use HMMH\SolrFileIndexer\Service\GarbageCollector;
 use TYPO3\CMS\Core\Resource\Event\AfterFileRemovedFromIndexEvent;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -44,7 +44,7 @@ class RemoveFile
     public function __invoke(AfterFileRemovedFromIndexEvent $event): void
     {
         $fileUid = $event->getFileUid();
-        $indexHandler = GeneralUtility::makeInstance(IndexHandler::class);
-        $indexHandler->deleteFile($fileUid);
+        $garbageCollector = GeneralUtility::makeInstance(GarbageCollector::class);
+        $garbageCollector->deleteFile($fileUid);
     }
 }

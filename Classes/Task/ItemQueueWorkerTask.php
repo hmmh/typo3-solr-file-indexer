@@ -2,9 +2,10 @@
 namespace HMMH\SolrFileIndexer\Task;
 
 /***************************************************************
+ *
  *  Copyright notice
  *
- *  (c) 2019 Sascha Wilking <sascha.wilking@hmmh.de> hmmh
+ *  (c) 2023 Sascha Wilking <sascha.wilking@hmmh.de>, hmmh
  *
  *  All rights reserved
  *

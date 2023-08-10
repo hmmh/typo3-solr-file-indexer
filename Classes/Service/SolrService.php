@@ -69,7 +69,7 @@ class SolrService implements ServiceInterface
      * @param FileInterface $file
      * @return string
      */
-    public function extractText(FileInterface $file)
+    public function extractText(FileInterface $file): string
     {
         $localTempFilePath = $file->getForLocalProcessing(false);
 
@@ -78,6 +78,6 @@ class SolrService implements ServiceInterface
 
         $response = $this->connectionAdapter->extractByQuery($this->solrConnection, $query);
 
-        return $response[0];
+        return (string)$response[0];
     }
 }

@@ -40,5 +40,5 @@ interface DocumentUrlInterface
      * @param Item $item
      * @param Document $document
      */
-    public function addDocumentUrl(Item $item, Document $document);
+    public function addDocumentUrl(Item $item, Document $document): void;
 }

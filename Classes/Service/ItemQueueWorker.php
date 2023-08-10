@@ -2,8 +2,32 @@
 
 namespace HMMH\SolrFileIndexer\Service;
 
+/***************************************************************
+ *
+ *  Copyright notice
+ *
+ *  (c) 2023 Sascha Wilking <sascha.wilking@hmmh.de>, hmmh
+ *
+ *  All rights reserved
+ *
+ *  This script is part of the TYPO3 project. The TYPO3 project is
+ *  free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  The GNU General Public License can be found at
+ *  http://www.gnu.org/copyleft/gpl.html.
+ *
+ *  This script is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  This copyright notice MUST APPEAR in all copies of the script!
+ ***************************************************************/
+
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\QueueItemRepository;
-use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\FrontendEnvironment;
 use HMMH\SolrFileIndexer\IndexQueue\InitializerFactory;
 use HMMH\SolrFileIndexer\IndexQueue\Queue;
@@ -46,7 +70,7 @@ class ItemQueueWorker
      * @return void
      * @throws \Doctrine\DBAL\Exception
      */
-    public function process()
+    public function process(): void
     {
         $this->indexItemRepository->lock();
 
@@ -73,7 +97,8 @@ class ItemQueueWorker
             );
         }
 
-        $this->collectGarbage();
+        $garbageCollector = GeneralUtility::makeInstance(GarbageCollector::class);
+        $garbageCollector->removeObsoleteEntriesFromIndexes();
     }
 
     /**
@@ -177,39 +202,5 @@ class ItemQueueWorker
             'localized' => $localizedUid,
             'changed' => $changed
         ];
-    }
-
-    protected function collectGarbage()
-    {
-        $obsoleteEntries = $this->indexItemRepository->findLockedEntries();
-        $connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
-        $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
-
-        foreach ($obsoleteEntries as $entry) {
-            $site = $this->siteFinder->getSiteByRootPageId($entry['root']);
-            if (!empty($entry['localized_uid'])) {
-                $itemUid = $entry['localized_uid'];
-            } else {
-                $itemUid = $entry['item_uid'];
-            }
-
-            $this->queueItemRepository->deleteItems([$site], [$entry['indexing_configuration']], [$entry['item_type']], [$entry['item_uid']]);
-
-            $solrSite = $siteRepository->getSiteByPageId($entry['root']);
-            $solrConfiguration = $solrSite->getSolrConfiguration();
-            $enableCommitsSetting = $solrConfiguration->getEnableCommits();
-
-            $solrConnections = $connectionAdapter->getConnectionsBySite($solrSite);
-            foreach ($solrConnections as $systemLanguageUid => $solrConnection) {
-                if ($systemLanguageUid === $entry[$GLOBALS['TCA']['tx_solrfileindexer_items']['ctrl']['languageField']]) {
-                    $connectionAdapter->deleteByQuery($solrConnection, 'type:' . $entry['item_type'] . ' AND uid:' . intval($itemUid));
-                    if ($enableCommitsSetting) {
-                        $connectionAdapter->commit($solrConnection, false, false);
-                    }
-                }
-            }
-        }
-
-        $this->indexItemRepository->removeObsoleteEntries();
     }
 }

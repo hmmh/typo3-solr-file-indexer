@@ -83,7 +83,7 @@ class FileInitializer extends AbstractInitializer
                 $initialized = $this->addMultipleItemsToQueue($indexRows);
             }
         } catch (\Exception) {
-
+            // do nothing
         }
 
         return $initialized;
@@ -97,38 +97,6 @@ class FileInitializer extends AbstractInitializer
     public function addMultipleItemsToQueue(array $indexRows): bool
     {
         return $this->queue->addMultipleItemsToQueue($indexRows);
-    }
-
-    /**
-     * @param AbstractFileCollection $collection
-     *
-     * @return array
-     */
-    public function getMetadataFromCollection(AbstractFileCollection $collection): array
-    {
-        $allowedFileTypes = $this->getArrayOfAllowedFileTypes();
-
-        $fileMetadata = [];
-
-        foreach ($collection as $file) {
-            /** @var \TYPO3\CMS\Core\Resource\File|\TYPO3\CMS\Core\Resource\FileReference $file */
-            if (!in_array($file->getExtension(), $allowedFileTypes)) {
-                continue;
-            }
-            if ($file instanceof \TYPO3\CMS\Core\Resource\File) {
-                $metadata = $file->getMetaData()->get();
-            } elseif ($file instanceof \TYPO3\CMS\Core\Resource\FileReference) {
-                $metadata = $file->getOriginalFile()->getMetaData()->get();
-            } else {
-                continue;
-            }
-            $fileMetadata[] = [
-                'uid' => $metadata['uid'],
-                'changed' => $metadata[BaseUtility::getMetadataTstampField()]
-            ];
-        }
-
-        return $fileMetadata;
     }
 
     /**
@@ -166,25 +134,6 @@ class FileInitializer extends AbstractInitializer
     {
         preg_match_all('/\w+/u', $this->indexingConfiguration['allowedFileTypes'], $matches);
         return $matches[0] ?? [];
-    }
-
-    /**
-     * @return array
-     */
-    protected function getAllEnabledMetadata()
-    {
-        $files = [];
-
-        $collections = $this->collectionRepository->findForSolr($this->site->getRootPageId());
-        foreach ($collections as $collection) {
-            $collection->loadContents();
-        }
-
-        foreach ($collections as $collection) {
-            $files = array_merge($files, $this->getMetadataFromCollection($collection));
-        }
-
-        return $files;
     }
 
     /**

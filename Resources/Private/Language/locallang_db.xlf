@@ -3,12 +3,6 @@
 	<file source-language="en" datatype="plaintext" original="messages" date="2016-08-04T16:12:05Z" product-name="solr_file_indexer">
 		<header/>
 		<body>
-			<trans-unit id="enable_indexing" xml:space="preserve">
-				<source>Select Siteroots to include in search index</source>
-			</trans-unit>
-			<trans-unit id="sys_file_metadata.tabs.search" xml:space="preserve">
-				<source>Search</source>
-			</trans-unit>
 			<trans-unit id="sys_file_collection.tabs.search" xml:space="preserve">
 				<source>Search</source>
 			</trans-unit>

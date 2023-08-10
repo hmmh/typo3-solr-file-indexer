@@ -41,5 +41,5 @@ interface ServiceInterface
      * @param \TYPO3\CMS\Core\Resource\FileInterface $file
      * @return string
      */
-    public function extractText(FileInterface $file);
+    public function extractText(FileInterface $file): string;
 }

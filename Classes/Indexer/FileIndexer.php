@@ -29,7 +29,6 @@ use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
 use ApacheSolrForTypo3\Solr\IndexQueue\Indexer;
 use ApacheSolrForTypo3\Solr\IndexQueue\Item;
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
-use ApacheSolrForTypo3\Solr\System\Solr\SolrConnection;
 use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
 use HMMH\SolrFileIndexer\Interfaces\AddContentInterface;
 use HMMH\SolrFileIndexer\Interfaces\CleanupContentInterface;
@@ -37,11 +36,9 @@ use HMMH\SolrFileIndexer\Interfaces\DocumentUrlInterface;
 use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\Service\ServiceFactory;
-use HMMH\SolrFileIndexer\Utility\BaseUtility;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\FileProcessingAspect;
-use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Error\Http\ServiceUnavailableException;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Http\ImmediateResponseException;
@@ -152,7 +149,7 @@ class FileIndexer extends Indexer
      * @return string
      * @throws \TYPO3\CMS\Core\Package\Exception\UnknownPackageException
      */
-    protected function txtFromFile(File $file)
+    protected function txtFromFile(File $file): string
     {
         try {
             $service = ServiceFactory::getTika();
@@ -173,9 +170,7 @@ class FileIndexer extends Indexer
      */
     protected function getIndexableFile(Item $item, $languageId)
     {
-        $record = $item->getRecord();
-        $indexableLanguage = $this->checkLanguageForIndexing($languageId, $record);
-        $indexableLanguage2 = $this->setRecordForLanguage($item, $languageId);
+        $indexableLanguage = $this->setRecordForLanguage($item, $languageId);
 
         $storedFile = $this->fetchFile($item);
         if ($storedFile !== null && $indexableLanguage) {
@@ -241,10 +236,12 @@ class FileIndexer extends Indexer
     }
 
     /**
-     * @param Item $item
+     * @param Item     $item
      * @param Document $document
+     *
+     * @return void
      */
-    protected function addDocumentUrl(Item $item, Document $document)
+    protected function addDocumentUrl(Item $item, Document $document): void
     {
         if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'] ?? false) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'] as $classReference) {
@@ -284,7 +281,7 @@ class FileIndexer extends Indexer
      *
      * @return string
      */
-    protected function emitPostCleanContentSignal($content)
+    protected function emitPostCleanContentSignal($content): string
     {
         if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['cleanupContent'] ?? false) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['cleanupContent'] as $classReference) {
@@ -304,7 +301,7 @@ class FileIndexer extends Indexer
      *
      * @return string
      */
-    protected function emitPostAddContentAfterSignal(Document $document, $content)
+    protected function emitPostAddContentAfterSignal(Document $document, $content): string
     {
         if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addContentAfter'] ?? false) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addContentAfter'] as $classReference) {
@@ -316,64 +313,5 @@ class FileIndexer extends Indexer
             }
         }
         return $content;
-    }
-
-    /**
-     * @param int $languageId
-     * @param array $record
-     *
-     * @return bool
-     */
-    protected function checkLanguageForIndexing($languageId, $record)
-    {
-        $languageField = BaseUtility::getMetadataLanguageField();
-        $indexableLanguage = (int)$record[$languageField] === $languageId;
-
-        if ($this->extensionConfiguration->ignoreLocalization() === true &&
-            $languageId > 0 &&
-            $indexableLanguage === false &&
-            (int)$record[$languageField] === 0
-        ) {
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
-            $result = $queryBuilder->select('uid')
-                ->from(self::FILE_TABLE)
-                ->where(
-                    $queryBuilder->expr()->eq(
-                        BaseUtility::getMetadataLanguageParentField(),
-                        $queryBuilder->createNamedParameter($record['uid'], \PDO::PARAM_INT)
-                    ),
-                    $queryBuilder->expr()->eq(
-                        $languageField,
-                        $queryBuilder->createNamedParameter($languageId, \PDO::PARAM_INT)
-                    )
-                )
-                ->setMaxResults(1)
-                ->execute();
-
-            $metadata = $result->fetchAssociative();
-
-            if (empty($metadata['uid'])) {
-                $indexableLanguage = true;
-            }
-        }
-
-        if ($languageId > 0) {
-            if ((int)$record[$languageField] > 0) {
-                $this->removeOriginalFromIndex($record[BaseUtility::getMetadataLanguageParentField()]);
-            } else {
-                $this->removeOriginalFromIndex($record['uid']);
-            }
-        }
-
-        return $indexableLanguage;
-    }
-
-    /**
-     * @param int $uid
-     */
-    protected function removeOriginalFromIndex($uid)
-    {
-        $connection = $this->currentlyUsedSolrConnection;
-        $this->connectionAdapter->deleteByQuery($connection, 'type:' . self::FILE_TABLE . ' AND uid:' . (int)$uid);
     }
 }
