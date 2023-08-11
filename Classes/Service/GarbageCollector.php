@@ -6,6 +6,7 @@ use ApacheSolrForTypo3\Solr\Domain\Index\Queue\QueueItemRepository;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\GarbageHandler;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
+use HMMH\SolrFileIndexer\Resource\MetadataRepository;
 use HMMH\SolrFileIndexer\Utility\BaseUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -48,7 +49,7 @@ class GarbageCollector implements SingletonInterface
 
             $solrConnections = $connectionAdapter->getConnectionsBySite($solrSite);
             foreach ($solrConnections as $systemLanguageUid => $solrConnection) {
-                if ($systemLanguageUid === $entry[$GLOBALS['TCA']['tx_solrfileindexer_items']['ctrl']['languageField']]) {
+                if ($systemLanguageUid === $entry[$GLOBALS['TCA'][IndexItemRepository::FILE_TABLE]['ctrl']['languageField']]) {
                     $connectionAdapter->deleteByQuery($solrConnection, 'type:' . $entry['item_type'] . ' AND uid:' . intval($itemUid));
                     if ($enableCommitsSetting) {
                         $connectionAdapter->commit($solrConnection, false, false);
@@ -68,9 +69,9 @@ class GarbageCollector implements SingletonInterface
      */
     public function deleteFile(int $fileUid): void
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(BaseUtility::METADATA_TABLE);
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(MetadataRepository::FILE_TABLE);
         $result = $queryBuilder->select('uid')
-            ->from(BaseUtility::METADATA_TABLE)
+            ->from(MetadataRepository::FILE_TABLE)
             ->where(
                 $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
             )
@@ -91,7 +92,7 @@ class GarbageCollector implements SingletonInterface
      */
     protected function collectGarbage(int $uid): void
     {
-        $this->getGarbageHandler()->collectGarbage(BaseUtility::METADATA_TABLE, $uid);
+        $this->getGarbageHandler()->collectGarbage(MetadataRepository::FILE_TABLE, $uid);
     }
 
     /**

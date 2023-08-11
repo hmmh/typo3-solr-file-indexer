@@ -2,6 +2,8 @@
 
 namespace HMMH\SolrFileIndexer\Utility;
 
+use HMMH\SolrFileIndexer\Resource\MetadataRepository;
+
 /***************************************************************
  *
  *  Copyright notice
@@ -29,20 +31,18 @@ namespace HMMH\SolrFileIndexer\Utility;
 
 class BaseUtility
 {
-    const METADATA_TABLE = 'sys_file_metadata';
-
     public static function getMetadataLanguageField()
     {
-        return $GLOBALS['TCA'][self::METADATA_TABLE]['ctrl']['languageField'];
+        return $GLOBALS['TCA'][MetadataRepository::FILE_TABLE]['ctrl']['languageField'];
     }
 
     public static function getMetadataLanguageParentField()
     {
-        return $GLOBALS['TCA'][self::METADATA_TABLE]['ctrl']['transOrigPointerField'];
+        return $GLOBALS['TCA'][MetadataRepository::FILE_TABLE]['ctrl']['transOrigPointerField'];
     }
 
     public static function getMetadataTstampField()
     {
-        return $GLOBALS['TCA'][self::METADATA_TABLE]['ctrl']['tstamp'];
+        return $GLOBALS['TCA'][MetadataRepository::FILE_TABLE]['ctrl']['tstamp'];
     }
 }

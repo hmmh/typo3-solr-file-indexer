@@ -29,12 +29,11 @@ namespace HMMH\SolrFileIndexer\IndexQueue;
 
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Initializer\AbstractInitializer;
+use HMMH\SolrFileIndexer\Resource\MetadataRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class InitializerFactory
 {
-    const CONFIGURATION_NAME = 'sys_file_metadata';
-
     /**
      * @param int    $rootPageId
      * @param string $indexingConfigurationName
@@ -44,7 +43,7 @@ class InitializerFactory
      */
     public static function createFileInitializerForRootPage(
         int $rootPageId,
-        string $indexingConfigurationName = self::CONFIGURATION_NAME
+        string $indexingConfigurationName = MetadataRepository::FILE_TABLE
     ): AbstractInitializer {
         $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
         $solrSite = $siteRepository->getSiteByPageId($rootPageId);

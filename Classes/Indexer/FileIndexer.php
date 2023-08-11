@@ -33,6 +33,7 @@ use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
 use HMMH\SolrFileIndexer\Event\AddDocumentUrlEvent;
 use HMMH\SolrFileIndexer\Event\ModifyContentEvent;
 use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
+use HMMH\SolrFileIndexer\Resource\MetadataRepository;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\Service\ServiceFactory;
 use HMMH\SolrFileIndexer\Service\SolrService;
@@ -54,8 +55,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class FileIndexer extends Indexer
 {
-    const FILE_TABLE = 'sys_file_metadata';
-
     /**
      * @var array
      */
@@ -211,7 +210,7 @@ class FileIndexer extends Indexer
         }
 
         if ($sysLanguageUid > 0 && $indexItem['item_uid'] !== $indexItem['localized_uid']) {
-            $translatedRecord = BackendUtility::getRecord('sys_file_metadata', $indexItem['localized_uid']);
+            $translatedRecord = BackendUtility::getRecord(MetadataRepository::FILE_TABLE, $indexItem['localized_uid']);
             if (!empty($translatedRecord)) {
                 $item->setRecord($translatedRecord);
             }

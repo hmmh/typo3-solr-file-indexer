@@ -33,6 +33,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class MetadataRepository
 {
+    const FILE_TABLE = 'sys_file_metadata';
 
     /**
      * @param int $uid
@@ -43,7 +44,7 @@ class MetadataRepository
      */
     public function findLocalizedEntry(int $uid, int $sysLanguageUid)
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
 
         $constraints = [
             $queryBuilder->expr()->eq(BaseUtility::getMetadataLanguageParentField(), $uid),
@@ -51,7 +52,7 @@ class MetadataRepository
         ];
 
         return $queryBuilder->select('*')
-            ->from('sys_file_metadata')
+            ->from(self::FILE_TABLE)
             ->where(...$constraints)
             ->executeQuery()
             ->fetchAssociative();

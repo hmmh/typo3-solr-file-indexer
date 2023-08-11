@@ -28,6 +28,7 @@ namespace HMMH\SolrFileIndexer\Task;
 use ApacheSolrForTypo3\Solr\Domain\Site\Site;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
+use HMMH\SolrFileIndexer\Resource\MetadataRepository;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\IndexQueue\InitializerFactory;
 use Symfony\Component\Console\Command\Command;
@@ -51,7 +52,7 @@ class DeleteByTypeTask extends Command
     /**
      * @var string
      */
-    protected string $type = InitializerFactory::CONFIGURATION_NAME;
+    protected string $type = MetadataRepository::FILE_TABLE;
 
     /**
      * @var bool
@@ -94,7 +95,7 @@ class DeleteByTypeTask extends Command
                 't',
                 InputOption::VALUE_OPTIONAL,
                 'Type to remove, Default: sys_file_metadata',
-                InitializerFactory::CONFIGURATION_NAME
+                MetadataRepository::FILE_TABLE
             );
     }
 

@@ -89,7 +89,7 @@ class ItemQueueWorker
         foreach ($this->items as $item) {
             $this->indexItemRepository->save($item);
             $queue->saveItemForRootpage(
-                'sys_file_metadata',
+                MetadataRepository::FILE_TABLE,
                 $item['item_uid'],
                 $item['root'],
                 $item['indexing_configuration'],
@@ -130,7 +130,7 @@ class ItemQueueWorker
     protected function generateItems(Site $site, SiteLanguage $language, array $collections)
     {
         $solrConfiguration = $this->frontendEnvironment->getSolrConfigurationFromPageId($site->getRootPageId(), $language->getLanguageId());
-        $indexingConfigurationNames = $solrConfiguration->getIndexQueueConfigurationNamesByTableName('sys_file_metadata');
+        $indexingConfigurationNames = $solrConfiguration->getIndexQueueConfigurationNamesByTableName(MetadataRepository::FILE_TABLE);
 
         foreach ($indexingConfigurationNames as $indexingConfigurationName) {
             $fileInitializer = InitializerFactory::createFileInitializerForRootPage($site->getRootPageId(), $indexingConfigurationName);
