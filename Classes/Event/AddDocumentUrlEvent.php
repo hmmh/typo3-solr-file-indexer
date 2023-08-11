@@ -38,7 +38,7 @@ use TYPO3\CMS\Core\Resource\FileInterface;
 final class AddDocumentUrlEvent
 {
     /** @var string|null  */
-    private ?string $url;
+    private ?string $url = null;
 
     /**
      * @param string $content
