@@ -7,7 +7,7 @@ services:
   HMMH\SolrFileIndexer\:
     resource: '../Classes/*'
 
-  HMMH\SolrFileIndexer\Listener\RemoveFile:
+  HMMH\SolrFileIndexer\EventListener\RemoveFile:
     tags:
       - name: event.listener
         identifier: 'tx-solr-file-indexer-remove-file'

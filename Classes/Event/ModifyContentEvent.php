@@ -1,10 +1,12 @@
 <?php
-namespace HMMH\SolrFileIndexer\Interfaces;
+
+namespace HMMH\SolrFileIndexer\Event;
 
 /***************************************************************
+ *
  *  Copyright notice
  *
- *  (c) 2021 Sascha Wilking <sascha.wilking@hmmh.de>, hmmh multimediahaus AG
+ *  (c) 2023 Sascha Wilking <sascha.wilking@hmmh.de>, hmmh
  *
  *  All rights reserved
  *
@@ -25,21 +27,36 @@ namespace HMMH\SolrFileIndexer\Interfaces;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
-use ApacheSolrForTypo3\Solr\IndexQueue\Item;
-
 /**
- * Class CleanupContentInterface
- *
- * @package HMMH\SolrFileIndexer\Interfaces
+ * Previously used with:
+ * $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addContentAfter']
+ * $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['cleanupContent']
  */
-interface CleanupContentInterface
+final class ModifyContentEvent
 {
 
     /**
-     * @param string|null $content
-     *
-     * @return string|null
+     * @param string $content
      */
-    public function cleanup(?string $content): ?string;
+    public function __construct(private string $content)
+    {
+    }
+
+    /**
+     * @return string
+     */
+    public function getContent(): string
+    {
+        return $this->content;
+    }
+
+    /**
+     * @param string $content
+     *
+     * @return void
+     */
+    public function setContent(string $content): void
+    {
+        $this->content = $content;
+    }
 }

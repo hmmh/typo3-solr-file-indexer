@@ -30,9 +30,8 @@ use ApacheSolrForTypo3\Solr\IndexQueue\Indexer;
 use ApacheSolrForTypo3\Solr\IndexQueue\Item;
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
 use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
-use HMMH\SolrFileIndexer\Interfaces\AddContentInterface;
-use HMMH\SolrFileIndexer\Interfaces\CleanupContentInterface;
-use HMMH\SolrFileIndexer\Interfaces\DocumentUrlInterface;
+use HMMH\SolrFileIndexer\Event\AddDocumentUrlEvent;
+use HMMH\SolrFileIndexer\Event\ModifyContentEvent;
 use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\Service\ServiceFactory;
@@ -133,7 +132,9 @@ class FileIndexer extends Indexer
             return null;
         }
 
-        $content = $this->emitPostAddContentAfterSignal($document, $content);
+        $event = new ModifyContentEvent($content);
+        $event = $this->eventDispatcher->dispatch($event);
+        $content = $event->getContent();
 
         $document->setField('content', $content);
         $url = $document['url'];
@@ -222,9 +223,9 @@ class FileIndexer extends Indexer
     /**
      * @param Item $item
      *
-     * @return File
+     * @return FileInterface|null
      */
-    protected function fetchFile(Item $item)
+    protected function fetchFile(Item $item): ?FileInterface
     {
         $sysFileUid = (int)$item->getRecord()['file'];
         // @extensionScannerIgnoreLine
@@ -247,24 +248,11 @@ class FileIndexer extends Indexer
      */
     protected function addDocumentUrl(Item $item, Document $document): void
     {
-        if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'] ?? false) {
-            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addDocumentUrl'] as $classReference) {
-                $documentUrlObject = GeneralUtility::makeInstance($classReference);
-
-                if ($documentUrlObject instanceof DocumentUrlInterface) {
-                    $documentUrlObject->addDocumentUrl($item, $document);
-                } else {
-                    throw new \UnexpectedValueException(
-                        get_class($documentUrlObject) . ' must implement interface ' . DocumentUrlInterface::class,
-                        1345807460
-                    );
-                }
-            }
-        } else {
-            $file = $this->fetchFile($item);
-            if ($file instanceof FileInterface) {
-                $document->setField('url', $file->getPublicUrl());
-            }
+        $file = $this->fetchFile($item);
+        if ($file instanceof FileInterface) {
+            $event = new AddDocumentUrlEvent($item, $document, $file);
+            $event = $this->eventDispatcher->dispatch($event);
+            $document->setField('url', $event->getUrl() ?? $file->getPublicUrl());
         }
     }
 
@@ -275,47 +263,6 @@ class FileIndexer extends Indexer
      */
     protected function cleanupContent($content): string
     {
-        $content = trim($content ?? '');
-
-        return $this->emitPostCleanContentSignal($content);
-    }
-
-    /**
-     * @param $content
-     *
-     * @return string
-     */
-    protected function emitPostCleanContentSignal($content): string
-    {
-        if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['cleanupContent'] ?? false) {
-            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['cleanupContent'] as $classReference) {
-                $cleanupObject = GeneralUtility::makeInstance($classReference);
-
-                if ($cleanupObject instanceof CleanupContentInterface) {
-                    $content = $cleanupObject->cleanup($content);
-                }
-            }
-        }
-        return $content;
-    }
-
-    /**
-     * @param Document $document
-     * @param string $content
-     *
-     * @return string
-     */
-    protected function emitPostAddContentAfterSignal(Document $document, $content): string
-    {
-        if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addContentAfter'] ?? false) {
-            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr_file_indexer']['addContentAfter'] as $classReference) {
-                $addObject = GeneralUtility::makeInstance($classReference);
-
-                if ($addObject instanceof AddContentInterface) {
-                    $content = $addObject->add($content);
-                }
-            }
-        }
-        return $content;
+        return trim($content ?? '');
     }
 }

@@ -1,5 +1,5 @@
 <?php
-namespace HMMH\SolrFileIndexer\Listener;
+namespace HMMH\SolrFileIndexer\EventListener;
 
 /***************************************************************
  *
@@ -33,7 +33,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Class RemoveFile
  *
- * @package HMMH\SolrFileIndexer\Listener
+ * @package HMMH\SolrFileIndexer\EventListener
  */
 class RemoveFile
 {
