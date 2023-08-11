@@ -28,7 +28,6 @@ namespace HMMH\SolrFileIndexer\Service;
 
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
 use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
-use HMMH\SolrFileIndexer\Interfaces\ServiceInterface;
 use TYPO3\CMS\Core\Package\Exception\UnknownPackageException;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;

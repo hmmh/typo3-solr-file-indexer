@@ -1,5 +1,5 @@
 <?php
-namespace HMMH\SolrFileIndexer\Interfaces;
+namespace HMMH\SolrFileIndexer\Service;
 
 /***************************************************************
  *
@@ -31,7 +31,7 @@ use TYPO3\CMS\Core\Resource\FileInterface;
 /**
  * Interface ServiceInterface
  *
- * @package HMMH\SolrFileIndexer\Interfaces
+ * @package HMMH\SolrFileIndexer\Service
  */
 interface ServiceInterface
 {
