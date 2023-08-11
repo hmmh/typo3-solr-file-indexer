@@ -2,6 +2,7 @@
 
 namespace HMMH\SolrFileIndexer\Utility;
 
+use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
 use HMMH\SolrFileIndexer\Resource\MetadataRepository;
 
 /***************************************************************
@@ -31,18 +32,28 @@ use HMMH\SolrFileIndexer\Resource\MetadataRepository;
 
 class BaseUtility
 {
-    public static function getMetadataLanguageField()
+    public static function getMetadataLanguageField(): string
     {
         return $GLOBALS['TCA'][MetadataRepository::FILE_TABLE]['ctrl']['languageField'];
     }
 
-    public static function getMetadataLanguageParentField()
+    public static function getMetadataLanguageParentField(): string
     {
         return $GLOBALS['TCA'][MetadataRepository::FILE_TABLE]['ctrl']['transOrigPointerField'];
     }
 
-    public static function getMetadataTstampField()
+    public static function getMetadataTstampField(): string
     {
         return $GLOBALS['TCA'][MetadataRepository::FILE_TABLE]['ctrl']['tstamp'];
+    }
+
+    public static function getIndexItemLanguageField(): string
+    {
+        return $GLOBALS['TCA'][IndexItemRepository::FILE_TABLE]['ctrl']['languageField'];
+    }
+
+    public static function getIndexItemEditlockField(): string
+    {
+        return $GLOBALS['TCA'][IndexItemRepository::FILE_TABLE]['ctrl']['editlock'];
     }
 }

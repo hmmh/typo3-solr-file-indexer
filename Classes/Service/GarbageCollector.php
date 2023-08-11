@@ -49,7 +49,7 @@ class GarbageCollector implements SingletonInterface
 
             $solrConnections = $connectionAdapter->getConnectionsBySite($solrSite);
             foreach ($solrConnections as $systemLanguageUid => $solrConnection) {
-                if ($systemLanguageUid === $entry[$GLOBALS['TCA'][IndexItemRepository::FILE_TABLE]['ctrl']['languageField']]) {
+                if ($systemLanguageUid === $entry[BaseUtility::getIndexItemLanguageField()]) {
                     $connectionAdapter->deleteByQuery($solrConnection, 'type:' . $entry['item_type'] . ' AND uid:' . intval($itemUid));
                     if ($enableCommitsSetting) {
                         $connectionAdapter->commit($solrConnection, false, false);

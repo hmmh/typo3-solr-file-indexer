@@ -27,6 +27,7 @@ namespace HMMH\SolrFileIndexer\Resource;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use HMMH\SolrFileIndexer\Utility\BaseUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -41,7 +42,7 @@ class IndexItemRepository
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
         $queryBuilder->update(self::FILE_TABLE)
-            ->set($GLOBALS['TCA'][self::FILE_TABLE]['ctrl']['editlock'], 1)
+            ->set(BaseUtility::getIndexItemEditlockField(), 1)
             ->executeStatement();
     }
 
@@ -59,7 +60,7 @@ class IndexItemRepository
             $queryBuilder->expr()->eq('root', $item['root']),
             $queryBuilder->expr()->eq('item_uid', $item['item_uid']),
             $queryBuilder->expr()->eq('localized_uid', $item['localized_uid']),
-            $queryBuilder->expr()->eq($GLOBALS['TCA'][self::FILE_TABLE]['ctrl']['languageField'], $item['sys_language_uid']),
+            $queryBuilder->expr()->eq(BaseUtility::getIndexItemLanguageField(), $item['sys_language_uid']),
             $queryBuilder->expr()->eq('indexing_configuration', $queryBuilder->createNamedParameter($item['indexing_configuration']))
         ];
 
@@ -73,7 +74,7 @@ class IndexItemRepository
 
         if (!empty($uid)) {
             $queryBuilder->update(self::FILE_TABLE)
-                ->set($GLOBALS['TCA'][self::FILE_TABLE]['ctrl']['editlock'], 0)
+                ->set(BaseUtility::getIndexItemEditlockField(), 0)
                 ->set('changed', $item['changed'])
                 ->where(
                     $queryBuilder->expr()->eq('uid', $uid)
@@ -86,7 +87,7 @@ class IndexItemRepository
                     'item_type' => MetadataRepository::FILE_TABLE,
                     'item_uid' => $item['item_uid'],
                     'localized_uid' => $item['localized_uid'],
-                    $GLOBALS['TCA'][self::FILE_TABLE]['ctrl']['languageField'] => $item['sys_language_uid'],
+                    BaseUtility::getIndexItemLanguageField() => $item['sys_language_uid'],
                     'indexing_configuration' => $item['indexing_configuration'],
                     'changed' => $item['changed']
                 ])
@@ -104,7 +105,7 @@ class IndexItemRepository
         return $queryBuilder->select('*')
             ->from(self::FILE_TABLE)
             ->where(
-                $queryBuilder->expr()->eq($GLOBALS['TCA'][self::FILE_TABLE]['ctrl']['editlock'], 1)
+                $queryBuilder->expr()->eq(BaseUtility::getIndexItemEditlockField(), 1)
             )
             ->executeQuery()
             ->fetchAllAssociative();
@@ -118,7 +119,7 @@ class IndexItemRepository
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
         $queryBuilder->delete(self::FILE_TABLE)
             ->where(
-                $queryBuilder->expr()->eq($GLOBALS['TCA'][self::FILE_TABLE]['ctrl']['editlock'], 1)
+                $queryBuilder->expr()->eq(BaseUtility::getIndexItemEditlockField(), 1)
             )
             ->executeStatement();
     }
@@ -139,7 +140,7 @@ class IndexItemRepository
             $queryBuilder->expr()->eq('root', $rootPage),
             $queryBuilder->expr()->eq('item_type', $queryBuilder->createNamedParameter($type)),
             $queryBuilder->expr()->eq('indexing_configuration', $queryBuilder->createNamedParameter($indexingConfigurationName)),
-            $queryBuilder->expr()->eq($GLOBALS['TCA'][self::FILE_TABLE]['ctrl']['editlock'], 0)
+            $queryBuilder->expr()->eq(BaseUtility::getIndexItemEditlockField(), 0)
         ];
 
         return $queryBuilder->select('root', 'item_type', 'item_uid', 'indexing_configuration', 'changed')
@@ -166,10 +167,10 @@ class IndexItemRepository
         $whereExpressions = [
             $queryBuilder->expr()->eq('root', $rootPage),
             $queryBuilder->expr()->eq('item_uid', $itemUid),
-            $queryBuilder->expr()->eq($GLOBALS['TCA'][self::FILE_TABLE]['ctrl']['languageField'], $sysLanguageUid),
+            $queryBuilder->expr()->eq(BaseUtility::getIndexItemLanguageField(), $sysLanguageUid),
             $queryBuilder->expr()->eq('item_type', $queryBuilder->createNamedParameter($type)),
             $queryBuilder->expr()->eq('indexing_configuration', $queryBuilder->createNamedParameter($configurationName)),
-            $queryBuilder->expr()->eq($GLOBALS['TCA'][self::FILE_TABLE]['ctrl']['editlock'], 0)
+            $queryBuilder->expr()->eq(BaseUtility::getIndexItemEditlockField(), 0)
         ];
 
         return $queryBuilder->select('*')
