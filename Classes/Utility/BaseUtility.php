@@ -2,9 +2,6 @@
 
 namespace HMMH\SolrFileIndexer\Utility;
 
-use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
-use HMMH\SolrFileIndexer\Resource\MetadataRepository;
-
 /***************************************************************
  *
  *  Copyright notice
@@ -29,6 +26,9 @@ use HMMH\SolrFileIndexer\Resource\MetadataRepository;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+
+use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
+use HMMH\SolrFileIndexer\Resource\MetadataRepository;
 
 class BaseUtility
 {

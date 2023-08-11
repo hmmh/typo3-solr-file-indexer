@@ -2,9 +2,10 @@
 namespace HMMH\SolrFileIndexer\Task;
 
 /***************************************************************
+ *
  *  Copyright notice
  *
- *  (c) 2019 Sascha Wilking <sascha.wilking@hmmh.de> hmmh
+ *  (c) 2023 Sascha Wilking <sascha.wilking@hmmh.de>, hmmh
  *
  *  All rights reserved
  *
@@ -30,7 +31,6 @@ use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use HMMH\SolrFileIndexer\Resource\MetadataRepository;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
-use HMMH\SolrFileIndexer\IndexQueue\InitializerFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

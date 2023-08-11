@@ -2,10 +2,6 @@
 
 namespace HMMH\SolrFileIndexer\Event;
 
-use ApacheSolrForTypo3\Solr\IndexQueue\Item;
-use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
-use TYPO3\CMS\Core\Resource\FileInterface;
-
 /***************************************************************
  *
  *  Copyright notice
@@ -30,6 +26,10 @@ use TYPO3\CMS\Core\Resource\FileInterface;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+
+use ApacheSolrForTypo3\Solr\IndexQueue\Item;
+use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
+use TYPO3\CMS\Core\Resource\FileInterface;
 
 /**
  * Previously used with:

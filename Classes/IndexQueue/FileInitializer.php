@@ -30,8 +30,6 @@ use ApacheSolrForTypo3\Solr\IndexQueue\Initializer\AbstractInitializer;
 use ApacheSolrForTypo3\Solr\System\Records\Pages\PagesRepository;
 use HMMH\SolrFileIndexer\Resource\FileCollectionRepository;
 use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
-use HMMH\SolrFileIndexer\Utility\BaseUtility;
-use TYPO3\CMS\Core\Resource\Collection\AbstractFileCollection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**

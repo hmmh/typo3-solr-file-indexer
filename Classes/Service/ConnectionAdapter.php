@@ -27,7 +27,7 @@ namespace HMMH\SolrFileIndexer\Service;
  ***************************************************************/
 
 use ApacheSolrForTypo3\Solr\Domain\Site\Site;
-use \ApacheSolrForTypo3\Solr\ConnectionManager;
+use ApacheSolrForTypo3\Solr\ConnectionManager;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
