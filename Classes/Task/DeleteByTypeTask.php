@@ -30,6 +30,10 @@ use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\IndexQueue\InitializerFactory;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -37,22 +41,22 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *
  * @package HMMH\SolrFileIndexer\Task
  */
-class DeleteByTypeTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
+class DeleteByTypeTask extends Command
 {
     /**
      * @var int
      */
-    public $siteRootPageId = 0;
+    protected int $siteRootPageId = 0;
 
     /**
      * @var string
      */
-    public $type = InitializerFactory::CONFIGURATION_NAME;
+    protected string $type = InitializerFactory::CONFIGURATION_NAME;
 
     /**
      * @var bool
      */
-    public $reindexing = true;
+    protected bool $reindexing = false;
 
     /**
      * @var \HMMH\SolrFileIndexer\Service\ConnectionAdapter
@@ -67,17 +71,46 @@ class DeleteByTypeTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
     protected $site;
 
     /**
-     * This is the main method that is called when a task is executed
-     * It MUST be implemented by all classes inheriting from this one
-     * Note that there is no error handling, errors and failures are expected
-     * to be handled and logged by the client implementations.
-     * Should return TRUE on successful execution, FALSE on error.
-     *
-     * @return bool Returns TRUE on successful execution, FALSE on error
+     * Configure the command by defining the name, options and arguments
      */
-    public function execute()
+    protected function configure()
+    {
+        $this->setDescription('Delete data from Solr core')
+            ->addOption(
+                'root-page',
+                'p',
+                InputOption::VALUE_REQUIRED,
+                'Root page for cleanup'
+            )
+            ->addOption(
+                'reindex',
+                'r',
+                InputOption::VALUE_OPTIONAL,
+                'Reindex data after cleanup',
+                '0'
+            )
+            ->addOption(
+                'type',
+                't',
+                InputOption::VALUE_OPTIONAL,
+                'Type to remove, Default: sys_file_metadata',
+                InitializerFactory::CONFIGURATION_NAME
+            );
+    }
+
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return int
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
+
+        $this->siteRootPageId = (int)$input->getOption('root-page');
+        $this->type = (string)$input->getOption('type');
+        $this->reindexing = (bool)$input->getOption('reindex');
 
         $this->setSite($this->siteRootPageId);
 
@@ -90,7 +123,7 @@ class DeleteByTypeTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
             // do nothing
         }
 
-        return true;
+        return Command::SUCCESS;
     }
 
     /**

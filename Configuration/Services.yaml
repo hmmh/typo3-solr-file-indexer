@@ -18,3 +18,9 @@ services:
       - name: 'console.command'
         command: 'solr_file_indexer:item-queue-worker'
         schedulable: true
+
+  HMMH\SolrFileIndexer\Task\DeleteByTypeTask:
+    tags:
+      - name: 'console.command'
+        command: 'solr_file_indexer:delete-by-type'
+        schedulable: true
