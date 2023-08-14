@@ -1,0 +1,19 @@
+<f:layout name="Backend"/>
+
+<f:section name="content">
+  <h1>File indexer administration module</h1>
+  <f:flashMessages />
+  <f:if condition="{count}">
+    <f:then>
+      <p>
+        This will simply empty the file index queue. Currently there are {count} items available.
+      </p>
+      <f:link.action action="clear" class="btn btn-sm btn-default btn-danger t3js-modal-trigger" data="{'title':'Delete items', 'bs-content':'Really delete?', 'severity':'warning'}">
+        Delete items
+      </f:link.action>
+    </f:then>
+    <f:else>
+      <p>There are no items available.</p>
+    </f:else>
+  </f:if>
+</f:section>

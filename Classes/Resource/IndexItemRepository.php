@@ -179,4 +179,27 @@ class IndexItemRepository
             ->executeQuery()
             ->fetchAssociative();
     }
+
+    /**
+     * @return int
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function countItems(): int
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
+
+        return (int)$queryBuilder->count('uid')
+            ->from(self::FILE_TABLE)
+            ->executeQuery()
+            ->fetchOne();
+    }
+
+    /**
+     * @return void
+     */
+    public function truncate(): void
+    {
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable(self::FILE_TABLE);
+        $connection->truncate(self::FILE_TABLE);
+    }
 }
