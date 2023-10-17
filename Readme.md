@@ -13,7 +13,7 @@ The extension has the following requirements:
 
 * TYPO3 CMS >= 12.4
 * PHP >= 8.1
-* EXT: TYPO3 Solr ab 12.0.0
+* EXT: TYPO3 Solr >= 12.0.0
 
 The extension can be installed using composer.
 
@@ -26,6 +26,7 @@ After installation activate the extension within the extension manager.
 * New localization management: There is no longer a global setting to index documents for all languages. This is now controlled via file collections, which can be translated for the appropriate languages.
 * Replace Hooks with Events
 * Replace scheduler task for cleanup with a command line task
+* Remove Dashboard Widgest from this Extension (now available in hmmh/solr-file-indexer-admin)
 
 ## Configuration
 

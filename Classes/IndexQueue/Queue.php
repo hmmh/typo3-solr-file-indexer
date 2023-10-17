@@ -68,7 +68,7 @@ class Queue extends \ApacheSolrForTypo3\Solr\IndexQueue\Queue
      */
     public function saveItemForRootpage($itemType, $itemUid, $rootPageId, $indexingConfigurationName, $indexingConfiguration)
     {
-        $itemInQueueForRootPage = $this->containsItemWithRootPageId($itemType, $itemUid, $rootPageId);
+        $itemInQueueForRootPage = $this->containsItemWithRootPageId($itemType, $itemUid, $rootPageId, $indexingConfigurationName);
         if ($itemInQueueForRootPage) {
             $this->updateExistingItemForRootpage($itemType, $itemUid, $indexingConfigurationName, $rootPageId);
         } else {
