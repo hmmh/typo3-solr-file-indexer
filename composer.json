@@ -49,5 +49,9 @@
     "typo3/cms": {
       "extension-key": "solr_file_indexer"
     }
+  },
+  "config": {
+    "allow-plugins": true,
+    "sort-packages": true
   }
 }
