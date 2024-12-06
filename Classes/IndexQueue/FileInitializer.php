@@ -71,17 +71,17 @@ class FileInitializer extends AbstractInitializer
      */
     public function initialize(): bool
     {
-        $initialized = false;
+        $initialized = true;
 
         try {
             $items = $this->getFileIndexerItems();
             $indexRows = $this->getIndexRows($items);
 
             if (!empty($indexRows)) {
-                $initialized = $this->addMultipleItemsToQueue($indexRows);
+                $this->addMultipleItemsToQueue($indexRows);
             }
         } catch (\Exception) {
-            // do nothing
+            $initialized = false;
         }
 
         return $initialized;

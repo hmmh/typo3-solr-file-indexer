@@ -25,6 +25,7 @@ namespace HMMH\SolrFileIndexer\Indexer;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use ApacheSolrForTypo3\Solr\FrontendEnvironment\Tsfe;
 use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
 use ApacheSolrForTypo3\Solr\IndexQueue\Indexer;
 use ApacheSolrForTypo3\Solr\IndexQueue\Item;
@@ -46,7 +47,9 @@ use TYPO3\CMS\Core\Http\ImmediateResponseException;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\FileRepository;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
  * Class FileIndexer
@@ -263,5 +266,29 @@ class FileIndexer extends Indexer
     protected function cleanupContent($content): string
     {
         return trim($content ?? '');
+    }
+
+    protected function resolveFieldValue(
+        array $indexingConfiguration,
+        string $solrFieldName,
+        array $data,
+        TypoScriptFrontendController $tsfe,
+        int|SiteLanguage $language,
+    ): mixed {
+        $request = $GLOBALS['TYPO3_REQUEST'] ?? GeneralUtility::makeInstance(Tsfe::class)
+            ->getServerRequestForTsfeByPageIdAndLanguageId(
+                $tsfe->id,
+                $language instanceof SiteLanguage ? $language->getLanguageId() : $language
+            );
+
+        if ($request->getAttribute('language') === null) {
+            if (!($language instanceof SiteLanguage)) {
+                $site = $request->getAttribute('site');
+                $language = $site->getLanguageById($language);
+            }
+            $GLOBALS['TYPO3_REQUEST'] = $request->withAttribute('language', $language);
+        }
+
+        return parent::resolveFieldValue($indexingConfiguration, $solrFieldName, $data, $tsfe, $language);
     }
 }
