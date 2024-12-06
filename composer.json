@@ -16,13 +16,13 @@
 
   "require": {
     "php": ">=8.1",
-    "typo3/cms-core": "~12.4.4",
-    "typo3/cms-install": "~12.4.4",
-    "apache-solr-for-typo3/solr": "~12.0.0"
+    "typo3/cms-core": "~12.4.21 || ~13.4.0",
+    "typo3/cms-install": "~12.4.21 || ~13.4.0",
+    "apache-solr-for-typo3/solr": "~12.0.0 || 13.0.0-alpha-1"
   },
 
   "suggest": {
-    "typo3/cms-filemetadata": "~12.4.4",
+    "typo3/cms-filemetadata": "~13.4.0",
     "hmmh/solr-file-indexer-admin": "~1.0.0",
     "apache-solr-for-typo3/tika": ">=11.0"
   },
