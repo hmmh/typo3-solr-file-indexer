@@ -1,11 +1,4 @@
 #
-# Table structure for table 'sys_file_metadata'
-#
-CREATE TABLE sys_file_metadata (
-    enable_indexing tinytext
-);
-
-#
 # Table structure for table 'sys_file_collection'
 #
 CREATE TABLE sys_file_collection (
