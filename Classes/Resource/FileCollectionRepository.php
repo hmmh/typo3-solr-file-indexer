@@ -37,13 +37,14 @@ class FileCollectionRepository extends \TYPO3\CMS\Core\Resource\FileCollectionRe
 {
 
     /**
-     * @param int      $rootPage
-     * @param int|null $sysLanguageUid
+     * @param int        $rootPage
+     * @param int|null   $sysLanguageUid
+     * @param array|null $collectionUids
      *
      * @return \TYPO3\CMS\Core\Collection\AbstractRecordCollection[]|null
      * @throws \Doctrine\DBAL\Exception
      */
-    public function findForSolr(int $rootPage, ?int $sysLanguageUid = null)
+    public function findForSolr(int $rootPage, ?int $sysLanguageUid = null, ?array $collectionUids = null)
     {
         $result = null;
 
@@ -52,6 +53,9 @@ class FileCollectionRepository extends \TYPO3\CMS\Core\Resource\FileCollectionRe
         $conditions[] = $queryBuilder->expr()->inSet('use_for_solr', $rootPage);
         if ($sysLanguageUid !== null) {
             $conditions[] = $queryBuilder->expr()->in('sys_language_uid', [$sysLanguageUid, -1]);
+        }
+        if (!empty($collectionUids)) {
+            $conditions[] = $queryBuilder->expr()->in('uid', $collectionUids);
         }
 
         $queryBuilder->select('*')
