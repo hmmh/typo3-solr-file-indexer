@@ -1,2 +1,5 @@
 # cat=general//10; type=boolean; label=Use Tika Extension (tika)
 useTika = 0
+
+# cat=general//20; type=string; label=Local path prefix for indexed Documents
+localPrefix = /
