@@ -55,4 +55,12 @@ class ExtensionConfig implements SingletonInterface
     {
         return (bool)$this->extConfig['useTika'];
     }
+
+        /**
+     * @return string
+     */
+    public function getLocalPrefix(): string
+    {
+        return $this->extConfig['localPrefix'];
+    }
 }

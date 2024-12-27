@@ -249,9 +249,16 @@ class FileIndexer extends Indexer
     {
         $file = $this->fetchFile($item);
         if ($file instanceof FileInterface) {
+            $publicUrl = $file->getPublicUrl();
+            if ($this->isLocalResource($file)) {
+                if (str_starts_with($publicUrl, '/')) {
+                    $publicUrl = ltrim($publicUrl, '/');
+                }
+                $publicUrl = $this->extensionConfiguration->getLocalPrefix() . $publicUrl;
+            }
             $event = new AddDocumentUrlEvent($item, $document, $file);
             $event = $this->eventDispatcher->dispatch($event);
-            $document->setField('url', $event->getUrl() ?? $file->getPublicUrl());
+            $document->setField('url', $event->getUrl() ?? $publicUrl);
         }
     }
 
@@ -263,5 +270,18 @@ class FileIndexer extends Indexer
     protected function cleanupContent($content): string
     {
         return trim($content ?? '');
+    }
+
+    protected function getPageIdOfItem(Item $item): ?int
+    {
+        if ($item->getType() === 'sys_file_metadata') {
+            return $item->getRootPageUid();
+        }
+        return parent::getPageIdOfItem($item);
+    }
+
+    protected function isLocalResource(FileInterface $file): bool
+    {
+        return $file->getStorage()->getDriverType() === 'Local';
     }
 }
