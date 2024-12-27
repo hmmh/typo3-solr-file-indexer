@@ -70,13 +70,13 @@ class ItemQueueWorker
      * @return void
      * @throws \Doctrine\DBAL\Exception
      */
-    public function process(): void
+    public function process(?array $collectionUids): void
     {
         $this->indexItemRepository->lock();
 
         foreach ($this->siteFinder->getAllSites() as $site) {
             foreach ($site->getLanguages() as $language) {
-                $collections = $this->loadFilesFromCollections($site, $language);
+                $collections = $this->loadFilesFromCollections($site, $language, $collectionUids);
                 if (!empty($collections)) {
                     $this->generateItems($site, $language, $collections);
                 }
@@ -108,9 +108,9 @@ class ItemQueueWorker
      * @return \TYPO3\CMS\Core\Collection\AbstractRecordCollection[]|null
      * @throws \Doctrine\DBAL\Exception
      */
-    protected function loadFilesFromCollections(Site $site, SiteLanguage $language)
+    protected function loadFilesFromCollections(Site $site, SiteLanguage $language, ?array $collectionUids = null)
     {
-        $collections = $this->fileCollectionRepository->findForSolr($site->getRootPageId(), $language->getLanguageId());
+        $collections = $this->fileCollectionRepository->findForSolr($site->getRootPageId(), $language->getLanguageId(), $collectionUids);
         if (!empty($collections)) {
             foreach ($collections as $collection) {
                 $collection->loadContents();

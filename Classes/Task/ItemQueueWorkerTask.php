@@ -29,6 +29,7 @@ namespace HMMH\SolrFileIndexer\Task;
 use HMMH\SolrFileIndexer\Service\ItemQueueWorker;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -53,7 +54,13 @@ class ItemQueueWorkerTask extends Command
      */
     protected function configure()
     {
-        $this->setDescription('Worker for file indexing');
+        $this->setDescription('Worker for file indexing')
+            ->addOption(
+                'collections',
+                'c',
+                InputOption::VALUE_OPTIONAL,
+                'Comma separated list of Collection UIDs (Leave empty if all collections are to be initialized. Also, IDs of localized datasets must be specified.)',
+            );
     }
 
     /**
@@ -64,7 +71,13 @@ class ItemQueueWorkerTask extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->itemQueueWorker->process();
+        $collectionUids = null;
+        $collectionString = (string)$input->getOption('collections') ?? '';
+        if (!empty($collectionString)) {
+            $collectionUids = array_map('intval', explode(',', $collectionString));
+        }
+
+        $this->itemQueueWorker->process($collectionUids);
 
         return Command::SUCCESS;
     }
