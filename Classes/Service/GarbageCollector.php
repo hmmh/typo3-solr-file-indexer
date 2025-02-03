@@ -33,6 +33,7 @@ use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
 use HMMH\SolrFileIndexer\Resource\MetadataRepository;
 use HMMH\SolrFileIndexer\Utility\BaseUtility;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Site\SiteFinder;
@@ -98,9 +99,9 @@ class GarbageCollector implements SingletonInterface
         $result = $queryBuilder->select('uid')
             ->from(MetadataRepository::FILE_TABLE)
             ->where(
-                $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
+                $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($fileUid, Connection::PARAM_INT))
             )
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         if (!empty($result)) {
