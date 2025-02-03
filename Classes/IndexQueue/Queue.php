@@ -26,6 +26,7 @@ namespace HMMH\SolrFileIndexer\IndexQueue;
  ***************************************************************/
 
 use Doctrine\DBAL\ArrayParameterType;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -49,11 +50,11 @@ class Queue extends \ApacheSolrForTypo3\Solr\IndexQueue\Queue
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::TABLE_INDEXQUEUE_ITEM);
         $queryBuilder->delete(self::TABLE_INDEXQUEUE_ITEM)
             ->where(
-                $queryBuilder->expr()->eq('item_type', $queryBuilder->createNamedParameter($itemType, \PDO::PARAM_STR)),
-                $queryBuilder->expr()->eq('item_uid', $queryBuilder->createNamedParameter($itemUid, \PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('item_type', $queryBuilder->createNamedParameter($itemType, Connection::PARAM_STR)),
+                $queryBuilder->expr()->eq('item_uid', $queryBuilder->createNamedParameter($itemUid, Connection::PARAM_INT)),
                 $queryBuilder->expr()->notIn('root', $queryBuilder->createNamedParameter($rootPages, ArrayParameterType::INTEGER))
             )
-            ->execute();
+            ->executeStatement();
     }
 
     /**
