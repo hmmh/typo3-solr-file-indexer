@@ -36,14 +36,24 @@ class IndexItemRepository
     const FILE_TABLE = 'tx_solrfileindexer_items';
 
     /**
+     * @param array|null $collectionUids
+     *
      * @return void
      */
-    public function lock()
+    public function lock(?array $collectionUids): void
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
-        $queryBuilder->update(self::FILE_TABLE)
-            ->set(BaseUtility::getIndexItemEditlockField(), 1)
-            ->executeStatement();
+        $queryBuilder
+            ->update(self::FILE_TABLE)
+            ->set(BaseUtility::getIndexItemEditlockField(), 1);
+
+        if (!empty($collectionUids)) {
+            $queryBuilder->where(
+                $queryBuilder->expr()->in('collection', $collectionUids)
+            );
+        }
+
+        $queryBuilder->executeStatement();
     }
 
     /**
@@ -52,7 +62,7 @@ class IndexItemRepository
      * @return void
      * @throws \Doctrine\DBAL\Exception
      */
-    public function save(array $item)
+    public function save(array $item): void
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
 
@@ -61,7 +71,8 @@ class IndexItemRepository
             $queryBuilder->expr()->eq('item_uid', $item['item_uid']),
             $queryBuilder->expr()->eq('localized_uid', $item['localized_uid']),
             $queryBuilder->expr()->eq(BaseUtility::getIndexItemLanguageField(), $item['sys_language_uid']),
-            $queryBuilder->expr()->eq('indexing_configuration', $queryBuilder->createNamedParameter($item['indexing_configuration']))
+            $queryBuilder->expr()->eq('indexing_configuration', $queryBuilder->createNamedParameter($item['indexing_configuration'])),
+            $queryBuilder->expr()->eq('collection', $item['collection'])
         ];
 
         $uid = $queryBuilder->select('uid')
@@ -89,7 +100,8 @@ class IndexItemRepository
                     'localized_uid' => $item['localized_uid'],
                     BaseUtility::getIndexItemLanguageField() => $item['sys_language_uid'],
                     'indexing_configuration' => $item['indexing_configuration'],
-                    'changed' => $item['changed']
+                    'changed' => $item['changed'],
+                    'collection'  => $item['collection']
                 ])
                 ->executeStatement();
         }
@@ -114,7 +126,7 @@ class IndexItemRepository
     /**
      * @return void
      */
-    public function removeObsoleteEntries()
+    public function removeObsoleteEntries(): void
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
         $queryBuilder->delete(self::FILE_TABLE)
