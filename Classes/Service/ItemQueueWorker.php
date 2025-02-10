@@ -72,7 +72,7 @@ class ItemQueueWorker
      */
     public function process(?array $collectionUids): void
     {
-        $this->indexItemRepository->lock();
+        $this->indexItemRepository->lock($collectionUids);
 
         foreach ($this->siteFinder->getAllSites() as $site) {
             foreach ($site->getLanguages() as $language) {
@@ -152,7 +152,8 @@ class ItemQueueWorker
                         'localized_uid' => $result['localized'],
                         'indexing_configuration' => $indexingConfigurationName,
                         'sys_language_uid' => $language->getLanguageId(),
-                        'changed' => $result['changed']
+                        'changed' => $result['changed'],
+                        'collection' => $collection->getUid(),
                     ];
                 }
             }
