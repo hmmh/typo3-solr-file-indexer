@@ -54,8 +54,8 @@ class FileInitializer extends AbstractInitializer
      * @param PagesRepository|null     $pagesRepository
      */
     public function __construct(
-        QueueItemRepository $queueItemRepository = null,
-        PagesRepository $pagesRepository = null
+        ?QueueItemRepository $queueItemRepository = null,
+        ?PagesRepository $pagesRepository = null
     )
     {
         parent::__construct($queueItemRepository, $pagesRepository);
