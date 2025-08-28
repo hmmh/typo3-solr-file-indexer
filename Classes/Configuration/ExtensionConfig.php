@@ -61,6 +61,6 @@ class ExtensionConfig implements SingletonInterface
      */
     public function getLocalPrefix(): string
     {
-        return $this->extConfig['localPrefix'];
+        return $this->extConfig['localPrefix'] ?? '/';
     }
 }
