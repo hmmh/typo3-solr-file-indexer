@@ -18,7 +18,7 @@
     "php": ">=8.1",
     "typo3/cms-core": "~13.4.0",
     "typo3/cms-install": "~13.4.0",
-    "apache-solr-for-typo3/solr": "~13.0.0"
+    "apache-solr-for-typo3/solr": "^13.0.0"
   },
 
   "suggest": {
