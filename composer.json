@@ -22,7 +22,6 @@
   },
 
   "require-dev": {
-    "phpunit/phpunit": "^11.5",
     "typo3/testing-framework": "^9.0"
   },
 
