@@ -32,6 +32,7 @@ use ApacheSolrForTypo3\Solr\IndexQueue\Item;
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
 use HMMH\SolrFileIndexer\Configuration\ExtensionConfig;
 use HMMH\SolrFileIndexer\Event\AddDocumentUrlEvent;
+use HMMH\SolrFileIndexer\Event\ModifyAccessEvent;
 use HMMH\SolrFileIndexer\Event\ModifyContentEvent;
 use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
 use HMMH\SolrFileIndexer\Resource\MetadataRepository;
@@ -305,6 +306,25 @@ class FileIndexer extends Indexer
             return $item->getRootPageUid();
         }
         return parent::getPageIdOfItem($item);
+    }
+
+    /**
+     * Generates an access rootline for a file item and dispatches a ModifyAccessEvent
+     * so that extensions (e.g. fal_securedownload, fal_protect) can set the correct
+     * access restrictions based on frontend user group permissions.
+     */
+    protected function getAccessRootline(Item $item): string
+    {
+        $accessRootline = parent::getAccessRootline($item);
+
+        $file = $this->fetchFile($item);
+        if ($file instanceof FileInterface) {
+            $event = new ModifyAccessEvent($accessRootline, $item, $file);
+            $event = $this->eventDispatcher->dispatch($event);
+            $accessRootline = $event->getAccessRootline();
+        }
+
+        return $accessRootline;
     }
 
     protected function isLocalResource(FileInterface $file): bool
