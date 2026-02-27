@@ -21,6 +21,10 @@
     "apache-solr-for-typo3/solr": "^13.0.0"
   },
 
+  "require-dev": {
+    "typo3/testing-framework": "^9.0"
+  },
+
   "suggest": {
     "typo3/cms-filemetadata": "~13.4.0",
     "hmmh/solr-file-indexer-admin": "~1.0.0",
