@@ -91,11 +91,14 @@ class FileIndexer extends Indexer
         $this->type = $item->getType();
         $this->setLogging($item);
 
+        $originalItem = clone $item;
+
         $this->connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
 
         $solrConnections = $this->connectionAdapter->getConnectionsBySite($item->getSite());
         foreach ($solrConnections as $systemLanguageUid => $solrConnection) {
             $this->currentlyUsedSolrConnection = $solrConnection;
+            $item = clone $originalItem; // restore original item with original record instead of manipulated $item
             // check whether we should move on at all
             $indexableFile = $this->getIndexableFile($item, (int)$systemLanguageUid);
             if ($indexableFile !== null) {
