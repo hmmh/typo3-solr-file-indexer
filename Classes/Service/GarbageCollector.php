@@ -119,6 +119,7 @@ class GarbageCollector implements SingletonInterface
     protected function collectGarbage(int $uid): void
     {
         $this->getGarbageHandler()->collectGarbage(MetadataRepository::FILE_TABLE, $uid);
+        $this->indexItemRepository->deleteItemsByUid($uid);
     }
 
     /**
