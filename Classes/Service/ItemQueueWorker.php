@@ -138,7 +138,7 @@ class ItemQueueWorker
 
             foreach ($collections as $collection) {
                 foreach ($collection as $file) {
-                    if (!in_array($file->getExtension(), $allowedFileTypes)) {
+                    if ($allowedFileTypes && !in_array($file->getExtension(), $allowedFileTypes)) {
                         continue;
                     }
                     $metadata = $this->getMetadataFromFile($file);
