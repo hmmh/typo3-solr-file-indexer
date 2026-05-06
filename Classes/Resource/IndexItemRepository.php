@@ -214,4 +214,18 @@ class IndexItemRepository
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable(self::FILE_TABLE);
         $connection->truncate(self::FILE_TABLE);
     }
+
+    /**
+     * @param int $itemUid
+     * @return void
+     */
+    public function deleteItemsByUid(int $itemUid): void
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
+        $queryBuilder->delete(self::FILE_TABLE)
+            ->where(
+                $queryBuilder->expr()->eq('item_uid', $itemUid)
+            )
+            ->executeStatement();
+    }
 }
