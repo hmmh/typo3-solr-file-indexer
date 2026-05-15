@@ -27,6 +27,7 @@ namespace HMMH\SolrFileIndexer\EventListener;
  ***************************************************************/
 
 use HMMH\SolrFileIndexer\Service\GarbageCollector;
+use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Resource\Event\AfterFileRemovedFromIndexEvent;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -38,9 +39,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class RemoveFile
 {
 
-    /**
-     * @param AfterFileRemovedFromIndexEvent $event
-     */
+    #[AsEventListener(
+        identifier: 'tx-solr-file-indexer-remove-file',
+    )]
     public function __invoke(AfterFileRemovedFromIndexEvent $event): void
     {
         $fileUid = $event->getFileUid();
