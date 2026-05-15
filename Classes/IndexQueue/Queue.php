@@ -25,6 +25,7 @@ namespace HMMH\SolrFileIndexer\IndexQueue;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use ApacheSolrForTypo3\Solr\Domain\Site\Site;
 use Doctrine\DBAL\ArrayParameterType;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -155,5 +156,10 @@ class Queue extends \ApacheSolrForTypo3\Solr\IndexQueue\Queue
             self::TABLE_INDEXQUEUE_ITEM,
             $indexRow
         );
+    }
+
+    public function getItemsToIndex(Site $site, int $limit = 50): array
+    {
+        return $this->queueItemRepository->findItemsToIndex($site, $limit);
     }
 }

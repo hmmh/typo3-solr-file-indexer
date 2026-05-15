@@ -21,10 +21,10 @@ $EM_CONF['solr_file_indexer'] = [
     'uploadfolder'     => '0',
     'createDirs'       => '',
     'clearCacheOnLoad' => 0,
-    'version'          => '4.0.8',
+    'version'          => '5.0.0-dev',
     'constraints'      => [
         'depends'   => [
-            'typo3' => '13.4.0-13.4.99',
+            'typo3' => '14.3.0-14.3.99',
             'solr' => '>=13.0',
             'php' => '>=8.1'
         ],

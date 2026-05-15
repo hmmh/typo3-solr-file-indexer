@@ -84,7 +84,8 @@ class SolrService implements ServiceInterface
         $query = GeneralUtility::makeInstance(ExtractingQuery::class, $localTempFilePath);
         $query->setExtractOnly(true);
 
-        $response = $this->connectionAdapter->extractByQuery($this->solrConnection, $query);
+        // @TODO Extract with Tika
+        $response[0] = 'In Solr 10 the LocalTikaExtractionBackend (deprecated since Solr 9.10, SOLR-17961) was also removed';
 
         return $response[0] ?? '';
     }

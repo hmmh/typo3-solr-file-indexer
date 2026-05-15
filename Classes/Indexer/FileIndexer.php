@@ -45,12 +45,12 @@ use TYPO3\CMS\Core\Context\FileProcessingAspect;
 use TYPO3\CMS\Core\Error\Http\ServiceUnavailableException;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Http\ImmediateResponseException;
+use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\FileRepository;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
  * Class FileIndexer
@@ -279,16 +279,16 @@ class FileIndexer extends Indexer
         return trim($content ?? '');
     }
 
-    protected function resolveFieldValue(
+    /*protected function resolveFieldValue(
         array $indexingConfiguration,
         string $solrFieldName,
         array $data,
-        TypoScriptFrontendController $tsfe,
+        ServerRequest $request,
         int|SiteLanguage $language,
     ): mixed {
         $request = $GLOBALS['TYPO3_REQUEST'] ?? GeneralUtility::makeInstance(Tsfe::class)
             ->getServerRequestForTsfeByPageIdAndLanguageId(
-                $tsfe->id,
+                0,
                 $language instanceof SiteLanguage ? $language->getLanguageId() : $language
             );
 
@@ -300,8 +300,8 @@ class FileIndexer extends Indexer
             $GLOBALS['TYPO3_REQUEST'] = $request->withAttribute('language', $language);
         }
 
-        return parent::resolveFieldValue($indexingConfiguration, $solrFieldName, $data, $tsfe, $language);
-    }
+        return parent::resolveFieldValue($indexingConfiguration, $solrFieldName, $data, $request, $language);
+    }*/
 
     protected function getPageIdOfItem(Item $item): ?int
     {

@@ -45,11 +45,6 @@ class FileInitializer extends AbstractInitializer
     protected Queue $queue;
 
     /**
-     * @var FileCollectionRepository
-     */
-    protected FileCollectionRepository $collectionRepository;
-
-    /**
      * @param QueueItemRepository|null $queueItemRepository
      * @param PagesRepository|null     $pagesRepository
      */
@@ -60,7 +55,6 @@ class FileInitializer extends AbstractInitializer
     {
         parent::__construct($queueItemRepository, $pagesRepository);
         $this->queue = GeneralUtility::makeInstance(Queue::class);
-        $this->collectionRepository = GeneralUtility::makeInstance(FileCollectionRepository::class);
     }
 
     /**

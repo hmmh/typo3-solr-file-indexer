@@ -85,17 +85,6 @@ class ConnectionAdapter implements SingletonInterface
 
     /**
      * @param \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $solrConnection
-     * @param \Solarium\QueryType\Extract\Query $query
-     *
-     * @return array
-     */
-    public function extractByQuery($solrConnection, $query)
-    {
-        return $this->getSolrWriteService($solrConnection)->extractByQuery($query);
-    }
-
-    /**
-     * @param \ApacheSolrForTypo3\Solr\System\Solr\SolrConnection $solrConnection
      * @param bool $expungeDeletes
      * @param bool $waitSearcher
      */

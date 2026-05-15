@@ -33,7 +33,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Repository for accessing file collections stored in the database
  */
-class FileCollectionRepository extends \TYPO3\CMS\Core\Resource\FileCollectionRepository
+readonly class FileCollectionRepository extends \TYPO3\CMS\Core\Resource\FileCollectionRepository
 {
 
     /**
@@ -48,7 +48,7 @@ class FileCollectionRepository extends \TYPO3\CMS\Core\Resource\FileCollectionRe
     {
         $result = null;
 
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($this->table);
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_collection');
 
         $conditions[] = $queryBuilder->expr()->inSet('use_for_solr', $rootPage);
         if ($sysLanguageUid !== null) {
@@ -59,7 +59,7 @@ class FileCollectionRepository extends \TYPO3\CMS\Core\Resource\FileCollectionRe
         }
 
         $queryBuilder->select('*')
-            ->from($this->table)
+            ->from('sys_file_collection')
             ->where(...$conditions);
 
         $data = $queryBuilder->executeQuery()->fetchAllAssociative();

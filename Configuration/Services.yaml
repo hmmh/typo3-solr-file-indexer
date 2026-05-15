@@ -7,6 +7,16 @@ services:
   HMMH\SolrFileIndexer\:
     resource: '../Classes/*'
 
+  HMMH\SolrFileIndexer\Middleware\IndexingMiddleware:
+    public: true
+    autowire: true
+    shared: false
+    arguments:
+      $logger: !service
+        class: ApacheSolrForTypo3\Solr\System\Logging\SolrLogManager
+        arguments:
+          $className: 'HMMH\SolrFileIndexer\Middleware\IndexingMiddleware'
+
   HMMH\SolrFileIndexer\EventListener\RemoveFile:
     tags:
       - name: event.listener

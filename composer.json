@@ -4,6 +4,7 @@
   "keywords": ["typo3", "solr", "file", "tika", "apache", "indexer"],
   "type": "typo3-cms-extension",
   "license": "GPL-3.0-or-later",
+  "version": "5.0.0",
 
   "authors": [
     {
@@ -15,10 +16,10 @@
   ],
 
   "require": {
-    "php": ">=8.1",
-    "typo3/cms-core": "~13.4.0",
-    "typo3/cms-install": "~13.4.0",
-    "apache-solr-for-typo3/solr": "^13.0.0"
+    "php": ">=8.3",
+    "typo3/cms-core": "^14",
+    "typo3/cms-install": "^14",
+    "apache-solr-for-typo3/solr": "14.0.0-alpha1"
   },
 
   "require-dev": {
@@ -26,7 +27,7 @@
   },
 
   "suggest": {
-    "typo3/cms-filemetadata": "~13.4.0",
+    "typo3/cms-filemetadata": "^14",
     "hmmh/solr-file-indexer-admin": "~1.0.0",
     "apache-solr-for-typo3/tika": ">=11.0"
   },
