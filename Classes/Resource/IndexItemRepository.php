@@ -182,7 +182,6 @@ class IndexItemRepository
             $queryBuilder->expr()->eq(BaseUtility::getIndexItemLanguageField(), $sysLanguageUid),
             $queryBuilder->expr()->eq('item_type', $queryBuilder->createNamedParameter($type)),
             $queryBuilder->expr()->eq('indexing_configuration', $queryBuilder->createNamedParameter($configurationName)),
-            $queryBuilder->expr()->eq(BaseUtility::getIndexItemEditlockField(), 0)
         ];
 
         return $queryBuilder->select('*')
