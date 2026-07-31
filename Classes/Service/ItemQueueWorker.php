@@ -44,9 +44,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ItemQueueWorker
 {
-    /** @var array  */
-    protected array $items = [];
-
     /** @var SiteFinder */
     protected SiteFinder $siteFinder;
 
@@ -61,7 +58,8 @@ class ItemQueueWorker
         protected MetadataRepository $metadataRepository,
         protected FileCollectionRepository $fileCollectionRepository,
         protected FrontendEnvironment $frontendEnvironment,
-        protected QueueItemRepository $queueItemRepository
+        protected QueueItemRepository $queueItemRepository,
+        protected Queue $queue
     ) {
         $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
     }
@@ -78,25 +76,11 @@ class ItemQueueWorker
 
         foreach ($this->siteFinder->getAllSites() as $site) {
             foreach ($site->getLanguages() as $language) {
-                $collections = $this->loadFilesFromCollections($site, $language, $collectionUids);
+                $collections = $this->getCollections($site, $language, $collectionUids);
                 if (!empty($collections)) {
                     $this->generateItems($site, $language, $collections);
                 }
             }
-        }
-
-        /** @var Queue $queue */
-        $queue = GeneralUtility::makeInstance(Queue::class);
-
-        foreach ($this->items as $item) {
-            $this->indexItemRepository->save($item);
-            $queue->saveItemForRootpage(
-                MetadataRepository::FILE_TABLE,
-                $item['item_uid'],
-                $item['root'],
-                $item['indexing_configuration'],
-                []
-            );
         }
 
         $garbageCollector = GeneralUtility::makeInstance(GarbageCollector::class);
@@ -110,21 +94,15 @@ class ItemQueueWorker
      * @return \TYPO3\CMS\Core\Collection\AbstractRecordCollection[]|null
      * @throws \Doctrine\DBAL\Exception
      */
-    protected function loadFilesFromCollections(Site $site, SiteLanguage $language, ?array $collectionUids = null)
+    protected function getCollections(Site $site, SiteLanguage $language, ?array $collectionUids = null)
     {
-        $collections = $this->fileCollectionRepository->findForSolr($site->getRootPageId(), $language->getLanguageId(), $collectionUids);
-        if (!empty($collections)) {
-            foreach ($collections as $collection) {
-                $collection->loadContents();
-            }
-        }
-        return $collections;
+        return $this->fileCollectionRepository->findForSolr($site->getRootPageId(), $language->getLanguageId(), $collectionUids);
     }
 
     /**
      * @param Site         $site
      * @param SiteLanguage $language
-     * @param array        $collections
+     * @param \TYPO3\CMS\Core\Collection\AbstractRecordCollection[] $collections
      *
      * @return void
      * @throws \Doctrine\DBAL\Exception
@@ -133,22 +111,34 @@ class ItemQueueWorker
     {
         $solrConfiguration = $this->frontendEnvironment->getSolrConfigurationFromPageId($site->getRootPageId(), $language->getLanguageId());
         $indexingConfigurationNames = $solrConfiguration->getIndexQueueConfigurationNamesByTableName(MetadataRepository::FILE_TABLE);
+        $allowedFileTypesMap = [];
 
+        // get the allowedFileTypes for each indexConfigurationName
         foreach ($indexingConfigurationNames as $indexingConfigurationName) {
             $fileInitializer = InitializerFactory::createFileInitializerForRootPage($site->getRootPageId(), $indexingConfigurationName);
-            $allowedFileTypes = $fileInitializer->getArrayOfAllowedFileTypes();
+            $allowedFileTypesMap[$indexingConfigurationName] = $fileInitializer->getArrayOfAllowedFileTypes();
+        }
 
-            foreach ($collections as $collection) {
-                foreach ($collection as $file) {
+        foreach ($collections as $collection) {
+            // load items of the collection being processed
+            $collection->loadContents();
+
+            foreach ($collection as $file) {
+                // reinit metadata and result for every new file
+                $metadata = null;
+                $result = null;
+
+                foreach ($allowedFileTypesMap as $indexingConfigurationName => $allowedFileTypes) {
                     if (!empty($allowedFileTypes) && !in_array($file->getExtension(), $allowedFileTypes)) {
                         continue;
                     }
-                    $metadata = $this->getMetadataFromFile($file);
+                    $metadata ??= $this->getMetadataFromFile($file);
                     if (empty($metadata)) {
-                        continue;
+                        // skip the file processing entirely for all indexingConfigurations
+                        continue 2;
                     }
-                    $result = $this->prepareMetadata($language, $metadata);
-                    $this->items[] = [
+                    $result ??= $this->prepareMetadata($language, $metadata);
+                    $this->saveItem([
                         'root' => $site->getRootPageId(),
                         'item_uid' => $result['uid'],
                         'localized_uid' => $result['localized'],
@@ -156,10 +146,25 @@ class ItemQueueWorker
                         'sys_language_uid' => $language->getLanguageId(),
                         'changed' => $result['changed'],
                         'collection' => $collection->getUid(),
-                    ];
+                    ]);
                 }
             }
         }
+    }
+
+    /**
+     * @param array $item
+     * @return void
+     */
+    protected function saveItem(array $item):void {
+        $this->indexItemRepository->save($item);
+        $this->queue->saveItemForRootpage(
+            MetadataRepository::FILE_TABLE,
+            $item['item_uid'],
+            $item['root'],
+            $item['indexing_configuration'],
+            []
+        );
     }
 
     /**
