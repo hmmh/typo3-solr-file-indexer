@@ -48,13 +48,15 @@ class GarbageCollector implements SingletonInterface
     ) {}
 
     /**
+     * @param array|null $collectionUids
+     *
      * @return void
      * @throws \Doctrine\DBAL\Exception
      * @throws \TYPO3\CMS\Core\Exception\SiteNotFoundException
      */
-    public function removeObsoleteEntriesFromIndexes(): void
+    public function removeObsoleteEntriesFromIndexes(?array $collectionUids): void
     {
-        $obsoleteEntries = $this->indexItemRepository->findLockedEntries();
+        $obsoleteEntries = $this->indexItemRepository->findLockedEntries($collectionUids);
         $connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
         $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
         $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
