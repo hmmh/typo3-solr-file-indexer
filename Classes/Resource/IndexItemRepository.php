@@ -108,17 +108,26 @@ class IndexItemRepository
     }
 
     /**
+     * @param array|null $collectionUids
+     *
      * @return \mixed[][]
      * @throws \Doctrine\DBAL\Exception
      */
-    public function findLockedEntries()
+    public function findLockedEntries(?array $collectionUids)
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
+
+        $constraints = [
+            $queryBuilder->expr()->eq(BaseUtility::getIndexItemEditlockField(), 1)
+        ];
+
+        if (!empty($collectionUids)){
+            $constraints[] = $queryBuilder->expr()->in('collection', $collectionUids);
+        }
+
         return $queryBuilder->select('*')
             ->from(self::FILE_TABLE)
-            ->where(
-                $queryBuilder->expr()->eq(BaseUtility::getIndexItemEditlockField(), 1)
-            )
+            ->where(...$constraints)
             ->executeQuery()
             ->fetchAllAssociative();
     }

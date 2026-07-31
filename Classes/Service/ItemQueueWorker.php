@@ -67,6 +67,8 @@ class ItemQueueWorker
     }
 
     /**
+     * @param array|null $collectionUids
+     *
      * @return void
      * @throws \Doctrine\DBAL\Exception
      */
@@ -98,7 +100,7 @@ class ItemQueueWorker
         }
 
         $garbageCollector = GeneralUtility::makeInstance(GarbageCollector::class);
-        $garbageCollector->removeObsoleteEntriesFromIndexes();
+        $garbageCollector->removeObsoleteEntriesFromIndexes($collectionUids);
     }
 
     /**
