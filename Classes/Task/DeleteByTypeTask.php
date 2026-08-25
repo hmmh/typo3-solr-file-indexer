@@ -26,9 +26,9 @@ namespace HMMH\SolrFileIndexer\Task;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use ApacheSolrForTypo3\Solr\Domain\Index\Queue\QueueInitializationService;
 use ApacheSolrForTypo3\Solr\Domain\Site\Site;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
-use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use HMMH\SolrFileIndexer\Resource\MetadataRepository;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use Symfony\Component\Console\Command\Command;
@@ -160,8 +160,7 @@ class DeleteByTypeTask extends Command
     {
         $solrConfiguration = $this->site->getSolrConfiguration();
         $indexingConfigurationNames = $solrConfiguration->getIndexQueueConfigurationNamesByTableName($type);
-        $queue = GeneralUtility::makeInstance(Queue::class);
-        $queue->getInitializationService()->initializeBySiteAndIndexConfigurations($this->site, $indexingConfigurationNames);
+        GeneralUtility::makeInstance(QueueInitializationService::class)->initializeBySiteAndIndexConfigurations($this->site, $indexingConfigurationNames);
     }
 
     /**
