@@ -53,7 +53,11 @@
 
   "extra": {
     "typo3/cms": {
-      "extension-key": "solr_file_indexer"
+      "extension-key": "solr_file_indexer",
+      "version": "5.0.0-dev",
+      "Package": {
+        "providesPackages": {}
+      }
     }
   },
   "config": {
