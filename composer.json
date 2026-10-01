@@ -19,7 +19,7 @@
     "php": ">=8.3",
     "typo3/cms-core": "^14",
     "typo3/cms-install": "^14",
-    "apache-solr-for-typo3/solr": "14.0.0-alpha1"
+    "apache-solr-for-typo3/solr": "^14.0"
   },
 
   "require-dev": {
