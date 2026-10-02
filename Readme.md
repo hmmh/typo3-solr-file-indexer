@@ -28,6 +28,11 @@ After installation activate the extension within the extension manager.
 * Replace scheduler task for cleanup with a command line task
 * Remove Dashboard Widgest from this Extension (now available in hmmh/solr-file-indexer-admin)
 
+## Changes in v5
+
+* IMPORTANT: Under TYPO3 v14, EXT:solr no longer provides text extraction functionality because it is fully based on Apache Solr v10, where this functionality has been removed.
+* To continue indexing document contents alongside metadata, a Tika server and EXT:tika are required.
+
 ## Configuration
 
 Example:
