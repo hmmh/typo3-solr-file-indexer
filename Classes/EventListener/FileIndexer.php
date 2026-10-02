@@ -132,6 +132,11 @@ final class FileIndexer
 
     protected function getFileContent(FileInterface $file): string
     {
+        // Indexing runs in a frontend sub-request. Depending on where it was triggered (CLI or backend),
+        // the storage evaluates the permissions of a backend user without file access, so reading fails.
+        $storage = $file->getStorage();
+        $evaluatePermissions = $storage->getEvaluatePermissions();
+        $storage->setEvaluatePermissions(false);
         try {
             $service = ServiceFactory::getTika();
             if ($service instanceof SolrService) {
@@ -141,6 +146,8 @@ final class FileIndexer
             $content = $this->cleanupContent($content);
         } catch (NoSolrConnectionFoundException $e) {
             $content = '';
+        } finally {
+            $storage->setEvaluatePermissions($evaluatePermissions);
         }
 
         return $content;
