@@ -4,7 +4,7 @@
   "keywords": ["typo3", "solr", "file", "tika", "apache", "indexer"],
   "type": "typo3-cms-extension",
   "license": "GPL-3.0-or-later",
-  "version": "5.0.0",
+  "version": "5.0.1",
 
   "authors": [
     {
@@ -54,7 +54,7 @@
   "extra": {
     "typo3/cms": {
       "extension-key": "solr_file_indexer",
-      "version": "5.0.0-dev",
+      "version": "5.0.1",
       "Package": {
         "providesPackages": {}
       }
