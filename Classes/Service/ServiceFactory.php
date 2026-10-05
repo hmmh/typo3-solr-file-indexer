@@ -40,7 +40,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class ServiceFactory
 {
     /**
-     * @var SolrService
+     * @var \ApacheSolrForTypo3\Tika\Service\Tika\ServiceInterface|ServiceInterface|null
      */
     protected static $solrService = null;
 
@@ -77,7 +77,7 @@ class ServiceFactory
             throw new UnknownPackageException('Package tika does not exists or is inactive');
         }
 
-        return $this->getSolrService();
+        return $this->getNoExtractionService();
     }
 
     /**
@@ -89,13 +89,11 @@ class ServiceFactory
     }
 
     /**
-     * @param $extensionConfig
-     *
-     * @return SolrService
+     * @return NoExtractionService
      */
-    protected function getSolrService()
+    protected function getNoExtractionService()
     {
-        return GeneralUtility::makeInstance(SolrService::class);
+        return GeneralUtility::makeInstance(NoExtractionService::class);
     }
 
     /**

@@ -2,7 +2,7 @@
 
 This extension gives you the capability to index individual documents using Solr.
 
-Apache Tika, which is capable of detecting and extracting metadata from approx. 1200 different file types is used for document content analysis. The configuration for Tika can be implemented directly within the extension, Solr server functionality is then used for parsing.
+Apache Tika, which is capable of detecting and extracting metadata from approx. 1200 different file types is used for document content analysis via EXT:tika. Without EXT:tika only the file metadata (title, description, keywords, ...) is indexed.
 
 Individual documents can be added to the search index for the default language or any localisation, likewise site roots can be selected for which the document is to indexed.
 
@@ -32,6 +32,7 @@ After installation activate the extension within the extension manager.
 
 * IMPORTANT: Under TYPO3 v14, EXT:solr no longer provides text extraction functionality because it is fully based on Apache Solr v10, where this functionality has been removed.
 * To continue indexing document contents alongside metadata, a Tika server and EXT:tika are required.
+* Without EXT:tika ("useTika" disabled) only the file metadata is indexed, the content field stays empty.
 
 ## Configuration
 
