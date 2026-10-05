@@ -28,7 +28,6 @@
 
   "suggest": {
     "typo3/cms-filemetadata": "^14",
-    "hmmh/solr-file-indexer-admin": "~1.0.0",
     "apache-solr-for-typo3/tika": "^14.0"
   },
 
