@@ -224,6 +224,28 @@ class IndexItemRepository
     }
 
     /**
+     * Finds the index items of a metadata record, either the default record (item_uid) or a translation (localized_uid)
+     *
+     * @param int $metadataUid
+     * @return array
+     */
+    public function findByMetadataUid(int $metadataUid): array
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
+
+        return $queryBuilder->select('*')
+            ->from(self::FILE_TABLE)
+            ->where(
+                $queryBuilder->expr()->or(
+                    $queryBuilder->expr()->eq('item_uid', $metadataUid),
+                    $queryBuilder->expr()->eq('localized_uid', $metadataUid)
+                )
+            )
+            ->executeQuery()
+            ->fetchAllAssociative();
+    }
+
+    /**
      * @param int $itemUid
      * @return void
      */
