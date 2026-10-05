@@ -27,8 +27,8 @@
   },
 
   "suggest": {
-    "typo3/cms-filemetadata": "^14",
-    "apache-solr-for-typo3/tika": "^14.0"
+    "apache-solr-for-typo3/tika": "Version ^14.0: required to index the file content via a Tika server, without it only the metadata is indexed",
+    "typo3/cms-filemetadata": "Version ^14: additional metadata fields (e.g. creator, keywords) that can be indexed"
   },
 
   "autoload": {
