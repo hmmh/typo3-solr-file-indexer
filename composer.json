@@ -1,6 +1,6 @@
 {
   "name": "hmmh/solr-file-indexer",
-  "description": "Solr file indexer for Typo3",
+  "description": "Solr file indexer for TYPO3",
   "keywords": ["typo3", "solr", "file", "tika", "apache", "indexer"],
   "type": "typo3-cms-extension",
   "license": "GPL-3.0-or-later",

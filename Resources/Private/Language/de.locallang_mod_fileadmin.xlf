@@ -8,12 +8,12 @@
 				<target>Dateiverwaltung</target>
 			</trans-unit>
 			<trans-unit id="short_description" xml:space="preserve">
-				<source>Administrate your solr file indexer system</source>
-				<target>Solr File Indexer verwalten</target>
+				<source>Administrate the Solr file indexer</source>
+				<target>Solr file indexer verwalten</target>
 			</trans-unit>
 			<trans-unit id="description" xml:space="preserve">
-				<source>This module allows you to do admin operations for solr file indexer.</source>
-				<target>Dieses Modul bietet Verwaltungsfunktionen für den Solr File Indexer.</target>
+				<source>This module provides administration operations for the Solr file indexer.</source>
+				<target>Dieses Modul bietet Verwaltungsfunktionen für den Solr file indexer.</target>
 			</trans-unit>
 			<trans-unit id="module.title" xml:space="preserve">
 				<source>File indexer items</source>

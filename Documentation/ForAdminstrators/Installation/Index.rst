@@ -60,7 +60,7 @@ Since Solr 10, Solr no longer extracts the content of files itself. Configure EX
 Static Template
 ---------------
 
-To set the base configuration for the index queue, add the static template "Solr file indexing"
+To set the base configuration for the index queue, add the static template "Solr file indexer"
 (EXT:solr_file_indexer/Configuration/TypoScript) or import it in your site package:
 
 .. code-block:: typoscript

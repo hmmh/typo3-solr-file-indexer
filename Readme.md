@@ -1,4 +1,4 @@
-# EXT solr_file_indexer
+# Solr file indexer (EXT:solr_file_indexer)
 
 This extension gives you the capability to index individual documents using Solr.
 
