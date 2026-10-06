@@ -99,6 +99,6 @@ In order to index documents for all (or desired) languages, a file collection ca
 
 ## Scheduler Tasks
 
-There is a command line task "solr_file_indexer:delete-by-type" that can delete files types (i.e. "sys_file_metadata") from the search index. File types are deleted from the Solr server search index for all languages but only for a specified site root.
+There is a command line task "solr_file_indexer:delete-by-type" that can delete files types (i.e. "sys_file_metadata") from the search index. File types are deleted from the Solr server search index for all languages but only for a specified site root (`--root-page`). Use `--reindex` to re-initialize the index queue afterwards, otherwise the documents are only indexed again when the records change.
 
 Also there is the task "solr_file_indexer:item-queue-worker" which is relevant for the indexing process and must integrated as recurring task.
