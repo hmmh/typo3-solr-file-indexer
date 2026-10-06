@@ -69,7 +69,19 @@ class GarbageCollector implements SingletonInterface
                 $itemUid = $entry['item_uid'];
             }
 
-            $this->queueItemRepository->deleteItems([$site], [$entry['indexing_configuration']], [$entry['item_type']], [$entry['item_uid']]);
+            if ($this->indexItemRepository->hasUnlockedItem((int)$entry['item_uid'], (int)$entry['root'], $entry['indexing_configuration'])) {
+                // The file is still indexed, e.g. only the localized metadata record changed (translation added or
+                // removed). The queue item is shared by all languages, so keep it and force re-indexing instead.
+                $this->queueItemRepository->updateItemsChangedTime(
+                    time(),
+                    [],
+                    [$entry['indexing_configuration']],
+                    [$entry['item_type']],
+                    [(int)$entry['item_uid']]
+                );
+            } else {
+                $this->queueItemRepository->deleteItems([$site], [$entry['indexing_configuration']], [$entry['item_type']], [$entry['item_uid']]);
+            }
 
             $solrSite = $siteRepository->getSiteByPageId($entry['root']);
             $solrConfiguration = $solrSite->getSolrConfiguration();
