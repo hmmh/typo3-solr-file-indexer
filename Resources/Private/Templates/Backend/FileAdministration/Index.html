@@ -1,19 +1,32 @@
-<f:layout name="Backend"/>
+<html
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
 
-<f:section name="content">
-  <h1>File indexer administration module</h1>
-  <f:flashMessages />
-  <f:if condition="{count}">
-    <f:then>
-      <p>
-        This will simply empty the file index queue. Currently there are {count} items available.
-      </p>
-      <f:link.action action="clear" class="btn btn-sm btn-default btn-danger t3js-modal-trigger" data="{'title':'Delete items', 'bs-content':'Really delete?', 'severity':'warning'}">
-        Delete items
-      </f:link.action>
-    </f:then>
-    <f:else>
-      <p>There are no items available.</p>
-    </f:else>
-  </f:if>
+<f:layout name="Module" />
+
+<f:section name="Content">
+    <h1><f:translate key="solr_file_indexer.mod_fileadmin:module.title" /></h1>
+    <p class="lead"><f:translate key="solr_file_indexer.mod_fileadmin:module.description" /></p>
+
+    <f:if condition="{count}">
+        <f:then>
+            <p><f:translate key="solr_file_indexer.mod_fileadmin:module.count" arguments="{0: count}" /></p>
+            <p><f:translate key="solr_file_indexer.mod_fileadmin:module.clear.description" /></p>
+            <f:link.action
+                action="clear"
+                class="btn btn-danger t3js-modal-trigger"
+                data-title="{f:translate(key: 'solr_file_indexer.mod_fileadmin:module.clear.confirm.title')}"
+                data-bs-content="{f:translate(key: 'solr_file_indexer.mod_fileadmin:module.clear.confirm.content')}"
+                data-severity="warning"
+            >
+                <f:translate key="solr_file_indexer.mod_fileadmin:module.clear.button" />
+            </f:link.action>
+        </f:then>
+        <f:else>
+            <p><f:translate key="solr_file_indexer.mod_fileadmin:module.empty" /></p>
+        </f:else>
+    </f:if>
 </f:section>
+
+</html>

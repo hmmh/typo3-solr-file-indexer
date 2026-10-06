@@ -1,43 +1,55 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <xliff version="1.0">
-	<file source-language="en" datatype="plaintext" original="messages" date="2016-08-04T16:12:05Z" product-name="solr_file_indexer">
+	<file source-language="en" target-language="de" datatype="plaintext" original="messages" date="2026-10-06T12:00:00Z" product-name="solr_file_indexer">
 		<header/>
 		<body>
 			<trans-unit id="title" xml:space="preserve">
 				<source>File Administration</source>
+				<target>Dateiverwaltung</target>
 			</trans-unit>
 			<trans-unit id="short_description" xml:space="preserve">
 				<source>Administrate your solr file indexer system</source>
+				<target>Solr File Indexer verwalten</target>
 			</trans-unit>
 			<trans-unit id="description" xml:space="preserve">
 				<source>This module allows you to do admin operations for solr file indexer.</source>
+				<target>Dieses Modul bietet Verwaltungsfunktionen für den Solr File Indexer.</target>
 			</trans-unit>
 			<trans-unit id="module.title" xml:space="preserve">
 				<source>File indexer items</source>
+				<target>File-Indexer-Einträge</target>
 			</trans-unit>
 			<trans-unit id="module.description" xml:space="preserve">
 				<source>The file indexer items assign the files of the file collections enabled for Solr to sites, languages and metadata records. They are built by the console command solr_file_indexer:item-queue-worker and are required to index files. The Solr index queue and the Solr index are not changed here.</source>
+				<target>Die File-Indexer-Einträge ordnen die Dateien der für Solr freigegebenen Dateisammlungen den Sites, Sprachen und Metadaten-Datensätzen zu. Sie werden vom Konsolenbefehl solr_file_indexer:item-queue-worker erzeugt und sind zum Indexieren der Dateien nötig. Die Solr-Index-Queue und der Solr-Index werden hier nicht verändert.</target>
 			</trans-unit>
 			<trans-unit id="module.count" xml:space="preserve">
 				<source>Currently there are %d items.</source>
+				<target>Aktuell gibt es %d Einträge.</target>
 			</trans-unit>
 			<trans-unit id="module.empty" xml:space="preserve">
 				<source>There are no items. Run the console command solr_file_indexer:item-queue-worker to build them.</source>
+				<target>Es gibt keine Einträge. Führen Sie den Konsolenbefehl solr_file_indexer:item-queue-worker aus, um sie zu erzeugen.</target>
 			</trans-unit>
 			<trans-unit id="module.clear.description" xml:space="preserve">
 				<source>Deleting the items removes the assignment of all files. Files are not indexed until solr_file_indexer:item-queue-worker has run again and the index queue for sys_file_metadata has been re-initialized.</source>
+				<target>Beim Löschen geht die Zuordnung aller Dateien verloren. Dateien werden erst wieder indexiert, wenn solr_file_indexer:item-queue-worker erneut gelaufen ist und die Index-Queue für sys_file_metadata neu initialisiert wurde.</target>
 			</trans-unit>
 			<trans-unit id="module.clear.button" xml:space="preserve">
 				<source>Delete items</source>
+				<target>Einträge löschen</target>
 			</trans-unit>
 			<trans-unit id="module.clear.confirm.title" xml:space="preserve">
 				<source>Delete file indexer items</source>
+				<target>File-Indexer-Einträge löschen</target>
 			</trans-unit>
 			<trans-unit id="module.clear.confirm.content" xml:space="preserve">
 				<source>Files are not indexed until the items are built again. Really delete all items?</source>
+				<target>Dateien werden erst wieder indexiert, wenn die Einträge neu erzeugt wurden. Wirklich alle Einträge löschen?</target>
 			</trans-unit>
 			<trans-unit id="module.clear.done" xml:space="preserve">
 				<source>File indexer items deleted. Run solr_file_indexer:item-queue-worker and re-initialize the index queue for sys_file_metadata.</source>
+				<target>File-Indexer-Einträge gelöscht. Führen Sie solr_file_indexer:item-queue-worker aus und initialisieren Sie die Index-Queue für sys_file_metadata neu.</target>
 			</trans-unit>
 		</body>
 	</file>
