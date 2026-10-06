@@ -19,3 +19,4 @@ composer.lock
 .Build
 Documentation/_make
 .phpunit.cache/
+var/

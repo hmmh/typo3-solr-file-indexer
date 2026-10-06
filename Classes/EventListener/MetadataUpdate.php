@@ -36,8 +36,6 @@ use HMMH\SolrFileIndexer\IndexQueue\Queue;
 use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
 use ApacheSolrForTypo3\Solr\System\Configuration\ExtensionConfiguration;
 use HMMH\SolrFileIndexer\Resource\MetadataRepository;
-use HMMH\SolrFileIndexer\Utility\BaseUtility;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 
 /**
@@ -53,7 +51,8 @@ final class MetadataUpdate
         private readonly IndexItemRepository $indexItemRepository,
         private readonly Queue $queue,
         private readonly QueueItemRepository $queueItemRepository,
-        private readonly ExtensionConfiguration $extensionConfiguration
+        private readonly ExtensionConfiguration $extensionConfiguration,
+        private readonly MetadataRepository $metadataRepository
     ) {}
 
     #[AsEventListener(
@@ -130,8 +129,7 @@ final class MetadataUpdate
     private function getMetadataUids(int $uid): array
     {
         $uids = [$uid];
-        $record = BackendUtility::getRecord(MetadataRepository::FILE_TABLE, $uid, BaseUtility::getMetadataLanguageParentField());
-        $parentUid = (int)($record[BaseUtility::getMetadataLanguageParentField()] ?? 0);
+        $parentUid = $this->metadataRepository->findLanguageParentUid($uid);
         if ($parentUid > 0) {
             $uids[] = $parentUid;
         }
