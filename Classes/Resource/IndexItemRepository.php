@@ -224,6 +224,52 @@ class IndexItemRepository
     }
 
     /**
+     * Checks whether a file still has an index item that was not locked by the current item queue worker run
+     *
+     * @param int $itemUid
+     * @param int $rootPage
+     * @param string $indexingConfigurationName
+     * @return bool
+     */
+    public function hasUnlockedItem(int $itemUid, int $rootPage, string $indexingConfigurationName): bool
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
+
+        return (bool)$queryBuilder->count('uid')
+            ->from(self::FILE_TABLE)
+            ->where(
+                $queryBuilder->expr()->eq('item_uid', $itemUid),
+                $queryBuilder->expr()->eq('root', $rootPage),
+                $queryBuilder->expr()->eq('indexing_configuration', $queryBuilder->createNamedParameter($indexingConfigurationName)),
+                $queryBuilder->expr()->eq(BaseUtility::getIndexItemEditlockField(), 0)
+            )
+            ->executeQuery()
+            ->fetchOne();
+    }
+
+    /**
+     * Finds the index items of a metadata record, either the default record (item_uid) or a translation (localized_uid)
+     *
+     * @param int $metadataUid
+     * @return array
+     */
+    public function findByMetadataUid(int $metadataUid): array
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::FILE_TABLE);
+
+        return $queryBuilder->select('*')
+            ->from(self::FILE_TABLE)
+            ->where(
+                $queryBuilder->expr()->or(
+                    $queryBuilder->expr()->eq('item_uid', $metadataUid),
+                    $queryBuilder->expr()->eq('localized_uid', $metadataUid)
+                )
+            )
+            ->executeQuery()
+            ->fetchAllAssociative();
+    }
+
+    /**
      * @param int $itemUid
      * @return void
      */

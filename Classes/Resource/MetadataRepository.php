@@ -28,6 +28,7 @@ namespace HMMH\SolrFileIndexer\Resource;
  ***************************************************************/
 
 use HMMH\SolrFileIndexer\Utility\BaseUtility;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -56,5 +57,19 @@ class MetadataRepository
             ->where(...$constraints)
             ->executeQuery()
             ->fetchAssociative();
+    }
+
+    /**
+     * Returns the uid of the default language record of a translated metadata record, 0 for default language records
+     *
+     * @param int $uid
+     * @return int
+     */
+    public function findLanguageParentUid(int $uid): int
+    {
+        $parentField = BaseUtility::getMetadataLanguageParentField();
+        $record = BackendUtility::getRecord(self::FILE_TABLE, $uid, $parentField);
+
+        return (int)($record[$parentField] ?? 0);
     }
 }
