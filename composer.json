@@ -1,6 +1,6 @@
 {
   "name": "hmmh/solr-file-indexer",
-  "description": "Solr file indexer for Typo3",
+  "description": "Solr file indexer for TYPO3",
   "keywords": ["typo3", "solr", "file", "tika", "apache", "indexer"],
   "type": "typo3-cms-extension",
   "license": "GPL-3.0-or-later",
@@ -27,9 +27,8 @@
   },
 
   "suggest": {
-    "typo3/cms-filemetadata": "^14",
-    "hmmh/solr-file-indexer-admin": "~1.0.0",
-    "apache-solr-for-typo3/tika": "^14.0"
+    "apache-solr-for-typo3/tika": "Version ^14.0: required to index the file content via a Tika server, without it only the metadata is indexed",
+    "typo3/cms-filemetadata": "Version ^14: additional metadata fields (e.g. creator, keywords) that can be indexed"
   },
 
   "autoload": {

@@ -1,4 +1,4 @@
-# cat=general//10; type=boolean; label=Use Tika Extension (tika)
+# cat=general//10; type=boolean; label=Extract file content with EXT:tika (otherwise only the metadata is indexed)
 useTika = 0
 
 # cat=general//20; type=string; label=Local path prefix for indexed Documents

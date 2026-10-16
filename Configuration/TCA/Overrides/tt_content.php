@@ -7,4 +7,4 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 /**
  * TypoScript
  */
-ExtensionManagementUtility::addStaticFile('solr_file_indexer', 'Configuration/TypoScript', 'Solr file indexing');
+ExtensionManagementUtility::addStaticFile('solr_file_indexer', 'Configuration/TypoScript', 'Solr file indexer');

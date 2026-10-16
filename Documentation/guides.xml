@@ -1,0 +1,18 @@
+<guides xmlns="https://www.phpdoc.org/guides" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://www.phpdoc.org/guides ../vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd"
+        links-are-relative="true"
+>
+    <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
+               project-home="https://extensions.typo3.org/extension/solr_file_indexer"
+               project-repository="https://github.com/hmmh/typo3-solr-file-indexer"
+               project-issues="https://github.com/hmmh/typo3-solr-file-indexer/issues"
+               edit-on-github-branch="master"
+               edit-on-github="hmmh/typo3-solr-file-indexer"
+               typo3-core-preferred="14.3"
+               interlink-shortcode="hmmh/solr-file-indexer"
+    />
+    <project title="Solr file indexer"
+             version="local"
+             copyright="since 2018 by hmmh"
+    />
+</guides>

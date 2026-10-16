@@ -31,6 +31,7 @@ use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Backend\Attribute\Controller;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 #[Controller]
 class FileAdministrationController extends ActionController
@@ -62,7 +63,9 @@ class FileAdministrationController extends ActionController
     public function clearAction(): ResponseInterface
     {
         $this->indexItemRepository->truncate();
-        $this->addFlashMessage('File index items removed.');
+        $this->addFlashMessage(
+            (string)LocalizationUtility::translate('module.clear.done', 'solr_file_indexer.mod_fileadmin')
+        );
         return $this->redirect('index');
     }
 }

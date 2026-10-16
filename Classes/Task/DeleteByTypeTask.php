@@ -110,32 +110,37 @@ class DeleteByTypeTask extends Command
         $this->connectionAdapter = GeneralUtility::makeInstance(ConnectionAdapter::class);
 
         $this->siteRootPageId = (int)$input->getOption('root-page');
-        $this->type = (string)$input->getOption('type');
-        $this->reindexing = (bool)$input->getOption('reindex');
+        $this->type = trim((string)$input->getOption('type'));
+        // "--reindex" without a value enables re-indexing, "--reindex=0|1" is still supported
+        $reindexOption = $input->getOption('reindex');
+        $this->reindexing = $reindexOption === null || (bool)filter_var($reindexOption, FILTER_VALIDATE_BOOLEAN);
 
-        $this->setSite($this->siteRootPageId);
+        if ($this->siteRootPageId <= 0) {
+            $output->writeln('<error>Please specify the root page of the site with --root-page</error>');
+            return Command::FAILURE;
+        }
 
         try {
+            $this->setSite($this->siteRootPageId);
             $this->deleteByType($this->type);
-            if ((bool)$this->reindexing === true) {
+            if ($this->reindexing) {
                 $this->reindexByType($this->type);
             }
         } catch (\Exception $e) {
-            // do nothing
+            $output->writeln('<error>' . $e->getMessage() . '</error>');
+            return Command::FAILURE;
+        }
+
+        $output->writeln(sprintf('Deleted documents of type "%s" for site "%s"', $this->type, $this->site->getLabel()));
+        if ($this->reindexing) {
+            $output->writeln('Index queue re-initialized, the documents are indexed with the next index queue worker run');
+        } else {
+            $output->writeln('<comment>No re-indexing: the documents are only indexed again when the records change, use --reindex to re-initialize the index queue</comment>');
         }
 
         return Command::SUCCESS;
     }
 
-    /**
-     * This method returns the destination mail address as additional information
-     *
-     * @return string Information to display
-     */
-    public function getAdditionalInformation()
-    {
-        return 'Site Root Page ID: ' . $this->siteRootPageId . ', Reindexing: ' . ($this->reindexing ? 'Yes' : 'No');
-    }
 
     /**
      * @param string $type
@@ -146,8 +151,11 @@ class DeleteByTypeTask extends Command
     protected function deleteByType($type)
     {
         $solrConnections = $this->connectionAdapter->getConnectionsBySite($this->site);
+        // Only delete the documents of this site, cores can be shared by several sites
+        $query = 'type:' . $type . ' AND siteHash:"' . $this->site->getSiteHash() . '"';
         foreach ($solrConnections as $solrConnection) {
-            $this->connectionAdapter->deleteByType($solrConnection, trim($type), true);
+            $this->connectionAdapter->deleteByQuery($solrConnection, $query);
+            $this->connectionAdapter->commit($solrConnection, false, false);
         }
     }
 

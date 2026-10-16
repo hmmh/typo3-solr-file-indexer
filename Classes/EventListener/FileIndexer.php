@@ -13,7 +13,6 @@ use HMMH\SolrFileIndexer\Event\ModifyContentEvent;
 use HMMH\SolrFileIndexer\Resource\IndexItemRepository;
 use HMMH\SolrFileIndexer\Service\ConnectionAdapter;
 use HMMH\SolrFileIndexer\Service\ServiceFactory;
-use HMMH\SolrFileIndexer\Service\SolrService;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
@@ -24,8 +23,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 final class FileIndexer
 {
     protected array $fileCache = [];
-
-    protected ?SolrConnection $currentlyUsedSolrConnection;
 
     public function __construct(private EventDispatcherInterface $eventDispatcher)
     {}
@@ -54,7 +51,6 @@ final class FileIndexer
         }
 
         if (isset($solrConnections[$languageUid]) && $solrConnections[$languageUid] instanceof SolrConnection) {
-            $this->currentlyUsedSolrConnection = $solrConnections[$languageUid];
             $indexableFile = $this->getIndexableFile($item, $languageUid);
             if ($indexableFile !== null) {
                 $content = $this->getFileContent($indexableFile);
@@ -139,9 +135,6 @@ final class FileIndexer
         $storage->setEvaluatePermissions(false);
         try {
             $service = ServiceFactory::getTika();
-            if ($service instanceof SolrService) {
-                $service->setSolrConnection($this->currentlyUsedSolrConnection);
-            }
             $content = $service->extractText($file);
             $content = $this->cleanupContent($content);
         } catch (NoSolrConnectionFoundException $e) {
